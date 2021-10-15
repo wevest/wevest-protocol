@@ -25,6 +25,30 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20__factory>;
     getContractFactory(
+      name: "IChainlinkAggregator",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IChainlinkAggregator__factory>;
+    getContractFactory(
+      name: "ICreditDelegationToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ICreditDelegationToken__factory>;
+    getContractFactory(
+      name: "IDelegationToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IDelegationToken__factory>;
+    getContractFactory(
+      name: "IERC20Detailed",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC20Detailed__factory>;
+    getContractFactory(
+      name: "IERC20WithPermit",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC20WithPermit__factory>;
+    getContractFactory(
+      name: "IInitializableWvLPToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IInitializableWvLPToken__factory>;
+    getContractFactory(
       name: "ILendingPool",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ILendingPool__factory>;
@@ -33,6 +57,18 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ILendingPoolAddressesProvider__factory>;
     getContractFactory(
+      name: "ILendingPoolCollateralManager",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ILendingPoolCollateralManager__factory>;
+    getContractFactory(
+      name: "ILendingPoolConfigurator",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ILendingPoolConfigurator__factory>;
+    getContractFactory(
+      name: "IPriceOracle",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPriceOracle__factory>;
+    getContractFactory(
       name: "IScaledBalanceToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IScaledBalanceToken__factory>;
@@ -40,6 +76,38 @@ declare module "hardhat/types/runtime" {
       name: "IWevestIncentivesController",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IWevestIncentivesController__factory>;
+    getContractFactory(
+      name: "IWvLPToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IWvLPToken__factory>;
+    getContractFactory(
+      name: "IWvToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IWvToken__factory>;
+    getContractFactory(
+      name: "Errors",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Errors__factory>;
+    getContractFactory(
+      name: "DebtTokenBase",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.DebtTokenBase__factory>;
+    getContractFactory(
+      name: "DelegationAwareWvLPToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.DelegationAwareWvLPToken__factory>;
+    getContractFactory(
+      name: "IncentivizedERC20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IncentivizedERC20__factory>;
+    getContractFactory(
+      name: "WvLPToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.WvLPToken__factory>;
+    getContractFactory(
+      name: "WvToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.WvToken__factory>;
     getContractFactory(
       name: "TestToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -61,6 +129,36 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20>;
     getContractAt(
+      name: "IChainlinkAggregator",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IChainlinkAggregator>;
+    getContractAt(
+      name: "ICreditDelegationToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ICreditDelegationToken>;
+    getContractAt(
+      name: "IDelegationToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IDelegationToken>;
+    getContractAt(
+      name: "IERC20Detailed",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC20Detailed>;
+    getContractAt(
+      name: "IERC20WithPermit",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC20WithPermit>;
+    getContractAt(
+      name: "IInitializableWvLPToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IInitializableWvLPToken>;
+    getContractAt(
       name: "ILendingPool",
       address: string,
       signer?: ethers.Signer
@@ -71,6 +169,21 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ILendingPoolAddressesProvider>;
     getContractAt(
+      name: "ILendingPoolCollateralManager",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ILendingPoolCollateralManager>;
+    getContractAt(
+      name: "ILendingPoolConfigurator",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ILendingPoolConfigurator>;
+    getContractAt(
+      name: "IPriceOracle",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPriceOracle>;
+    getContractAt(
       name: "IScaledBalanceToken",
       address: string,
       signer?: ethers.Signer
@@ -80,6 +193,46 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IWevestIncentivesController>;
+    getContractAt(
+      name: "IWvLPToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IWvLPToken>;
+    getContractAt(
+      name: "IWvToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IWvToken>;
+    getContractAt(
+      name: "Errors",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Errors>;
+    getContractAt(
+      name: "DebtTokenBase",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.DebtTokenBase>;
+    getContractAt(
+      name: "DelegationAwareWvLPToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.DelegationAwareWvLPToken>;
+    getContractAt(
+      name: "IncentivizedERC20",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IncentivizedERC20>;
+    getContractAt(
+      name: "WvLPToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.WvLPToken>;
+    getContractAt(
+      name: "WvToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.WvToken>;
     getContractAt(
       name: "TestToken",
       address: string,
