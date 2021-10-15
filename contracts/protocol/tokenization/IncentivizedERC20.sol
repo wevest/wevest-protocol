@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Detailed} from '../../interfaces/IERC20Detailed.sol';
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import {IWevestIncentivesController} from '../../interfaces/IWevestIncentivesController.sol';
 
 /**

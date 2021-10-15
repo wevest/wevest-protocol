@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.6.12;
 
 import {DebtTokenBase} from './base/DebtTokenBase.sol';
 import {MathUtils} from '../libraries/math/MathUtils.sol';
@@ -77,7 +77,7 @@ contract WvToken is IWvToken, DebtTokenBase {
    * @dev Returns the average stable rate across all the stable rate debt
    * @return the average stable rate
    **/
-  function getAverageStableRate() external view virtual override returns (uint256) {
+  function getAverageStableRate() external view virtual returns (uint256) {
     return _avgStableRate;
   }
 
@@ -94,7 +94,7 @@ contract WvToken is IWvToken, DebtTokenBase {
    * @param user The address of the user
    * @return The stable rate of user
    **/
-  function getUserStableRate(address user) external view virtual override returns (uint256) {
+  function getUserStableRate(address user) external view virtual returns (uint256) {
     return _usersStableRate[user];
   }
 
@@ -148,7 +148,7 @@ contract WvToken is IWvToken, DebtTokenBase {
 
     vars.previousSupply = totalSupply();
     vars.currentAvgStableRate = _avgStableRate;
-    vars.nextSupply = _totalSupply = vars.previousSupply.add(amount);
+    vars.nextSupply = _totalSupply = vars.previousSupply + amount;
 
     vars.amountInRay = amount.wadToRay();
 
@@ -306,7 +306,7 @@ contract WvToken is IWvToken, DebtTokenBase {
   /**
    * @dev Returns the the total supply and the average stable rate
    **/
-  function getTotalSupplyAndAvgRate() public view override returns (uint256, uint256) {
+  function getTotalSupplyAndAvgRate() public view returns (uint256, uint256) {
     uint256 avgRate = _avgStableRate;
     return (_calcTotalSupply(avgRate), avgRate);
   }

@@ -2,7 +2,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {ILendingPool} from '../../interfaces/ILendingPool.sol';
 import {IWvLPToken} from '../../interfaces/IWvLPToken.sol';
 import {WadRayMath} from '../libraries/math/WadRayMath.sol';
@@ -354,7 +354,8 @@ contract WvLPToken is
         )
       );
     require(owner == ecrecover(digest, v, r, s), 'INVALID_SIGNATURE');
-    _nonces[owner] = currentValidNonce.add(1);
+    // _nonces[owner] = currentValidNonce.add(1);
+    _nonces[owner] = currentValidNonce + 1;
     _approve(owner, spender, value);
   }
 
