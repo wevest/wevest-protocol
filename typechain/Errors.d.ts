@@ -36,14 +36,14 @@ interface ErrorsInterface extends ethers.utils.Interface {
     "LPCM_SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER()": FunctionFragment;
     "LPC_CALLER_NOT_EMERGENCY_ADMIN()": FunctionFragment;
     "LPC_INVALID_ADDRESSES_PROVIDER_ID()": FunctionFragment;
-    "LPC_INVALID_ATOKEN_POOL_ADDRESS()": FunctionFragment;
     "LPC_INVALID_CONFIGURATION()": FunctionFragment;
     "LPC_INVALID_STABLE_DEBT_TOKEN_POOL_ADDRESS()": FunctionFragment;
     "LPC_INVALID_STABLE_DEBT_TOKEN_UNDERLYING_ADDRESS()": FunctionFragment;
     "LPC_INVALID_VARIABLE_DEBT_TOKEN_POOL_ADDRESS()": FunctionFragment;
     "LPC_INVALID_VARIABLE_DEBT_TOKEN_UNDERLYING_ADDRESS()": FunctionFragment;
+    "LPC_INVALID_WVLPTOKEN_POOL_ADDRESS()": FunctionFragment;
     "LPC_RESERVE_LIQUIDITY_NOT_0()": FunctionFragment;
-    "LP_CALLER_MUST_BE_AN_ATOKEN()": FunctionFragment;
+    "LP_CALLER_MUST_BE_AN_WVLPTOKEN()": FunctionFragment;
     "LP_CALLER_NOT_LENDING_POOL_CONFIGURATOR()": FunctionFragment;
     "LP_FAILED_COLLATERAL_SWAP()": FunctionFragment;
     "LP_FAILED_REPAY_WITH_COLLATERAL()": FunctionFragment;
@@ -167,10 +167,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "LPC_INVALID_ATOKEN_POOL_ADDRESS",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "LPC_INVALID_CONFIGURATION",
     values?: undefined
   ): string;
@@ -191,11 +187,15 @@ interface ErrorsInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "LPC_INVALID_WVLPTOKEN_POOL_ADDRESS",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "LPC_RESERVE_LIQUIDITY_NOT_0",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "LP_CALLER_MUST_BE_AN_ATOKEN",
+    functionFragment: "LP_CALLER_MUST_BE_AN_WVLPTOKEN",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -488,10 +488,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "LPC_INVALID_ATOKEN_POOL_ADDRESS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "LPC_INVALID_CONFIGURATION",
     data: BytesLike
   ): Result;
@@ -512,11 +508,15 @@ interface ErrorsInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "LPC_INVALID_WVLPTOKEN_POOL_ADDRESS",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "LPC_RESERVE_LIQUIDITY_NOT_0",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "LP_CALLER_MUST_BE_AN_ATOKEN",
+    functionFragment: "LP_CALLER_MUST_BE_AN_WVLPTOKEN",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -841,10 +841,6 @@ export class Errors extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    LPC_INVALID_ATOKEN_POOL_ADDRESS(
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     LPC_INVALID_CONFIGURATION(overrides?: CallOverrides): Promise<[string]>;
 
     LPC_INVALID_STABLE_DEBT_TOKEN_POOL_ADDRESS(
@@ -863,9 +859,15 @@ export class Errors extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    LPC_INVALID_WVLPTOKEN_POOL_ADDRESS(
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     LPC_RESERVE_LIQUIDITY_NOT_0(overrides?: CallOverrides): Promise<[string]>;
 
-    LP_CALLER_MUST_BE_AN_ATOKEN(overrides?: CallOverrides): Promise<[string]>;
+    LP_CALLER_MUST_BE_AN_WVLPTOKEN(
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     LP_CALLER_NOT_LENDING_POOL_CONFIGURATOR(
       overrides?: CallOverrides
@@ -1076,8 +1078,6 @@ export class Errors extends BaseContract {
 
   LPC_INVALID_ADDRESSES_PROVIDER_ID(overrides?: CallOverrides): Promise<string>;
 
-  LPC_INVALID_ATOKEN_POOL_ADDRESS(overrides?: CallOverrides): Promise<string>;
-
   LPC_INVALID_CONFIGURATION(overrides?: CallOverrides): Promise<string>;
 
   LPC_INVALID_STABLE_DEBT_TOKEN_POOL_ADDRESS(
@@ -1096,9 +1096,13 @@ export class Errors extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  LPC_INVALID_WVLPTOKEN_POOL_ADDRESS(
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   LPC_RESERVE_LIQUIDITY_NOT_0(overrides?: CallOverrides): Promise<string>;
 
-  LP_CALLER_MUST_BE_AN_ATOKEN(overrides?: CallOverrides): Promise<string>;
+  LP_CALLER_MUST_BE_AN_WVLPTOKEN(overrides?: CallOverrides): Promise<string>;
 
   LP_CALLER_NOT_LENDING_POOL_CONFIGURATOR(
     overrides?: CallOverrides
@@ -1289,8 +1293,6 @@ export class Errors extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    LPC_INVALID_ATOKEN_POOL_ADDRESS(overrides?: CallOverrides): Promise<string>;
-
     LPC_INVALID_CONFIGURATION(overrides?: CallOverrides): Promise<string>;
 
     LPC_INVALID_STABLE_DEBT_TOKEN_POOL_ADDRESS(
@@ -1309,9 +1311,13 @@ export class Errors extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    LPC_INVALID_WVLPTOKEN_POOL_ADDRESS(
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     LPC_RESERVE_LIQUIDITY_NOT_0(overrides?: CallOverrides): Promise<string>;
 
-    LP_CALLER_MUST_BE_AN_ATOKEN(overrides?: CallOverrides): Promise<string>;
+    LP_CALLER_MUST_BE_AN_WVLPTOKEN(overrides?: CallOverrides): Promise<string>;
 
     LP_CALLER_NOT_LENDING_POOL_CONFIGURATOR(
       overrides?: CallOverrides
@@ -1523,10 +1529,6 @@ export class Errors extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    LPC_INVALID_ATOKEN_POOL_ADDRESS(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     LPC_INVALID_CONFIGURATION(overrides?: CallOverrides): Promise<BigNumber>;
 
     LPC_INVALID_STABLE_DEBT_TOKEN_POOL_ADDRESS(
@@ -1545,9 +1547,15 @@ export class Errors extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    LPC_INVALID_WVLPTOKEN_POOL_ADDRESS(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     LPC_RESERVE_LIQUIDITY_NOT_0(overrides?: CallOverrides): Promise<BigNumber>;
 
-    LP_CALLER_MUST_BE_AN_ATOKEN(overrides?: CallOverrides): Promise<BigNumber>;
+    LP_CALLER_MUST_BE_AN_WVLPTOKEN(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     LP_CALLER_NOT_LENDING_POOL_CONFIGURATOR(
       overrides?: CallOverrides
@@ -1781,10 +1789,6 @@ export class Errors extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    LPC_INVALID_ATOKEN_POOL_ADDRESS(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     LPC_INVALID_CONFIGURATION(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1805,11 +1809,15 @@ export class Errors extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    LPC_INVALID_WVLPTOKEN_POOL_ADDRESS(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     LPC_RESERVE_LIQUIDITY_NOT_0(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    LP_CALLER_MUST_BE_AN_ATOKEN(
+    LP_CALLER_MUST_BE_AN_WVLPTOKEN(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

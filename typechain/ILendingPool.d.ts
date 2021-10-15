@@ -260,7 +260,7 @@ export type LiquidationCallEvent = TypedEvent<
     debtToCover: BigNumber;
     liquidatedCollateralAmount: BigNumber;
     liquidator: string;
-    receiveAToken: boolean;
+    receiveWvLPToken: boolean;
   }
 >;
 
@@ -421,7 +421,7 @@ export class ILendingPool extends BaseContract {
           currentVariableBorrowRate: BigNumber;
           currentStableBorrowRate: BigNumber;
           lastUpdateTimestamp: number;
-          aTokenAddress: string;
+          wvLPTokenAddress: string;
           stableDebtTokenAddress: string;
           variableDebtTokenAddress: string;
           interestRateStrategyAddress: string;
@@ -463,7 +463,7 @@ export class ILendingPool extends BaseContract {
 
     initReserve(
       reserve: string,
-      aTokenAddress: string,
+      wvLPTokenAddress: string,
       stableDebtAddress: string,
       variableDebtAddress: string,
       interestRateStrategyAddress: string,
@@ -475,7 +475,7 @@ export class ILendingPool extends BaseContract {
       debtAsset: string,
       user: string,
       debtToCover: BigNumberish,
-      receiveAToken: boolean,
+      receiveWvLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -591,7 +591,7 @@ export class ILendingPool extends BaseContract {
       currentVariableBorrowRate: BigNumber;
       currentStableBorrowRate: BigNumber;
       lastUpdateTimestamp: number;
-      aTokenAddress: string;
+      wvLPTokenAddress: string;
       stableDebtTokenAddress: string;
       variableDebtTokenAddress: string;
       interestRateStrategyAddress: string;
@@ -632,7 +632,7 @@ export class ILendingPool extends BaseContract {
 
   initReserve(
     reserve: string,
-    aTokenAddress: string,
+    wvLPTokenAddress: string,
     stableDebtAddress: string,
     variableDebtAddress: string,
     interestRateStrategyAddress: string,
@@ -644,7 +644,7 @@ export class ILendingPool extends BaseContract {
     debtAsset: string,
     user: string,
     debtToCover: BigNumberish,
-    receiveAToken: boolean,
+    receiveWvLPToken: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -760,7 +760,7 @@ export class ILendingPool extends BaseContract {
         currentVariableBorrowRate: BigNumber;
         currentStableBorrowRate: BigNumber;
         lastUpdateTimestamp: number;
-        aTokenAddress: string;
+        wvLPTokenAddress: string;
         stableDebtTokenAddress: string;
         variableDebtTokenAddress: string;
         interestRateStrategyAddress: string;
@@ -801,7 +801,7 @@ export class ILendingPool extends BaseContract {
 
     initReserve(
       reserve: string,
-      aTokenAddress: string,
+      wvLPTokenAddress: string,
       stableDebtAddress: string,
       variableDebtAddress: string,
       interestRateStrategyAddress: string,
@@ -813,7 +813,7 @@ export class ILendingPool extends BaseContract {
       debtAsset: string,
       user: string,
       debtToCover: BigNumberish,
-      receiveAToken: boolean,
+      receiveWvLPToken: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -933,7 +933,7 @@ export class ILendingPool extends BaseContract {
       debtToCover?: null,
       liquidatedCollateralAmount?: null,
       liquidator?: null,
-      receiveAToken?: null
+      receiveWvLPToken?: null
     ): TypedEventFilter<
       [string, string, string, BigNumber, BigNumber, string, boolean],
       {
@@ -943,7 +943,7 @@ export class ILendingPool extends BaseContract {
         debtToCover: BigNumber;
         liquidatedCollateralAmount: BigNumber;
         liquidator: string;
-        receiveAToken: boolean;
+        receiveWvLPToken: boolean;
       }
     >;
 
@@ -954,7 +954,7 @@ export class ILendingPool extends BaseContract {
       debtToCover?: null,
       liquidatedCollateralAmount?: null,
       liquidator?: null,
-      receiveAToken?: null
+      receiveWvLPToken?: null
     ): TypedEventFilter<
       [string, string, string, BigNumber, BigNumber, string, boolean],
       {
@@ -964,7 +964,7 @@ export class ILendingPool extends BaseContract {
         debtToCover: BigNumber;
         liquidatedCollateralAmount: BigNumber;
         liquidator: string;
-        receiveAToken: boolean;
+        receiveWvLPToken: boolean;
       }
     >;
 
@@ -1167,7 +1167,7 @@ export class ILendingPool extends BaseContract {
 
     initReserve(
       reserve: string,
-      aTokenAddress: string,
+      wvLPTokenAddress: string,
       stableDebtAddress: string,
       variableDebtAddress: string,
       interestRateStrategyAddress: string,
@@ -1179,7 +1179,7 @@ export class ILendingPool extends BaseContract {
       debtAsset: string,
       user: string,
       debtToCover: BigNumberish,
-      receiveAToken: boolean,
+      receiveWvLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1302,7 +1302,7 @@ export class ILendingPool extends BaseContract {
 
     initReserve(
       reserve: string,
-      aTokenAddress: string,
+      wvLPTokenAddress: string,
       stableDebtAddress: string,
       variableDebtAddress: string,
       interestRateStrategyAddress: string,
@@ -1314,7 +1314,7 @@ export class ILendingPool extends BaseContract {
       debtAsset: string,
       user: string,
       debtToCover: BigNumberish,
-      receiveAToken: boolean,
+      receiveWvLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -21,13 +21,13 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface DelegationAwareWvLPTokenInterface extends ethers.utils.Interface {
   functions: {
-    "ATOKEN_REVISION()": FunctionFragment;
     "DOMAIN_SEPARATOR()": FunctionFragment;
     "EIP712_REVISION()": FunctionFragment;
     "PERMIT_TYPEHASH()": FunctionFragment;
     "POOL()": FunctionFragment;
     "RESERVE_TREASURY_ADDRESS()": FunctionFragment;
     "UNDERLYING_ASSET_ADDRESS()": FunctionFragment;
+    "WVLPTOKEN_REVISION()": FunctionFragment;
     "_nonces(address)": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
@@ -56,10 +56,6 @@ interface DelegationAwareWvLPTokenInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(
-    functionFragment: "ATOKEN_REVISION",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "DOMAIN_SEPARATOR",
     values?: undefined
   ): string;
@@ -78,6 +74,10 @@ interface DelegationAwareWvLPTokenInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "UNDERLYING_ASSET_ADDRESS",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "WVLPTOKEN_REVISION",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "_nonces", values: [string]): string;
@@ -184,10 +184,6 @@ interface DelegationAwareWvLPTokenInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "ATOKEN_REVISION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "DOMAIN_SEPARATOR",
     data: BytesLike
   ): Result;
@@ -206,6 +202,10 @@ interface DelegationAwareWvLPTokenInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "UNDERLYING_ASSET_ADDRESS",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "WVLPTOKEN_REVISION",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "_nonces", data: BytesLike): Result;
@@ -385,8 +385,6 @@ export class DelegationAwareWvLPToken extends BaseContract {
   interface: DelegationAwareWvLPTokenInterface;
 
   functions: {
-    ATOKEN_REVISION(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
 
     EIP712_REVISION(overrides?: CallOverrides): Promise<[string]>;
@@ -398,6 +396,8 @@ export class DelegationAwareWvLPToken extends BaseContract {
     RESERVE_TREASURY_ADDRESS(overrides?: CallOverrides): Promise<[string]>;
 
     UNDERLYING_ASSET_ADDRESS(overrides?: CallOverrides): Promise<[string]>;
+
+    WVLPTOKEN_REVISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     _nonces(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -531,8 +531,6 @@ export class DelegationAwareWvLPToken extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  ATOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
-
   DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
   EIP712_REVISION(overrides?: CallOverrides): Promise<string>;
@@ -544,6 +542,8 @@ export class DelegationAwareWvLPToken extends BaseContract {
   RESERVE_TREASURY_ADDRESS(overrides?: CallOverrides): Promise<string>;
 
   UNDERLYING_ASSET_ADDRESS(overrides?: CallOverrides): Promise<string>;
+
+  WVLPTOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
   _nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -674,8 +674,6 @@ export class DelegationAwareWvLPToken extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    ATOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
-
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
     EIP712_REVISION(overrides?: CallOverrides): Promise<string>;
@@ -687,6 +685,8 @@ export class DelegationAwareWvLPToken extends BaseContract {
     RESERVE_TREASURY_ADDRESS(overrides?: CallOverrides): Promise<string>;
 
     UNDERLYING_ASSET_ADDRESS(overrides?: CallOverrides): Promise<string>;
+
+    WVLPTOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     _nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -963,8 +963,6 @@ export class DelegationAwareWvLPToken extends BaseContract {
   };
 
   estimateGas: {
-    ATOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
-
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
 
     EIP712_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -976,6 +974,8 @@ export class DelegationAwareWvLPToken extends BaseContract {
     RESERVE_TREASURY_ADDRESS(overrides?: CallOverrides): Promise<BigNumber>;
 
     UNDERLYING_ASSET_ADDRESS(overrides?: CallOverrides): Promise<BigNumber>;
+
+    WVLPTOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     _nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1110,8 +1110,6 @@ export class DelegationAwareWvLPToken extends BaseContract {
   };
 
   populateTransaction: {
-    ATOKEN_REVISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     EIP712_REVISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1125,6 +1123,10 @@ export class DelegationAwareWvLPToken extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     UNDERLYING_ASSET_ADDRESS(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    WVLPTOKEN_REVISION(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

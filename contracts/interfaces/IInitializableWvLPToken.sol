@@ -7,7 +7,6 @@ import {IWevestIncentivesController} from './IWevestIncentivesController.sol';
 /**
  * @title IInitializableWvLPToken
  * @notice Interface for the initialize function on WvLPToken
- * @author Aave
  **/
 interface IInitializableWvLPToken {
   /**
@@ -35,8 +34,8 @@ interface IInitializableWvLPToken {
   /**
    * @dev Initializes the wvLPToken
    * @param pool The address of the lending pool where this wvLPToken will be used
-   * @param treasury The address of the Aave treasury, receiving the fees on this wvLPToken
-   * @param underlyingAsset The address of the underlying asset of this wvLPToken (E.g. WETH for aWETH)
+   * @param treasury The address of the Wevest treasury, receiving the fees on this wvLPToken
+   * @param underlyingAsset The address of the underlying asset of this wvLPToken (E.g. WETH for wvLPWETH)
    * @param incentivesController The smart contract managing potential incentives distribution
    * @param wvLPTokenDecimals The decimals of the wvLPToken, same as the underlying asset's
    * @param wvLPTokenName The name of the wvLPToken

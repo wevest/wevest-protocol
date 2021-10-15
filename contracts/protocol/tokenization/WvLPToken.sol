@@ -29,7 +29,7 @@ contract WvLPToken is
   bytes32 public constant PERMIT_TYPEHASH =
     keccak256('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)');
 
-  uint256 public constant ATOKEN_REVISION = 0x1;
+  uint256 public constant WVLPTOKEN_REVISION = 0x1;
 
   /// @dev owner => next valid nonce to submit with permit()
   mapping(address => uint256) public _nonces;
@@ -47,7 +47,7 @@ contract WvLPToken is
   }
 
   function getRevision() internal pure virtual override returns (uint256) {
-    return ATOKEN_REVISION;
+    return WVLPTOKEN_REVISION;
   }
 
   /**
