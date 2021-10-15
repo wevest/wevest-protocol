@@ -354,8 +354,7 @@ contract WvLPToken is
         )
       );
     require(owner == ecrecover(digest, v, r, s), 'INVALID_SIGNATURE');
-    // _nonces[owner] = currentValidNonce.add(1);
-    _nonces[owner] = currentValidNonce + 1;
+    _nonces[owner] = currentValidNonce.add(1);
     _approve(owner, spender, value);
   }
 
