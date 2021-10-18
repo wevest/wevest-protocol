@@ -69,6 +69,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IPriceOracle__factory>;
     getContractFactory(
+      name: "IPriceOracleGetter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPriceOracleGetter__factory>;
+    getContractFactory(
       name: "IScaledBalanceToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IScaledBalanceToken__factory>;
@@ -183,6 +187,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IPriceOracle>;
+    getContractAt(
+      name: "IPriceOracleGetter",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPriceOracleGetter>;
     getContractAt(
       name: "IScaledBalanceToken",
       address: string,

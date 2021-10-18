@@ -15,6 +15,7 @@ export type { ILendingPoolAddressesProvider } from "./ILendingPoolAddressesProvi
 export type { ILendingPoolCollateralManager } from "./ILendingPoolCollateralManager";
 export type { ILendingPoolConfigurator } from "./ILendingPoolConfigurator";
 export type { IPriceOracle } from "./IPriceOracle";
+export type { IPriceOracleGetter } from "./IPriceOracleGetter";
 export type { IScaledBalanceToken } from "./IScaledBalanceToken";
 export type { IWevestIncentivesController } from "./IWevestIncentivesController";
 export type { IWvLPToken } from "./IWvLPToken";
@@ -41,6 +42,7 @@ export { ILendingPoolAddressesProvider__factory } from "./factories/ILendingPool
 export { ILendingPoolCollateralManager__factory } from "./factories/ILendingPoolCollateralManager__factory";
 export { ILendingPoolConfigurator__factory } from "./factories/ILendingPoolConfigurator__factory";
 export { IPriceOracle__factory } from "./factories/IPriceOracle__factory";
+export { IPriceOracleGetter__factory } from "./factories/IPriceOracleGetter__factory";
 export { IScaledBalanceToken__factory } from "./factories/IScaledBalanceToken__factory";
 export { IWevestIncentivesController__factory } from "./factories/IWevestIncentivesController__factory";
 export { IWvLPToken__factory } from "./factories/IWvLPToken__factory";
