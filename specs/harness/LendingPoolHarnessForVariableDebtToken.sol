@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
@@ -172,18 +173,6 @@ contract LendingPoolHarnessForVariableDebtToken is ILendingPool {
 
   function paused() external view override returns (bool) {
     return originalPool.paused();
-  }
-
-  function flashLoan(
-    address receiver,
-    address[] calldata assets,
-    uint256[] calldata amounts,
-    uint256[] calldata modes,
-    address onBehalfOf,
-    bytes calldata params,
-    uint16 referralCode
-  ) external override {
-    originalPool.flashLoan(receiver, assets, amounts, modes, onBehalfOf, params, referralCode);
   }
 
   function finalizeTransfer(
