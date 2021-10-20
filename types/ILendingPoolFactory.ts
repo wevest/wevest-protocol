@@ -109,49 +109,6 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "target",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "initiator",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "asset",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "premium",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint16",
-        name: "referralCode",
-        type: "uint16",
-      },
-    ],
-    name: "FlashLoan",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
         name: "collateralAsset",
         type: "address",
       },
@@ -489,49 +446,6 @@ const _abi = [
       },
     ],
     name: "finalizeTransfer",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "receiverAddress",
-        type: "address",
-      },
-      {
-        internalType: "address[]",
-        name: "assets",
-        type: "address[]",
-      },
-      {
-        internalType: "uint256[]",
-        name: "amounts",
-        type: "uint256[]",
-      },
-      {
-        internalType: "uint256[]",
-        name: "modes",
-        type: "uint256[]",
-      },
-      {
-        internalType: "address",
-        name: "onBehalfOf",
-        type: "address",
-      },
-      {
-        internalType: "bytes",
-        name: "params",
-        type: "bytes",
-      },
-      {
-        internalType: "uint16",
-        name: "referralCode",
-        type: "uint16",
-      },
-    ],
-    name: "flashLoan",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

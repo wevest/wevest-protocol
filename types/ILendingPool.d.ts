@@ -25,7 +25,6 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
     "borrow(address,uint256,uint256,uint16,address)": FunctionFragment;
     "deposit(address,uint256,address,uint16)": FunctionFragment;
     "finalizeTransfer(address,address,address,uint256,uint256,uint256)": FunctionFragment;
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)": FunctionFragment;
     "getAddressesProvider()": FunctionFragment;
     "getConfiguration(address)": FunctionFragment;
     "getReserveData(address)": FunctionFragment;
@@ -58,18 +57,6 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "finalizeTransfer",
     values: [string, string, string, BigNumberish, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "flashLoan",
-    values: [
-      string,
-      string[],
-      BigNumberish[],
-      BigNumberish[],
-      string,
-      BytesLike,
-      BigNumberish
-    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getAddressesProvider",
@@ -148,7 +135,6 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
     functionFragment: "finalizeTransfer",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "flashLoan", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getAddressesProvider",
     data: BytesLike
@@ -217,7 +203,6 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
   events: {
     "Borrow(address,address,address,uint256,uint256,uint256,uint16)": EventFragment;
     "Deposit(address,address,address,uint256,uint16)": EventFragment;
-    "FlashLoan(address,address,address,uint256,uint256,uint16)": EventFragment;
     "LiquidationCall(address,address,address,uint256,uint256,address,bool)": EventFragment;
     "Paused()": EventFragment;
     "RebalanceStableBorrowRate(address,address)": EventFragment;
@@ -232,7 +217,6 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "Borrow"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LiquidationCall"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RebalanceStableBorrowRate"): EventFragment;
@@ -314,28 +298,6 @@ export class ILendingPool extends Contract {
       amount: BigNumberish,
       balanceFromAfter: BigNumberish,
       balanceToBefore: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    flashLoan(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -707,28 +669,6 @@ export class ILendingPool extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  flashLoan(
-    receiverAddress: string,
-    assets: string[],
-    amounts: BigNumberish[],
-    modes: BigNumberish[],
-    onBehalfOf: string,
-    params: BytesLike,
-    referralCode: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-    receiverAddress: string,
-    assets: string[],
-    amounts: BigNumberish[],
-    modes: BigNumberish[],
-    onBehalfOf: string,
-    params: BytesLike,
-    referralCode: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   getAddressesProvider(overrides?: CallOverrides): Promise<string>;
 
   "getAddressesProvider()"(overrides?: CallOverrides): Promise<string>;
@@ -1065,28 +1005,6 @@ export class ILendingPool extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    flashLoan(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     getAddressesProvider(overrides?: CallOverrides): Promise<string>;
 
     "getAddressesProvider()"(overrides?: CallOverrides): Promise<string>;
@@ -1385,15 +1303,6 @@ export class ILendingPool extends Contract {
       referral: BigNumberish | null
     ): EventFilter;
 
-    FlashLoan(
-      target: string | null,
-      initiator: string | null,
-      asset: string | null,
-      amount: null,
-      premium: null,
-      referralCode: null
-    ): EventFilter;
-
     LiquidationCall(
       collateralAsset: string | null,
       debtAsset: string | null,
@@ -1505,28 +1414,6 @@ export class ILendingPool extends Contract {
       amount: BigNumberish,
       balanceFromAfter: BigNumberish,
       balanceToBefore: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    flashLoan(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -1785,28 +1672,6 @@ export class ILendingPool extends Contract {
       amount: BigNumberish,
       balanceFromAfter: BigNumberish,
       balanceToBefore: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    flashLoan(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

@@ -22,14 +22,12 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface LendingPoolInterface extends ethers.utils.Interface {
   functions: {
-    "FLASHLOAN_PREMIUM_TOTAL()": FunctionFragment;
     "LENDINGPOOL_REVISION()": FunctionFragment;
     "MAX_NUMBER_RESERVES()": FunctionFragment;
     "MAX_STABLE_RATE_BORROW_SIZE_PERCENT()": FunctionFragment;
     "borrow(address,uint256,uint256,uint16,address)": FunctionFragment;
     "deposit(address,uint256,address,uint16)": FunctionFragment;
     "finalizeTransfer(address,address,address,uint256,uint256,uint256)": FunctionFragment;
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)": FunctionFragment;
     "getAddressesProvider()": FunctionFragment;
     "getConfiguration(address)": FunctionFragment;
     "getReserveData(address)": FunctionFragment;
@@ -53,10 +51,6 @@ interface LendingPoolInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(
-    functionFragment: "FLASHLOAN_PREMIUM_TOTAL",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "LENDINGPOOL_REVISION",
     values?: undefined
   ): string;
@@ -79,18 +73,6 @@ interface LendingPoolInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "finalizeTransfer",
     values: [string, string, string, BigNumberish, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "flashLoan",
-    values: [
-      string,
-      string[],
-      BigNumberish[],
-      BigNumberish[],
-      string,
-      BytesLike,
-      BigNumberish
-    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getAddressesProvider",
@@ -165,10 +147,6 @@ interface LendingPoolInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "FLASHLOAN_PREMIUM_TOTAL",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "LENDINGPOOL_REVISION",
     data: BytesLike
   ): Result;
@@ -186,7 +164,6 @@ interface LendingPoolInterface extends ethers.utils.Interface {
     functionFragment: "finalizeTransfer",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "flashLoan", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getAddressesProvider",
     data: BytesLike
@@ -256,7 +233,6 @@ interface LendingPoolInterface extends ethers.utils.Interface {
   events: {
     "Borrow(address,address,address,uint256,uint256,uint256,uint16)": EventFragment;
     "Deposit(address,address,address,uint256,uint16)": EventFragment;
-    "FlashLoan(address,address,address,uint256,uint256,uint16)": EventFragment;
     "LiquidationCall(address,address,address,uint256,uint256,address,bool)": EventFragment;
     "Paused()": EventFragment;
     "RebalanceStableBorrowRate(address,address)": EventFragment;
@@ -271,7 +247,6 @@ interface LendingPoolInterface extends ethers.utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "Borrow"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LiquidationCall"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RebalanceStableBorrowRate"): EventFragment;
@@ -302,14 +277,6 @@ export class LendingPool extends Contract {
   interface: LendingPoolInterface;
 
   functions: {
-    FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<{
-      0: BigNumber;
-    }>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<{
-      0: BigNumber;
-    }>;
-
     LENDINGPOOL_REVISION(overrides?: CallOverrides): Promise<{
       0: BigNumber;
     }>;
@@ -387,28 +354,6 @@ export class LendingPool extends Contract {
       amount: BigNumberish,
       balanceFromBefore: BigNumberish,
       balanceToBefore: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    flashLoan(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -736,10 +681,6 @@ export class LendingPool extends Contract {
     ): Promise<ContractTransaction>;
   };
 
-  FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   LENDINGPOOL_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
   "LENDINGPOOL_REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -807,28 +748,6 @@ export class LendingPool extends Contract {
     amount: BigNumberish,
     balanceFromBefore: BigNumberish,
     balanceToBefore: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  flashLoan(
-    receiverAddress: string,
-    assets: string[],
-    amounts: BigNumberish[],
-    modes: BigNumberish[],
-    onBehalfOf: string,
-    params: BytesLike,
-    referralCode: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-    receiverAddress: string,
-    assets: string[],
-    amounts: BigNumberish[],
-    modes: BigNumberish[],
-    onBehalfOf: string,
-    params: BytesLike,
-    referralCode: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -1124,10 +1043,6 @@ export class LendingPool extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     LENDINGPOOL_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     "LENDINGPOOL_REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1195,28 +1110,6 @@ export class LendingPool extends Contract {
       amount: BigNumberish,
       balanceFromBefore: BigNumberish,
       balanceToBefore: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    flashLoan(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1525,15 +1418,6 @@ export class LendingPool extends Contract {
       referral: BigNumberish | null
     ): EventFilter;
 
-    FlashLoan(
-      target: string | null,
-      initiator: string | null,
-      asset: string | null,
-      amount: null,
-      premium: null,
-      referralCode: null
-    ): EventFilter;
-
     LiquidationCall(
       collateralAsset: string | null,
       debtAsset: string | null,
@@ -1594,10 +1478,6 @@ export class LendingPool extends Contract {
   };
 
   estimateGas: {
-    FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     LENDINGPOOL_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     "LENDINGPOOL_REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1665,28 +1545,6 @@ export class LendingPool extends Contract {
       amount: BigNumberish,
       balanceFromBefore: BigNumberish,
       balanceToBefore: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    flashLoan(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -1901,14 +1759,6 @@ export class LendingPool extends Contract {
   };
 
   populateTransaction: {
-    FLASHLOAN_PREMIUM_TOTAL(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     LENDINGPOOL_REVISION(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1984,28 +1834,6 @@ export class LendingPool extends Contract {
       amount: BigNumberish,
       balanceFromBefore: BigNumberish,
       balanceToBefore: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    flashLoan(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "flashLoan(address,address[],uint256[],uint256[],address,bytes,uint16)"(
-      receiverAddress: string,
-      assets: string[],
-      amounts: BigNumberish[],
-      modes: BigNumberish[],
-      onBehalfOf: string,
-      params: BytesLike,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

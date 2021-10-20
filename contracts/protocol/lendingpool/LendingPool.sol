@@ -9,7 +9,7 @@ import { Address } from "../../dependencies/openzeppelin/contracts/Address.sol";
 import { ILendingPoolAddressesProvider } from "../../interfaces/ILendingPoolAddressesProvider.sol";
 import { IAToken } from "../../interfaces/IAToken.sol";
 import { IVariableDebtToken } from "../../interfaces/IVariableDebtToken.sol";
-import { IFlashLoanReceiver } from "../../flashloan/interfaces/IFlashLoanReceiver.sol";
+// import { IFlashLoanReceiver } from "../../flashloan/interfaces/IFlashLoanReceiver.sol";
 import { IPriceOracleGetter } from "../../interfaces/IPriceOracleGetter.sol";
 import { IStableDebtToken } from "../../interfaces/IStableDebtToken.sol";
 import { ILendingPool } from "../../interfaces/ILendingPool.sol";
@@ -434,6 +434,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         require(returnCode == 0, string(abi.encodePacked(returnMessage)));
     }
 
+    /**
     struct FlashLoanLocalVars {
         IFlashLoanReceiver receiver;
         address oracle;
@@ -444,7 +445,8 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         uint256 currentPremium;
         uint256 currentAmountPlusPremium;
         address debtToken;
-    }
+    } 
+    **/
 
     /**
      * @dev Allows smartcontracts to access the liquidity of the pool within one transaction,
@@ -463,6 +465,8 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
      * @param referralCode Code used to register the integrator originating the operation, for potential rewards.
      *   0 if the action is executed directly by the user, without any middle-man
      **/
+
+    /**
     function flashLoan(
         address receiverAddress,
         address[] calldata assets,
@@ -545,6 +549,8 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
             );
         }
     }
+
+    **/
 
     /**
      * @dev Returns the state and configuration of the reserve
@@ -663,9 +669,12 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     /**
      * @dev Returns the fee on flash loans
      */
+
+    /**
     function FLASHLOAN_PREMIUM_TOTAL() public view returns (uint256) {
         return _flashLoanPremiumTotal;
     }
+    */
 
     /**
      * @dev Returns the maximum number of reserves supported to be listed in this LendingPool
