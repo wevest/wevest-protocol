@@ -33,7 +33,7 @@ import {
   MintableERC20Factory,
   MockAggregatorFactory,
   MockATokenFactory,
-  MockFlashLoanReceiverFactory,
+  // MockFlashLoanReceiverFactory,
   MockParaSwapAugustusFactory,
   MockParaSwapAugustusRegistryFactory,
   MockStableDebtTokenFactory,
@@ -223,13 +223,13 @@ export const deployInitializableAdminUpgradeabilityProxy = async (verify?: boole
     verify,
   );
 
-export const deployMockFlashLoanReceiver = async (addressesProvider: tEthereumAddress, verify?: boolean) =>
+/* export const deployMockFlashLoanReceiver = async (addressesProvider: tEthereumAddress, verify?: boolean) =>
   withSaveAndVerify(
     await new MockFlashLoanReceiverFactory(await getFirstSigner()).deploy(addressesProvider),
     eContractid.MockFlashLoanReceiver,
     [addressesProvider],
     verify,
-  );
+  ); */
 
 export const deployWalletBalancerProvider = async (verify?: boolean) =>
   withSaveAndVerify(

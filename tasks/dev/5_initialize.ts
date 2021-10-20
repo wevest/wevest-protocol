@@ -1,7 +1,7 @@
 import { task } from "hardhat/config";
 import {
   deployLendingPoolCollateralManager,
-  deployMockFlashLoanReceiver,
+  // deployMockFlashLoanReceiver,
   deployWalletBalancerProvider,
   deployAaveProtocolDataProvider,
   authorizeWETHGateway,
@@ -66,8 +66,8 @@ task("dev:initialize-lending-pool", "Initialize lending pool configuration.")
     const collateralManager = await deployLendingPoolCollateralManager(verify);
     await waitForTx(await addressesProvider.setLendingPoolCollateralManager(collateralManager.address));
 
-    const mockFlashLoanReceiver = await deployMockFlashLoanReceiver(addressesProvider.address, verify);
-    await insertContractAddressInDb(eContractid.MockFlashLoanReceiver, mockFlashLoanReceiver.address);
+    // const mockFlashLoanReceiver = await deployMockFlashLoanReceiver(addressesProvider.address, verify);
+    // await insertContractAddressInDb(eContractid.MockFlashLoanReceiver, mockFlashLoanReceiver.address);
 
     await deployWalletBalancerProvider(verify);
 
