@@ -280,7 +280,7 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
 
     /**
      * @dev Transfers the underlying asset to `target`. Used by the LendingPool to transfer
-     * assets in borrow(), withdraw() and flashLoan()
+     * assets in borrow() and withdraw()
      * @param target The recipient of the aTokens
      * @param amount The amount getting transferred
      * @return The amount transferred
