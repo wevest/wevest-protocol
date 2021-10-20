@@ -49,10 +49,8 @@ library Errors {
     string public constant LP_INTEREST_RATE_REBALANCE_CONDITIONS_NOT_MET = "22"; // 'Interest rate rebalance conditions were not met'
     string public constant LP_LIQUIDATION_CALL_FAILED = "23"; // 'Liquidation call failed'
     string public constant LP_NOT_ENOUGH_LIQUIDITY_TO_BORROW = "24"; // 'There is not enough liquidity available to borrow'
-    string public constant LP_REQUESTED_AMOUNT_TOO_SMALL = "25"; // 'The requested amount is too small for a FlashLoan.'
     string public constant LP_INCONSISTENT_PROTOCOL_ACTUAL_BALANCE = "26"; // 'The actual balance of the protocol is inconsistent'
     string public constant LP_CALLER_NOT_LENDING_POOL_CONFIGURATOR = "27"; // 'The caller of the function is not the lending pool configurator'
-    string public constant LP_INCONSISTENT_FLASHLOAN_PARAMS = "28";
     string public constant CT_CALLER_MUST_BE_LENDING_POOL = "29"; // 'The caller of this function must be a lending pool'
     string public constant CT_CANNOT_GIVE_ALLOWANCE_TO_HIMSELF = "30"; // 'User cannot give allowance to himself'
     string public constant CT_TRANSFER_AMOUNT_NOT_GT_0 = "31"; // 'Transferred amount needs to be greater than zero'
@@ -72,7 +70,6 @@ library Errors {
     string public constant LPCM_SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER = "44"; // 'User did not borrow the specified currency'
     string public constant LPCM_NOT_ENOUGH_LIQUIDITY_TO_LIQUIDATE = "45"; // "There isn't enough liquidity available to liquidate"
     string public constant LPCM_NO_ERRORS = "46"; // 'No errors'
-    string public constant LP_INVALID_FLASHLOAN_MODE = "47"; //Invalid flashloan mode selected
     string public constant MATH_MULTIPLICATION_OVERFLOW = "48";
     string public constant MATH_ADDITION_OVERFLOW = "49";
     string public constant MATH_DIVISION_BY_ZERO = "50";
@@ -97,7 +94,6 @@ library Errors {
     string public constant RC_INVALID_DECIMALS = "70";
     string public constant RC_INVALID_RESERVE_FACTOR = "71";
     string public constant LPAPR_INVALID_ADDRESSES_PROVIDER_ID = "72";
-    string public constant VL_INCONSISTENT_FLASHLOAN_PARAMS = "73";
     string public constant LP_INCONSISTENT_PARAMS_LENGTH = "74";
     string public constant UL_INVALID_INDEX = "77";
     string public constant LP_NOT_CONTRACT = "78";

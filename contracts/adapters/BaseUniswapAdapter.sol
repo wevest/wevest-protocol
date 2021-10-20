@@ -28,8 +28,7 @@ abstract contract BaseUniswapAdapter is FlashLoanReceiverBase, IBaseUniswapAdapt
 
     // Max slippage percent allowed
     uint256 public constant override MAX_SLIPPAGE_PERCENT = 3000; // 30%
-    // FLash Loan fee set in lending pool
-    uint256 public constant override FLASHLOAN_PREMIUM_TOTAL = 9;
+
     // USD oracle asset address
     address public constant override USD_ADDRESS = 0x10F7Fc1F91Ba351f9C629c5947AD69bD03C05b96;
 
@@ -336,8 +335,7 @@ abstract contract BaseUniswapAdapter is FlashLoanReceiverBase, IBaseUniswapAdapt
         address reserveOut,
         uint256 amountIn
     ) internal view returns (AmountCalc memory) {
-        // Subtract flash loan fee
-        uint256 finalAmountIn = amountIn.sub(amountIn.mul(FLASHLOAN_PREMIUM_TOTAL).div(10000));
+        uint256 finalAmountIn = amountIn;
 
         if (reserveIn == reserveOut) {
             uint256 reserveDecimals = _getDecimals(reserveIn);
@@ -421,8 +419,7 @@ abstract contract BaseUniswapAdapter is FlashLoanReceiverBase, IBaseUniswapAdapt
         uint256 amountOut
     ) internal view returns (AmountCalc memory) {
         if (reserveIn == reserveOut) {
-            // Add flash loan fee
-            uint256 amountIn = amountOut.add(amountOut.mul(FLASHLOAN_PREMIUM_TOTAL).div(10000));
+            uint256 amountIn = amountOut;
             uint256 reserveDecimals = _getDecimals(reserveIn);
             address[] memory path = new address[](1);
             path[0] = reserveIn;
@@ -439,8 +436,7 @@ abstract contract BaseUniswapAdapter is FlashLoanReceiverBase, IBaseUniswapAdapt
 
         (uint256[] memory amounts, address[] memory path) = _getAmountsInAndPath(reserveIn, reserveOut, amountOut);
 
-        // Add flash loan fee
-        uint256 finalAmountIn = amounts[0].add(amounts[0].mul(FLASHLOAN_PREMIUM_TOTAL).div(10000));
+        uint256 finalAmountIn = amounts[0];
 
         uint256 reserveInDecimals = _getDecimals(reserveIn);
         uint256 reserveOutDecimals = _getDecimals(reserveOut);

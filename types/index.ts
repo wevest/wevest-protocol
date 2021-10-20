@@ -43,8 +43,6 @@ export { SelfdestructTransferFactory } from "./SelfdestructTransferFactory";
 export type { SelfdestructTransfer } from "./SelfdestructTransfer";
 export { WETH9Factory } from "./WETH9Factory";
 export type { WETH9 } from "./WETH9";
-export { MockFlashLoanReceiverFactory } from "./MockFlashLoanReceiverFactory";
-export type { MockFlashLoanReceiver } from "./MockFlashLoanReceiver";
 export { MockAggregatorFactory } from "./MockAggregatorFactory";
 export type { MockAggregator } from "./MockAggregator";
 export { LendingRateOracleFactory } from "./LendingRateOracleFactory";

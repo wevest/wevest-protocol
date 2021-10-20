@@ -50,19 +50,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "FLASHLOAN_PREMIUM_TOTAL",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "MAX_SLIPPAGE_PERCENT",
     outputs: [
       {

@@ -28,8 +28,6 @@ interface IBaseUniswapAdapter {
 
     function MAX_SLIPPAGE_PERCENT() external returns (uint256);
 
-    function FLASHLOAN_PREMIUM_TOTAL() external returns (uint256);
-
     function USD_ADDRESS() external returns (address);
 
     function ORACLE() external returns (IPriceOracleGetter);

@@ -22,7 +22,6 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface IBaseUniswapAdapterInterface extends ethers.utils.Interface {
   functions: {
-    "FLASHLOAN_PREMIUM_TOTAL()": FunctionFragment;
     "MAX_SLIPPAGE_PERCENT()": FunctionFragment;
     "ORACLE()": FunctionFragment;
     "UNISWAP_ROUTER()": FunctionFragment;
@@ -32,10 +31,6 @@ interface IBaseUniswapAdapterInterface extends ethers.utils.Interface {
     "getAmountsOut(uint256,address,address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "FLASHLOAN_PREMIUM_TOTAL",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "MAX_SLIPPAGE_PERCENT",
     values?: undefined
@@ -62,10 +57,6 @@ interface IBaseUniswapAdapterInterface extends ethers.utils.Interface {
     values: [BigNumberish, string, string]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "FLASHLOAN_PREMIUM_TOTAL",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "MAX_SLIPPAGE_PERCENT",
     data: BytesLike
@@ -113,14 +104,6 @@ export class IBaseUniswapAdapter extends Contract {
   interface: IBaseUniswapAdapterInterface;
 
   functions: {
-    FLASHLOAN_PREMIUM_TOTAL(
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
     MAX_SLIPPAGE_PERCENT(overrides?: Overrides): Promise<ContractTransaction>;
 
     "MAX_SLIPPAGE_PERCENT()"(
@@ -196,12 +179,6 @@ export class IBaseUniswapAdapter extends Contract {
     }>;
   };
 
-  FLASHLOAN_PREMIUM_TOTAL(overrides?: Overrides): Promise<ContractTransaction>;
-
-  "FLASHLOAN_PREMIUM_TOTAL()"(
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   MAX_SLIPPAGE_PERCENT(overrides?: Overrides): Promise<ContractTransaction>;
 
   "MAX_SLIPPAGE_PERCENT()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -275,10 +252,6 @@ export class IBaseUniswapAdapter extends Contract {
   }>;
 
   callStatic: {
-    FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     MAX_SLIPPAGE_PERCENT(overrides?: CallOverrides): Promise<BigNumber>;
 
     "MAX_SLIPPAGE_PERCENT()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -362,10 +335,6 @@ export class IBaseUniswapAdapter extends Contract {
   };
 
   estimateGas: {
-    FLASHLOAN_PREMIUM_TOTAL(overrides?: Overrides): Promise<BigNumber>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: Overrides): Promise<BigNumber>;
-
     MAX_SLIPPAGE_PERCENT(overrides?: Overrides): Promise<BigNumber>;
 
     "MAX_SLIPPAGE_PERCENT()"(overrides?: Overrides): Promise<BigNumber>;
@@ -416,14 +385,6 @@ export class IBaseUniswapAdapter extends Contract {
   };
 
   populateTransaction: {
-    FLASHLOAN_PREMIUM_TOTAL(
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
     MAX_SLIPPAGE_PERCENT(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "MAX_SLIPPAGE_PERCENT()"(

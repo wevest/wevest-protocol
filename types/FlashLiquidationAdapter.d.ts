@@ -23,7 +23,6 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface FlashLiquidationAdapterInterface extends ethers.utils.Interface {
   functions: {
     "ADDRESSES_PROVIDER()": FunctionFragment;
-    "FLASHLOAN_PREMIUM_TOTAL()": FunctionFragment;
     "LENDING_POOL()": FunctionFragment;
     "MAX_SLIPPAGE_PERCENT()": FunctionFragment;
     "ORACLE()": FunctionFragment;
@@ -41,10 +40,6 @@ interface FlashLiquidationAdapterInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "ADDRESSES_PROVIDER",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "FLASHLOAN_PREMIUM_TOTAL",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -96,10 +91,6 @@ interface FlashLiquidationAdapterInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "ADDRESSES_PROVIDER",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "FLASHLOAN_PREMIUM_TOTAL",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -178,14 +169,6 @@ export class FlashLiquidationAdapter extends Contract {
 
     "ADDRESSES_PROVIDER()"(overrides?: CallOverrides): Promise<{
       0: string;
-    }>;
-
-    FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<{
-      0: BigNumber;
-    }>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<{
-      0: BigNumber;
     }>;
 
     LENDING_POOL(overrides?: CallOverrides): Promise<{
@@ -343,10 +326,6 @@ export class FlashLiquidationAdapter extends Contract {
 
   "ADDRESSES_PROVIDER()"(overrides?: CallOverrides): Promise<string>;
 
-  FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   LENDING_POOL(overrides?: CallOverrides): Promise<string>;
 
   "LENDING_POOL()"(overrides?: CallOverrides): Promise<string>;
@@ -473,10 +452,6 @@ export class FlashLiquidationAdapter extends Contract {
     ADDRESSES_PROVIDER(overrides?: CallOverrides): Promise<string>;
 
     "ADDRESSES_PROVIDER()"(overrides?: CallOverrides): Promise<string>;
-
-    FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     LENDING_POOL(overrides?: CallOverrides): Promise<string>;
 
@@ -617,10 +592,6 @@ export class FlashLiquidationAdapter extends Contract {
 
     "ADDRESSES_PROVIDER()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    FLASHLOAN_PREMIUM_TOTAL(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     LENDING_POOL(overrides?: CallOverrides): Promise<BigNumber>;
 
     "LENDING_POOL()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -723,14 +694,6 @@ export class FlashLiquidationAdapter extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "ADDRESSES_PROVIDER()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    FLASHLOAN_PREMIUM_TOTAL(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "FLASHLOAN_PREMIUM_TOTAL()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

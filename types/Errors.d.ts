@@ -48,12 +48,10 @@ interface ErrorsInterface extends ethers.utils.Interface {
     "LP_CALLER_NOT_LENDING_POOL_CONFIGURATOR()": FunctionFragment;
     "LP_FAILED_COLLATERAL_SWAP()": FunctionFragment;
     "LP_FAILED_REPAY_WITH_COLLATERAL()": FunctionFragment;
-    "LP_INCONSISTENT_FLASHLOAN_PARAMS()": FunctionFragment;
     "LP_INCONSISTENT_PARAMS_LENGTH()": FunctionFragment;
     "LP_INCONSISTENT_PROTOCOL_ACTUAL_BALANCE()": FunctionFragment;
     "LP_INTEREST_RATE_REBALANCE_CONDITIONS_NOT_MET()": FunctionFragment;
     "LP_INVALID_EQUAL_ASSETS_TO_SWAP()": FunctionFragment;
-    "LP_INVALID_FLASHLOAN_MODE()": FunctionFragment;
     "LP_INVALID_FLASH_LOAN_EXECUTOR_RETURN()": FunctionFragment;
     "LP_IS_PAUSED()": FunctionFragment;
     "LP_LIQUIDATION_CALL_FAILED()": FunctionFragment;
@@ -62,7 +60,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
     "LP_NOT_ENOUGH_STABLE_BORROW_BALANCE()": FunctionFragment;
     "LP_NO_MORE_RESERVES_ALLOWED()": FunctionFragment;
     "LP_REENTRANCY_NOT_ALLOWED()": FunctionFragment;
-    "LP_REQUESTED_AMOUNT_TOO_SMALL()": FunctionFragment;
     "MATH_ADDITION_OVERFLOW()": FunctionFragment;
     "MATH_DIVISION_BY_ZERO()": FunctionFragment;
     "MATH_MULTIPLICATION_OVERFLOW()": FunctionFragment;
@@ -88,7 +85,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
     "VL_CURRENT_AVAILABLE_LIQUIDITY_NOT_ENOUGH()": FunctionFragment;
     "VL_DEPOSIT_ALREADY_IN_USE()": FunctionFragment;
     "VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD()": FunctionFragment;
-    "VL_INCONSISTENT_FLASHLOAN_PARAMS()": FunctionFragment;
     "VL_INVALID_AMOUNT()": FunctionFragment;
     "VL_INVALID_INTEREST_RATE_MODE_SELECTED()": FunctionFragment;
     "VL_NOT_ENOUGH_AVAILABLE_USER_BALANCE()": FunctionFragment;
@@ -212,10 +208,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "LP_INCONSISTENT_FLASHLOAN_PARAMS",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "LP_INCONSISTENT_PARAMS_LENGTH",
     values?: undefined
   ): string;
@@ -229,10 +221,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "LP_INVALID_EQUAL_ASSETS_TO_SWAP",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "LP_INVALID_FLASHLOAN_MODE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -265,10 +253,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "LP_REENTRANCY_NOT_ALLOWED",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "LP_REQUESTED_AMOUNT_TOO_SMALL",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -369,10 +353,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "VL_INCONSISTENT_FLASHLOAN_PARAMS",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -533,10 +513,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "LP_INCONSISTENT_FLASHLOAN_PARAMS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "LP_INCONSISTENT_PARAMS_LENGTH",
     data: BytesLike
   ): Result;
@@ -550,10 +526,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "LP_INVALID_EQUAL_ASSETS_TO_SWAP",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "LP_INVALID_FLASHLOAN_MODE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -586,10 +558,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "LP_REENTRANCY_NOT_ALLOWED",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "LP_REQUESTED_AMOUNT_TOO_SMALL",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -690,10 +658,6 @@ interface ErrorsInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "VL_INCONSISTENT_FLASHLOAN_PARAMS",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -1012,14 +976,6 @@ export class Errors extends Contract {
       0: string;
     }>;
 
-    LP_INCONSISTENT_FLASHLOAN_PARAMS(overrides?: CallOverrides): Promise<{
-      0: string;
-    }>;
-
-    "LP_INCONSISTENT_FLASHLOAN_PARAMS()"(overrides?: CallOverrides): Promise<{
-      0: string;
-    }>;
-
     LP_INCONSISTENT_PARAMS_LENGTH(overrides?: CallOverrides): Promise<{
       0: string;
     }>;
@@ -1057,14 +1013,6 @@ export class Errors extends Contract {
     }>;
 
     "LP_INVALID_EQUAL_ASSETS_TO_SWAP()"(overrides?: CallOverrides): Promise<{
-      0: string;
-    }>;
-
-    LP_INVALID_FLASHLOAN_MODE(overrides?: CallOverrides): Promise<{
-      0: string;
-    }>;
-
-    "LP_INVALID_FLASHLOAN_MODE()"(overrides?: CallOverrides): Promise<{
       0: string;
     }>;
 
@@ -1133,14 +1081,6 @@ export class Errors extends Contract {
     }>;
 
     "LP_REENTRANCY_NOT_ALLOWED()"(overrides?: CallOverrides): Promise<{
-      0: string;
-    }>;
-
-    LP_REQUESTED_AMOUNT_TOO_SMALL(overrides?: CallOverrides): Promise<{
-      0: string;
-    }>;
-
-    "LP_REQUESTED_AMOUNT_TOO_SMALL()"(overrides?: CallOverrides): Promise<{
       0: string;
     }>;
 
@@ -1359,14 +1299,6 @@ export class Errors extends Contract {
     "VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD()"(
       overrides?: CallOverrides
     ): Promise<{
-      0: string;
-    }>;
-
-    VL_INCONSISTENT_FLASHLOAN_PARAMS(overrides?: CallOverrides): Promise<{
-      0: string;
-    }>;
-
-    "VL_INCONSISTENT_FLASHLOAN_PARAMS()"(overrides?: CallOverrides): Promise<{
       0: string;
     }>;
 
@@ -1643,12 +1575,6 @@ export class Errors extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  LP_INCONSISTENT_FLASHLOAN_PARAMS(overrides?: CallOverrides): Promise<string>;
-
-  "LP_INCONSISTENT_FLASHLOAN_PARAMS()"(
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   LP_INCONSISTENT_PARAMS_LENGTH(overrides?: CallOverrides): Promise<string>;
 
   "LP_INCONSISTENT_PARAMS_LENGTH()"(overrides?: CallOverrides): Promise<string>;
@@ -1674,10 +1600,6 @@ export class Errors extends Contract {
   "LP_INVALID_EQUAL_ASSETS_TO_SWAP()"(
     overrides?: CallOverrides
   ): Promise<string>;
-
-  LP_INVALID_FLASHLOAN_MODE(overrides?: CallOverrides): Promise<string>;
-
-  "LP_INVALID_FLASHLOAN_MODE()"(overrides?: CallOverrides): Promise<string>;
 
   LP_INVALID_FLASH_LOAN_EXECUTOR_RETURN(
     overrides?: CallOverrides
@@ -1720,10 +1642,6 @@ export class Errors extends Contract {
   LP_REENTRANCY_NOT_ALLOWED(overrides?: CallOverrides): Promise<string>;
 
   "LP_REENTRANCY_NOT_ALLOWED()"(overrides?: CallOverrides): Promise<string>;
-
-  LP_REQUESTED_AMOUNT_TOO_SMALL(overrides?: CallOverrides): Promise<string>;
-
-  "LP_REQUESTED_AMOUNT_TOO_SMALL()"(overrides?: CallOverrides): Promise<string>;
 
   MATH_ADDITION_OVERFLOW(overrides?: CallOverrides): Promise<string>;
 
@@ -1850,12 +1768,6 @@ export class Errors extends Contract {
   ): Promise<string>;
 
   "VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD()"(
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  VL_INCONSISTENT_FLASHLOAN_PARAMS(overrides?: CallOverrides): Promise<string>;
-
-  "VL_INCONSISTENT_FLASHLOAN_PARAMS()"(
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -2098,14 +2010,6 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    LP_INCONSISTENT_FLASHLOAN_PARAMS(
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "LP_INCONSISTENT_FLASHLOAN_PARAMS()"(
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     LP_INCONSISTENT_PARAMS_LENGTH(overrides?: CallOverrides): Promise<string>;
 
     "LP_INCONSISTENT_PARAMS_LENGTH()"(
@@ -2133,10 +2037,6 @@ export class Errors extends Contract {
     "LP_INVALID_EQUAL_ASSETS_TO_SWAP()"(
       overrides?: CallOverrides
     ): Promise<string>;
-
-    LP_INVALID_FLASHLOAN_MODE(overrides?: CallOverrides): Promise<string>;
-
-    "LP_INVALID_FLASHLOAN_MODE()"(overrides?: CallOverrides): Promise<string>;
 
     LP_INVALID_FLASH_LOAN_EXECUTOR_RETURN(
       overrides?: CallOverrides
@@ -2181,12 +2081,6 @@ export class Errors extends Contract {
     LP_REENTRANCY_NOT_ALLOWED(overrides?: CallOverrides): Promise<string>;
 
     "LP_REENTRANCY_NOT_ALLOWED()"(overrides?: CallOverrides): Promise<string>;
-
-    LP_REQUESTED_AMOUNT_TOO_SMALL(overrides?: CallOverrides): Promise<string>;
-
-    "LP_REQUESTED_AMOUNT_TOO_SMALL()"(
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     MATH_ADDITION_OVERFLOW(overrides?: CallOverrides): Promise<string>;
 
@@ -2319,14 +2213,6 @@ export class Errors extends Contract {
     ): Promise<string>;
 
     "VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD()"(
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    VL_INCONSISTENT_FLASHLOAN_PARAMS(
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "VL_INCONSISTENT_FLASHLOAN_PARAMS()"(
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -2596,14 +2482,6 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    LP_INCONSISTENT_FLASHLOAN_PARAMS(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "LP_INCONSISTENT_FLASHLOAN_PARAMS()"(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     LP_INCONSISTENT_PARAMS_LENGTH(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -2633,12 +2511,6 @@ export class Errors extends Contract {
     ): Promise<BigNumber>;
 
     "LP_INVALID_EQUAL_ASSETS_TO_SWAP()"(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    LP_INVALID_FLASHLOAN_MODE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "LP_INVALID_FLASHLOAN_MODE()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2689,14 +2561,6 @@ export class Errors extends Contract {
     LP_REENTRANCY_NOT_ALLOWED(overrides?: CallOverrides): Promise<BigNumber>;
 
     "LP_REENTRANCY_NOT_ALLOWED()"(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    LP_REQUESTED_AMOUNT_TOO_SMALL(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "LP_REQUESTED_AMOUNT_TOO_SMALL()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2845,14 +2709,6 @@ export class Errors extends Contract {
     ): Promise<BigNumber>;
 
     "VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD()"(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    VL_INCONSISTENT_FLASHLOAN_PARAMS(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "VL_INCONSISTENT_FLASHLOAN_PARAMS()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -3150,14 +3006,6 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    LP_INCONSISTENT_FLASHLOAN_PARAMS(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "LP_INCONSISTENT_FLASHLOAN_PARAMS()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     LP_INCONSISTENT_PARAMS_LENGTH(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -3187,14 +3035,6 @@ export class Errors extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "LP_INVALID_EQUAL_ASSETS_TO_SWAP()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    LP_INVALID_FLASHLOAN_MODE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "LP_INVALID_FLASHLOAN_MODE()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -3253,14 +3093,6 @@ export class Errors extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "LP_REENTRANCY_NOT_ALLOWED()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    LP_REQUESTED_AMOUNT_TOO_SMALL(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "LP_REQUESTED_AMOUNT_TOO_SMALL()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -3457,14 +3289,6 @@ export class Errors extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    VL_INCONSISTENT_FLASHLOAN_PARAMS(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "VL_INCONSISTENT_FLASHLOAN_PARAMS()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
