@@ -14,25 +14,20 @@ import {
   LendingRateOracleFactory,
   MintableERC20Factory,
   MockATokenFactory,
-  MockFlashLoanReceiverFactory,
   MockStableDebtTokenFactory,
   MockVariableDebtTokenFactory,
   MockUniswapV2Router02Factory,
   MockParaSwapAugustusFactory,
   MockParaSwapAugustusRegistryFactory,
-  ParaSwapLiquiditySwapAdapterFactory,
   PriceOracleFactory,
   ReserveLogicFactory,
   SelfdestructTransferFactory,
   StableAndVariableTokensHelperFactory,
   StableDebtTokenFactory,
-  UniswapLiquiditySwapAdapterFactory,
-  UniswapRepayAdapterFactory,
   VariableDebtTokenFactory,
   WalletBalanceProviderFactory,
   WETH9MockedFactory,
   WETHGatewayFactory,
-  FlashLiquidationAdapterFactory,
 } from "../types";
 import { IERC20DetailedFactory } from "../types/IERC20DetailedFactory";
 import { getEthersSigners, MockTokenMap } from "./contracts-helpers";
@@ -108,12 +103,6 @@ export const getInterestRateStrategy = async (address?: tEthereumAddress) =>
       (
         await getDb().get(`${eContractid.DefaultReserveInterestRateStrategy}.${DRE.network.name}`).value()
       ).address,
-    await getFirstSigner(),
-  );
-
-export const getMockFlashLoanReceiver = async (address?: tEthereumAddress) =>
-  await MockFlashLoanReceiverFactory.connect(
-    address || (await getDb().get(`${eContractid.MockFlashLoanReceiver}.${DRE.network.name}`).value()).address,
     await getFirstSigner(),
   );
 
@@ -306,24 +295,6 @@ export const getMockUniswapRouter = async (address?: tEthereumAddress) =>
     await getFirstSigner(),
   );
 
-export const getUniswapLiquiditySwapAdapter = async (address?: tEthereumAddress) =>
-  await UniswapLiquiditySwapAdapterFactory.connect(
-    address || (await getDb().get(`${eContractid.UniswapLiquiditySwapAdapter}.${DRE.network.name}`).value()).address,
-    await getFirstSigner(),
-  );
-
-export const getUniswapRepayAdapter = async (address?: tEthereumAddress) =>
-  await UniswapRepayAdapterFactory.connect(
-    address || (await getDb().get(`${eContractid.UniswapRepayAdapter}.${DRE.network.name}`).value()).address,
-    await getFirstSigner(),
-  );
-
-export const getFlashLiquidationAdapter = async (address?: tEthereumAddress) =>
-  await FlashLiquidationAdapterFactory.connect(
-    address || (await getDb().get(`${eContractid.FlashLiquidationAdapter}.${DRE.network.name}`).value()).address,
-    await getFirstSigner(),
-  );
-
 export const getMockParaSwapAugustus = async (address?: tEthereumAddress) =>
   await MockParaSwapAugustusFactory.connect(
     address || (await getDb().get(`${eContractid.MockParaSwapAugustus}.${DRE.network.name}`).value()).address,
@@ -333,11 +304,5 @@ export const getMockParaSwapAugustus = async (address?: tEthereumAddress) =>
 export const getMockParaSwapAugustusRegistry = async (address?: tEthereumAddress) =>
   await MockParaSwapAugustusRegistryFactory.connect(
     address || (await getDb().get(`${eContractid.MockParaSwapAugustusRegistry}.${DRE.network.name}`).value()).address,
-    await getFirstSigner(),
-  );
-
-export const getParaSwapLiquiditySwapAdapter = async (address?: tEthereumAddress) =>
-  await ParaSwapLiquiditySwapAdapterFactory.connect(
-    address || (await getDb().get(`${eContractid.ParaSwapLiquiditySwapAdapter}.${DRE.network.name}`).value()).address,
     await getFirstSigner(),
   );
