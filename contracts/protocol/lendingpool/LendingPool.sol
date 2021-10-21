@@ -12,7 +12,7 @@ import { IVariableDebtToken } from "../../interfaces/IVariableDebtToken.sol";
 import { IPriceOracleGetter } from "../../interfaces/IPriceOracleGetter.sol";
 import { IStableDebtToken } from "../../interfaces/IStableDebtToken.sol";
 import { ILendingPool } from "../../interfaces/ILendingPool.sol";
-import { VersionedInitializable } from "../libraries/aave-upgradeability/VersionedInitializable.sol";
+import { VersionedInitializable } from "../libraries/wevest-upgradeability/VersionedInitializable.sol";
 import { Helpers } from "../libraries/helpers/Helpers.sol";
 import { Errors } from "../libraries/helpers/Errors.sol";
 import { WadRayMath } from "../libraries/math/WadRayMath.sol";
