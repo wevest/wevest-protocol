@@ -261,6 +261,10 @@
     "hardhat": {
       "address": "0x85bdE212E66e2BAE510E44Ed59116c1eC712795b",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0xECB3Dee212Af3F4618CBFC942968F1B2CB0d9029",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "LendingPoolAddressesProviderRegistry": {
@@ -273,51 +277,83 @@
     "hardhat": {
       "address": "0xE91bBe8ee03560E3dda2786f95335F5399813Ca0",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0xa7e790Dd4cF340e2e12E09b5798f3631Bfb433be",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "GenericLogic": {
     "hardhat": {
       "address": "0x3870a14c5057f596e385ea21537792fE4fF4C1BE",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0xdFeCcAF598b80497e1c8e9566F2396aE0934A536",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "ValidationLogic": {
     "hardhat": {
       "address": "0x4977FC58783ceBCC310311C800B786EcAf45F98f",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x5f9B70B852775A8dd5694476A4C0Ba4Fb84B63Fe",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "LendingPoolImpl": {
     "hardhat": {
       "address": "0x32eF223A01fB55Fd862E6E30d5F4A3b2d44f9586"
+    },
+    "kovan": {
+      "address": "0x00845Cfba453683B09e8301a0B5F84451De4aCA8"
     }
   },
   "LendingPool": {
     "hardhat": {
       "address": "0x32eF223A01fB55Fd862E6E30d5F4A3b2d44f9586",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x6795839480B7CAe0Ba8bc6f93945aed77e677006"
     }
   },
   "LendingPoolConfiguratorImpl": {
     "hardhat": {
       "address": "0x57965788BD1a93639CE738a58176e1A3d6F4d04f"
+    },
+    "kovan": {
+      "address": "0x451e95d9F6F90CE513B7602392677eac6DBf7541"
     }
   },
   "LendingPoolConfigurator": {
     "hardhat": {
       "address": "0xCDfa18cdFEFCa96D6c79628c6ef941201b63faE4"
+    },
+    "kovan": {
+      "address": "0xb4E2bfb04313F93d85421A3B474C9A75868Aec09"
     }
   },
   "StableAndVariableTokensHelper": {
     "hardhat": {
       "address": "0xdDD96662ea11dA6F289A5D00da41Ec5F3b67d2b4",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x235eF1B9b44c07c8967412DdD493DbFBA00c4e8E",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "ATokensAndRatesHelper": {
     "hardhat": {
       "address": "0xecE50C63d1Ae02Ba306c2b2E1579d0327220196e",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x03489e91C32bE1E38Da896ab754469F002959462",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "PriceOracle": {
@@ -336,88 +372,144 @@
     "hardhat": {
       "address": "0xbAc762e2000b6815268587b081Fd17aC25519aD5",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x19DAbFDCb4A892E290c447EC61a8556886f4160F",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "LendingRateOracle": {
     "hardhat": {
       "address": "0xAa7BC1924711B77A0F3Aaebdd550BfeDDDbaf3cd",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0xb1835c3473FCA6670B997A5E5935f252385d5e23",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "AaveProtocolDataProvider": {
     "hardhat": {
       "address": "0x987D8EE0F70EdC8e9651c9E6a1618B8Bc8B9FB61",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x7a226AC578590754FA2Fc5afd58bC7611bc234a4",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "AToken": {
     "hardhat": {
       "address": "0xAF4AC65bBdFfA029335436d85E1B57c77995C59B",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x584C2fD30A5C08b180818b93cE3Bf6ECE229961B",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "DelegationAwareAToken": {
     "hardhat": {
       "address": "0xE91bBe8ee03560E3dda2786f95335F5399813Ca0",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0xd92B8BAFE62Ec6CfE0aDdAF6f5FD1799aC4A9f2c",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "StableDebtToken": {
     "hardhat": {
       "address": "0xF11e5B522cDbc30b67dCcE3607C1e9796F55e9C3",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0xc1e89cF88802EA38d3D6feab08392D6e98e6933C",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "VariableDebtToken": {
     "hardhat": {
       "address": "0x4E43773D3A3aca08449fe18D3f26759CD43CBC2b",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0xfC43fE086b483fd00Ad370E1aDEA877Fd0CA0D0f",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "DefaultReserveInterestRateStrategy": {
     "hardhat": {
       "address": "0x5f7134cd38C826a7649f9Cc47dda24d834DD2967",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x6c38E689C6cF179b63654dC19770b2B5034462fD",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "rateStrategyAAVE": {
     "hardhat": {
       "address": "0x173ecAdAf173Cc423919B996D811368552cCa219"
+    },
+    "kovan": {
+      "address": "0xa8B6CC501620B8bCeE1fDCDEd0e9DF9b9083AA00"
     }
   },
   "rateStrategyVolatileOne": {
     "hardhat": {
       "address": "0x5D74e15E36492a9CC6fda503b3cFf0CA10d90a83"
+    },
+    "kovan": {
+      "address": "0x61bAA67Ce1BbA6bA17723DdeB157411a35789B2d"
     }
   },
   "rateStrategyStableOne": {
     "hardhat": {
       "address": "0x65A7D8d33E148D5Bf9fe11FD1425D31A4Bf3d9E1"
+    },
+    "kovan": {
+      "address": "0x127D7bb06B887f1f971fC7558Bd6e1C70fa77D35"
     }
   },
   "rateStrategyStableTwo": {
     "hardhat": {
       "address": "0x314B40e9232177AB0B54E874A7d351c781eFe44d"
+    },
+    "kovan": {
+      "address": "0xd38461cf157e0F2E9Ea5260329d2BA5966AAb555"
     }
   },
   "rateStrategyVolatileTwo": {
     "hardhat": {
       "address": "0x90b17b801434FB1c48a4f1888dd6C410d11Bda59"
+    },
+    "kovan": {
+      "address": "0x28203756d5e5a93086670fa11D405e607f3771eA"
     }
   },
   "rateStrategyVolatileThree": {
     "hardhat": {
       "address": "0xeB80313502EA077FA9B8E89b45e4a1B236cA17Ea"
+    },
+    "kovan": {
+      "address": "0xBcF5ffc37D53e099c3C412A832CD76f78D4D41E5"
     }
   },
   "rateStrategyStableThree": {
     "hardhat": {
       "address": "0x854161Fa77C3B0fF7A26e2AFcb72680d9eCB686E"
+    },
+    "kovan": {
+      "address": "0x6e7b79844C502BbfF479ca91dB0BF4e6fEf180eF"
     }
   },
   "rateStrategyWETH": {
     "hardhat": {
       "address": "0xB8054085AF605D93c32E6B829d3d7eA2A8C84F9A"
+    },
+    "kovan": {
+      "address": "0x6c38E689C6cF179b63654dC19770b2B5034462fD"
     }
   },
   "rateStrategyVolatileFour": {
@@ -482,12 +574,20 @@
     "hardhat": {
       "address": "0xB660Fdd109a95718cB9d20E3A89EE6cE342aDcB6",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0x53e81528b374aEF644c3ae7E93444EBDF5Ec4372",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "WETHGateway": {
     "hardhat": {
       "address": "0x830bceA96E56DBC1F8578f75fBaC0AF16B32A07d",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "kovan": {
+      "address": "0xe4C415ec62e26f984f504ac64Cb09740D39876D1",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   },
   "MintableDelegationERC20": {
@@ -518,6 +618,12 @@
     "hardhat": {
       "address": "0xE91bBe8ee03560E3dda2786f95335F5399813Ca0",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    }
+  },
+  "UiPoolDataProvider": {
+    "kovan": {
+      "address": "0x1cFDD873f09D4ebb110A311E3599466b187187E3",
+      "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
     }
   }
 }
