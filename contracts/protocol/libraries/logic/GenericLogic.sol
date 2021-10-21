@@ -14,7 +14,6 @@ import { DataTypes } from "../types/DataTypes.sol";
 
 /**
  * @title GenericLogic library
- * @author Aave
  * @title Implements protocol-level logic to calculate and validate the state of a user
  */
 library GenericLogic {

@@ -9,7 +9,6 @@ import { AToken } from "./AToken.sol";
 /**
  * @title Aave AToken enabled to delegate voting power of the underlying asset to a different address
  * @dev The underlying asset needs to be compatible with the COMP delegation interface
- * @author Aave
  */
 contract DelegationAwareAToken is AToken {
     modifier onlyPoolAdmin {

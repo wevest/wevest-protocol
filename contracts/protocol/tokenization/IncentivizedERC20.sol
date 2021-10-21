@@ -10,7 +10,7 @@ import { IAaveIncentivesController } from "../../interfaces/IAaveIncentivesContr
 /**
  * @title ERC20
  * @notice Basic ERC20 implementation
- * @author Aave, inspired by the Openzeppelin ERC20 implementation
+ * @author inspired by the Openzeppelin ERC20 implementation
  **/
 abstract contract IncentivizedERC20 is Context, IERC20, IERC20Detailed {
     using SafeMath for uint256;

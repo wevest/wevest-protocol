@@ -14,7 +14,6 @@ import { IAaveIncentivesController } from "../../interfaces/IAaveIncentivesContr
 /**
  * @title Aave ERC20 AToken
  * @dev Implementation of the interest bearing token for the Aave protocol
- * @author Aave
  */
 contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATOKEN_IMPL", 0), IAToken {
     using WadRayMath for uint256;

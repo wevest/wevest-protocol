@@ -3,7 +3,6 @@ pragma solidity 0.6.12;
 
 /**
  * @title Errors library
- * @author Aave
  * @notice Defines the error messages emitted by the different contracts of the Aave protocol
  * @dev Error messages prefix glossary:
  *  - VL = ValidationLogic

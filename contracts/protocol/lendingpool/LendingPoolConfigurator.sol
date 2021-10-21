@@ -21,7 +21,6 @@ import { ILendingPoolConfigurator } from "../../interfaces/ILendingPoolConfigura
 
 /**
  * @title LendingPoolConfigurator contract
- * @author Aave
  * @dev Implements the configuration methods for the Aave protocol
  **/
 

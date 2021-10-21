@@ -12,7 +12,6 @@ import { IAaveIncentivesController } from "../../interfaces/IAaveIncentivesContr
  * @title VariableDebtToken
  * @notice Implements a variable debt token to track the borrowing positions of users
  * at variable rate mode
- * @author Aave
  **/
 contract VariableDebtToken is DebtTokenBase, IVariableDebtToken {
     using WadRayMath for uint256;
