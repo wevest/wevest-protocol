@@ -7,7 +7,6 @@ import { IAaveIncentivesController } from "./IAaveIncentivesController.sol";
 
 /**
  * @title IVariableDebtToken
- * @author Aave
  * @notice Defines the basic interface for a variable debt token.
  **/
 interface IVariableDebtToken is IScaledBalanceToken, IInitializableDebtToken {

@@ -7,7 +7,6 @@ import { IAaveIncentivesController } from "./IAaveIncentivesController.sol";
 /**
  * @title IInitializableDebtToken
  * @notice Interface for the initialize function common between debt tokens
- * @author Aave
  **/
 interface IInitializableDebtToken {
     /**
