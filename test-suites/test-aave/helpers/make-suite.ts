@@ -11,10 +11,6 @@ import {
   getLendingPoolAddressesProviderRegistry,
   getWETHMocked,
   getWETHGateway,
-  getUniswapLiquiditySwapAdapter,
-  getUniswapRepayAdapter,
-  getFlashLiquidationAdapter,
-  getParaSwapLiquiditySwapAdapter,
 } from "../../../helpers/contracts-getters";
 import { eEthereumNetwork, eNetwork, tEthereumAddress } from "../../../helpers/types";
 import { LendingPool } from "../../../types/LendingPool";
@@ -39,7 +35,6 @@ import { WETH9Mocked } from "../../../types/WETH9Mocked";
 import { WETHGateway } from "../../../types/WETHGateway";
 import { solidity } from "ethereum-waffle";
 import { AaveConfig } from "../../../markets/aave";
-import { FlashLiquidationAdapter } from "../../../types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { usingTenderly } from "../../../helpers/tenderly-utils";
 
@@ -69,7 +64,6 @@ export interface TestEnv {
   uniswapRepayAdapter: UniswapRepayAdapter;
   registry: LendingPoolAddressesProviderRegistry;
   wethGateway: WETHGateway;
-  flashLiquidationAdapter: FlashLiquidationAdapter;
   paraswapLiquiditySwapAdapter: ParaSwapLiquiditySwapAdapter;
 }
 
@@ -94,7 +88,6 @@ const testEnv: TestEnv = {
   addressesProvider: {} as LendingPoolAddressesProvider,
   uniswapLiquiditySwapAdapter: {} as UniswapLiquiditySwapAdapter,
   uniswapRepayAdapter: {} as UniswapRepayAdapter,
-  flashLiquidationAdapter: {} as FlashLiquidationAdapter,
   paraswapLiquiditySwapAdapter: {} as ParaSwapLiquiditySwapAdapter,
   registry: {} as LendingPoolAddressesProviderRegistry,
   wethGateway: {} as WETHGateway,
@@ -158,12 +151,6 @@ export async function initializeMakeSuite() {
   testEnv.aave = await getMintableERC20(aaveAddress);
   testEnv.weth = await getWETHMocked(wethAddress);
   testEnv.wethGateway = await getWETHGateway();
-
-  testEnv.uniswapLiquiditySwapAdapter = await getUniswapLiquiditySwapAdapter();
-  testEnv.uniswapRepayAdapter = await getUniswapRepayAdapter();
-  testEnv.flashLiquidationAdapter = await getFlashLiquidationAdapter();
-
-  testEnv.paraswapLiquiditySwapAdapter = await getParaSwapLiquiditySwapAdapter();
 }
 
 const setSnapshot = async () => {
