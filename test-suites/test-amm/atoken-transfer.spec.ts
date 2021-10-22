@@ -6,7 +6,7 @@ import { RateMode, ProtocolErrors } from '../../helpers/types';
 import { makeSuite, TestEnv } from './helpers/make-suite';
 import { CommonsConfig } from '../../markets/amm/commons';
 
-const AAVE_REFERRAL = CommonsConfig.ProtocolGlobalParams.AaveReferral;
+// const AAVE_REFERRAL = CommonsConfig.ProtocolGlobalParams.AaveReferral;
 
 makeSuite('AToken: Transfer', (testEnv: TestEnv) => {
   const {
@@ -27,7 +27,7 @@ makeSuite('AToken: Transfer', (testEnv: TestEnv) => {
 
     await pool
       .connect(users[0].signer)
-      .deposit(dai.address, amountDAItoDeposit, users[0].address, '0');
+      .deposit(dai.address, amountDAItoDeposit, users[0].address);
 
     await aDai.connect(users[0].signer).transfer(users[1].address, amountDAItoDeposit);
 
@@ -55,16 +55,22 @@ makeSuite('AToken: Transfer', (testEnv: TestEnv) => {
 
     await pool
       .connect(users[0].signer)
-      .deposit(weth.address, ethers.utils.parseEther('1.0'), userAddress, '0');
+      .deposit(weth.address, ethers.utils.parseEther('1.0'), userAddress);
     await pool
       .connect(users[1].signer)
       .borrow(
         weth.address,
         ethers.utils.parseEther('0.1'),
         RateMode.Variable,
-        AAVE_REFERRAL,
         users[1].address
       );
+      /* .borrow(
+        weth.address,
+        ethers.utils.parseEther('0.1'),
+        RateMode.Variable,
+        AAVE_REFERRAL,
+        users[1].address
+      ); */
 
     const userReserveData = await helpersContract.getUserReserveData(
       weth.address,

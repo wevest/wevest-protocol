@@ -113,7 +113,7 @@ makeSuite('Mainnet Check list', (testEnv: TestEnv) => {
     // Deposit 10000 DAI
     await dai.connect(user.signer).mint(daiSize);
     await dai.connect(user.signer).approve(pool.address, daiSize);
-    await pool.connect(user.signer).deposit(dai.address, daiSize, user.address, '0');
+    await pool.connect(user.signer).deposit(dai.address, daiSize, user.address);
 
     const aTokensBalance = await aDai.balanceOf(user.address);
 
@@ -122,7 +122,7 @@ makeSuite('Mainnet Check list', (testEnv: TestEnv) => {
 
     // Borrow WETH with WETH as collateral
     await waitForTx(
-      await pool.connect(user.signer).borrow(weth.address, borrowSize, '1', '0', user.address)
+      await pool.connect(user.signer).borrow(weth.address, borrowSize, '1', user.address)
     );
 
     const debtBalance = await stableDebtToken.balanceOf(user.address);
@@ -162,7 +162,7 @@ makeSuite('Mainnet Check list', (testEnv: TestEnv) => {
 
     // Borrow WETH with WETH as collateral
     await waitForTx(
-      await pool.connect(user.signer).borrow(weth.address, borrowSize, '2', '0', user.address)
+      await pool.connect(user.signer).borrow(weth.address, borrowSize, '2', user.address)
     );
 
     const debtBalance = await varDebtToken.balanceOf(user.address);
