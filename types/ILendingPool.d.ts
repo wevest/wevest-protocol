@@ -22,8 +22,8 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface ILendingPoolInterface extends ethers.utils.Interface {
   functions: {
-    "borrow(address,uint256,uint256,uint16,address)": FunctionFragment;
-    "deposit(address,uint256,address,uint16)": FunctionFragment;
+    "borrow(address,uint256,uint256,address)": FunctionFragment;
+    "deposit(address,uint256,address)": FunctionFragment;
     "finalizeTransfer(address,address,address,uint256,uint256,uint256)": FunctionFragment;
     "getAddressesProvider()": FunctionFragment;
     "getConfiguration(address)": FunctionFragment;
@@ -48,11 +48,11 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "borrow",
-    values: [string, BigNumberish, BigNumberish, BigNumberish, string]
+    values: [string, BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
-    values: [string, BigNumberish, string, BigNumberish]
+    values: [string, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "finalizeTransfer",
@@ -201,8 +201,8 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "Borrow(address,address,address,uint256,uint256,uint256,uint16)": EventFragment;
-    "Deposit(address,address,address,uint256,uint16)": EventFragment;
+    "Borrow(address,address,address,uint256,uint256,uint256)": EventFragment;
+    "Deposit(address,address,address,uint256)": EventFragment;
     "LiquidationCall(address,address,address,uint256,uint256,address,bool)": EventFragment;
     "Paused()": EventFragment;
     "RebalanceStableBorrowRate(address,address)": EventFragment;
@@ -251,16 +251,14 @@ export class ILendingPool extends Contract {
       asset: string,
       amount: BigNumberish,
       interestRateMode: BigNumberish,
-      referralCode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "borrow(address,uint256,uint256,uint16,address)"(
+    "borrow(address,uint256,uint256,address)"(
       asset: string,
       amount: BigNumberish,
       interestRateMode: BigNumberish,
-      referralCode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -269,15 +267,13 @@ export class ILendingPool extends Contract {
       asset: string,
       amount: BigNumberish,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "deposit(address,uint256,address,uint16)"(
+    "deposit(address,uint256,address)"(
       asset: string,
       amount: BigNumberish,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -619,16 +615,14 @@ export class ILendingPool extends Contract {
     asset: string,
     amount: BigNumberish,
     interestRateMode: BigNumberish,
-    referralCode: BigNumberish,
     onBehalfOf: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "borrow(address,uint256,uint256,uint16,address)"(
+  "borrow(address,uint256,uint256,address)"(
     asset: string,
     amount: BigNumberish,
     interestRateMode: BigNumberish,
-    referralCode: BigNumberish,
     onBehalfOf: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -637,15 +631,13 @@ export class ILendingPool extends Contract {
     asset: string,
     amount: BigNumberish,
     onBehalfOf: string,
-    referralCode: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "deposit(address,uint256,address,uint16)"(
+  "deposit(address,uint256,address)"(
     asset: string,
     amount: BigNumberish,
     onBehalfOf: string,
-    referralCode: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -955,16 +947,14 @@ export class ILendingPool extends Contract {
       asset: string,
       amount: BigNumberish,
       interestRateMode: BigNumberish,
-      referralCode: BigNumberish,
       onBehalfOf: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "borrow(address,uint256,uint256,uint16,address)"(
+    "borrow(address,uint256,uint256,address)"(
       asset: string,
       amount: BigNumberish,
       interestRateMode: BigNumberish,
-      referralCode: BigNumberish,
       onBehalfOf: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -973,15 +963,13 @@ export class ILendingPool extends Contract {
       asset: string,
       amount: BigNumberish,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "deposit(address,uint256,address,uint16)"(
+    "deposit(address,uint256,address)"(
       asset: string,
       amount: BigNumberish,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1291,16 +1279,14 @@ export class ILendingPool extends Contract {
       onBehalfOf: string | null,
       amount: null,
       borrowRateMode: null,
-      borrowRate: null,
-      referral: BigNumberish | null
+      borrowRate: null
     ): EventFilter;
 
     Deposit(
       reserve: string | null,
       user: null,
       onBehalfOf: string | null,
-      amount: null,
-      referral: BigNumberish | null
+      amount: null
     ): EventFilter;
 
     LiquidationCall(
@@ -1367,16 +1353,14 @@ export class ILendingPool extends Contract {
       asset: string,
       amount: BigNumberish,
       interestRateMode: BigNumberish,
-      referralCode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "borrow(address,uint256,uint256,uint16,address)"(
+    "borrow(address,uint256,uint256,address)"(
       asset: string,
       amount: BigNumberish,
       interestRateMode: BigNumberish,
-      referralCode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -1385,15 +1369,13 @@ export class ILendingPool extends Contract {
       asset: string,
       amount: BigNumberish,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "deposit(address,uint256,address,uint16)"(
+    "deposit(address,uint256,address)"(
       asset: string,
       amount: BigNumberish,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -1625,16 +1607,14 @@ export class ILendingPool extends Contract {
       asset: string,
       amount: BigNumberish,
       interestRateMode: BigNumberish,
-      referralCode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "borrow(address,uint256,uint256,uint16,address)"(
+    "borrow(address,uint256,uint256,address)"(
       asset: string,
       amount: BigNumberish,
       interestRateMode: BigNumberish,
-      referralCode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -1643,15 +1623,13 @@ export class ILendingPool extends Contract {
       asset: string,
       amount: BigNumberish,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "deposit(address,uint256,address,uint16)"(
+    "deposit(address,uint256,address)"(
       asset: string,
       amount: BigNumberish,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

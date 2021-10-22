@@ -102,7 +102,6 @@ contract WETHGateway is IWETHGateway, Ownable {
      * @param lendingPool address of the targeted underlying lending pool
      * @param amount the amount of ETH to borrow
      * @param interesRateMode the interest rate mode
-     * @param referralCode integrators are assigned a referral code and can potentially receive rewards
      */
     function borrowETH(
         address lendingPool,

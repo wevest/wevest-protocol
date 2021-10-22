@@ -34,11 +34,6 @@ const _abi = [
         name: "interesRateMode",
         type: "uint256",
       },
-      {
-        internalType: "uint16",
-        name: "referralCode",
-        type: "uint16",
-      },
     ],
     name: "borrowETH",
     outputs: [],
@@ -56,11 +51,6 @@ const _abi = [
         internalType: "address",
         name: "onBehalfOf",
         type: "address",
-      },
-      {
-        internalType: "uint16",
-        name: "referralCode",
-        type: "uint16",
       },
     ],
     name: "depositETH",

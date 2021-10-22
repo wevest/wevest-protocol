@@ -24,8 +24,8 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 interface WETHGatewayInterface extends ethers.utils.Interface {
   functions: {
     "authorizeLendingPool(address)": FunctionFragment;
-    "borrowETH(address,uint256,uint256,uint16)": FunctionFragment;
-    "depositETH(address,address,uint16)": FunctionFragment;
+    "borrowETH(address,uint256,uint256)": FunctionFragment;
+    "depositETH(address,address)": FunctionFragment;
     "emergencyEtherTransfer(address,uint256)": FunctionFragment;
     "emergencyTokenTransfer(address,address,uint256)": FunctionFragment;
     "getWETHAddress()": FunctionFragment;
@@ -42,11 +42,11 @@ interface WETHGatewayInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "borrowETH",
-    values: [string, BigNumberish, BigNumberish, BigNumberish]
+    values: [string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositETH",
-    values: [string, string, BigNumberish]
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "emergencyEtherTransfer",
@@ -146,29 +146,25 @@ export class WETHGateway extends Contract {
       lendingPool: string,
       amount: BigNumberish,
       interesRateMode: BigNumberish,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "borrowETH(address,uint256,uint256,uint16)"(
+    "borrowETH(address,uint256,uint256)"(
       lendingPool: string,
       amount: BigNumberish,
       interesRateMode: BigNumberish,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
     depositETH(
       lendingPool: string,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: PayableOverrides
     ): Promise<ContractTransaction>;
 
-    "depositETH(address,address,uint16)"(
+    "depositETH(address,address)"(
       lendingPool: string,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: PayableOverrides
     ): Promise<ContractTransaction>;
 
@@ -273,29 +269,25 @@ export class WETHGateway extends Contract {
     lendingPool: string,
     amount: BigNumberish,
     interesRateMode: BigNumberish,
-    referralCode: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "borrowETH(address,uint256,uint256,uint16)"(
+  "borrowETH(address,uint256,uint256)"(
     lendingPool: string,
     amount: BigNumberish,
     interesRateMode: BigNumberish,
-    referralCode: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   depositETH(
     lendingPool: string,
     onBehalfOf: string,
-    referralCode: BigNumberish,
     overrides?: PayableOverrides
   ): Promise<ContractTransaction>;
 
-  "depositETH(address,address,uint16)"(
+  "depositETH(address,address)"(
     lendingPool: string,
     onBehalfOf: string,
-    referralCode: BigNumberish,
     overrides?: PayableOverrides
   ): Promise<ContractTransaction>;
 
@@ -392,29 +384,25 @@ export class WETHGateway extends Contract {
       lendingPool: string,
       amount: BigNumberish,
       interesRateMode: BigNumberish,
-      referralCode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "borrowETH(address,uint256,uint256,uint16)"(
+    "borrowETH(address,uint256,uint256)"(
       lendingPool: string,
       amount: BigNumberish,
       interesRateMode: BigNumberish,
-      referralCode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     depositETH(
       lendingPool: string,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "depositETH(address,address,uint16)"(
+    "depositETH(address,address)"(
       lendingPool: string,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -519,29 +507,25 @@ export class WETHGateway extends Contract {
       lendingPool: string,
       amount: BigNumberish,
       interesRateMode: BigNumberish,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "borrowETH(address,uint256,uint256,uint16)"(
+    "borrowETH(address,uint256,uint256)"(
       lendingPool: string,
       amount: BigNumberish,
       interesRateMode: BigNumberish,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
     depositETH(
       lendingPool: string,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: PayableOverrides
     ): Promise<BigNumber>;
 
-    "depositETH(address,address,uint16)"(
+    "depositETH(address,address)"(
       lendingPool: string,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: PayableOverrides
     ): Promise<BigNumber>;
 
@@ -639,29 +623,25 @@ export class WETHGateway extends Contract {
       lendingPool: string,
       amount: BigNumberish,
       interesRateMode: BigNumberish,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "borrowETH(address,uint256,uint256,uint16)"(
+    "borrowETH(address,uint256,uint256)"(
       lendingPool: string,
       amount: BigNumberish,
       interesRateMode: BigNumberish,
-      referralCode: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     depositETH(
       lendingPool: string,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
-    "depositETH(address,address,uint16)"(
+    "depositETH(address,address)"(
       lendingPool: string,
       onBehalfOf: string,
-      referralCode: BigNumberish,
       overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
