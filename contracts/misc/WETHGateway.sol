@@ -36,15 +36,10 @@ contract WETHGateway is IWETHGateway, Ownable {
      * is minted.
      * @param lendingPool address of the targeted underlying lending pool
      * @param onBehalfOf address of the user who will receive the aTokens representing the deposit
-     * @param referralCode integrators are assigned a referral code and can potentially receive rewards.
      **/
-    function depositETH(
-        address lendingPool,
-        address onBehalfOf,
-        uint16 referralCode
-    ) external payable override {
+    function depositETH(address lendingPool, address onBehalfOf) external payable override {
         WETH.deposit{ value: msg.value }();
-        ILendingPool(lendingPool).deposit(address(WETH), msg.value, onBehalfOf, referralCode);
+        ILendingPool(lendingPool).deposit(address(WETH), msg.value, onBehalfOf);
     }
 
     /**
@@ -112,10 +107,9 @@ contract WETHGateway is IWETHGateway, Ownable {
     function borrowETH(
         address lendingPool,
         uint256 amount,
-        uint256 interesRateMode,
-        uint16 referralCode
+        uint256 interesRateMode
     ) external override {
-        ILendingPool(lendingPool).borrow(address(WETH), amount, interesRateMode, referralCode, msg.sender);
+        ILendingPool(lendingPool).borrow(address(WETH), amount, interesRateMode, msg.sender);
         WETH.withdraw(amount);
         _safeTransferETH(msg.sender, amount);
     }

@@ -95,14 +95,11 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
      * @param onBehalfOf The address that will receive the aTokens, same as msg.sender if the user
      *   wants to receive them on his own wallet, or a different address if the beneficiary of aTokens
      *   is a different wallet
-     * @param referralCode Code used to register the integrator originating the operation, for potential rewards.
-     *   0 if the action is executed directly by the user, without any middle-man
      **/
     function deposit(
         address asset,
         uint256 amount,
-        address onBehalfOf,
-        uint16 referralCode
+        address onBehalfOf
     ) external override whenNotPaused {
         DataTypes.ReserveData storage reserve = _reserves[asset];
 
@@ -122,7 +119,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
             emit ReserveUsedAsCollateralEnabled(asset, onBehalfOf);
         }
 
-        emit Deposit(asset, msg.sender, onBehalfOf, amount, referralCode);
+        emit Deposit(asset, msg.sender, onBehalfOf, amount);
     }
 
     /**
@@ -199,22 +196,12 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         address asset,
         uint256 amount,
         uint256 interestRateMode,
-        uint16 referralCode,
         address onBehalfOf
     ) external override whenNotPaused {
         DataTypes.ReserveData storage reserve = _reserves[asset];
 
         _executeBorrow(
-            ExecuteBorrowParams(
-                asset,
-                msg.sender,
-                onBehalfOf,
-                amount,
-                interestRateMode,
-                reserve.aTokenAddress,
-                referralCode,
-                true
-            )
+            ExecuteBorrowParams(asset, msg.sender, onBehalfOf, amount, interestRateMode, reserve.aTokenAddress, true)
         );
     }
 
@@ -665,7 +652,6 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         uint256 amount;
         uint256 interestRateMode;
         address aTokenAddress;
-        uint16 referralCode;
         bool releaseUnderlying;
     }
 
@@ -736,8 +722,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
             vars.interestRateMode,
             DataTypes.InterestRateMode(vars.interestRateMode) == DataTypes.InterestRateMode.STABLE
                 ? currentStableRate
-                : reserve.currentVariableBorrowRate,
-            vars.referralCode
+                : reserve.currentVariableBorrowRate
         );
     }
 

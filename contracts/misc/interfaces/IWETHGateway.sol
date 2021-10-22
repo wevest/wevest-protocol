@@ -2,11 +2,7 @@
 pragma solidity 0.6.12;
 
 interface IWETHGateway {
-    function depositETH(
-        address lendingPool,
-        address onBehalfOf,
-        uint16 referralCode
-    ) external payable;
+    function depositETH(address lendingPool, address onBehalfOf) external payable;
 
     function withdrawETH(
         address lendingPool,
@@ -24,7 +20,6 @@ interface IWETHGateway {
     function borrowETH(
         address lendingPool,
         uint256 amount,
-        uint256 interesRateMode,
-        uint16 referralCode
+        uint256 interesRateMode
     ) external;
 }
