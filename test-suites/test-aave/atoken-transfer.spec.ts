@@ -6,7 +6,7 @@ import { RateMode, ProtocolErrors } from "../../helpers/types";
 import { makeSuite, TestEnv } from "./helpers/make-suite";
 import { CommonsConfig } from "../../markets/aave/commons";
 
-const AAVE_REFERRAL = CommonsConfig.ProtocolGlobalParams.AaveReferral;
+// const AAVE_REFERRAL = CommonsConfig.ProtocolGlobalParams.AaveReferral;
 
 makeSuite("AToken: Transfer", (testEnv: TestEnv) => {
   const { INVALID_FROM_BALANCE_AFTER_TRANSFER, INVALID_TO_BALANCE_AFTER_TRANSFER, VL_TRANSFER_NOT_ALLOWED } =
@@ -22,7 +22,7 @@ makeSuite("AToken: Transfer", (testEnv: TestEnv) => {
     //user 1 deposits 1000 DAI
     const amountDAItoDeposit = await convertToCurrencyDecimals(dai.address, "1000");
 
-    await pool.connect(users[0].signer).deposit(dai.address, amountDAItoDeposit, users[0].address, "0");
+    await pool.connect(users[0].signer).deposit(dai.address, amountDAItoDeposit, users[0].address);
 
     await aDai.connect(users[0].signer).transfer(users[1].address, amountDAItoDeposit);
 
@@ -45,11 +45,11 @@ makeSuite("AToken: Transfer", (testEnv: TestEnv) => {
 
     await weth.connect(users[0].signer).approve(pool.address, APPROVAL_AMOUNT_LENDING_POOL);
 
-    await pool.connect(users[0].signer).deposit(weth.address, ethers.utils.parseEther("1.0"), userAddress, "0");
+    await pool.connect(users[0].signer).deposit(weth.address, ethers.utils.parseEther("1.0"), userAddress);
     await pool
       .connect(users[1].signer)
-      .borrow(weth.address, ethers.utils.parseEther("0.1"), RateMode.Stable, AAVE_REFERRAL, users[1].address);
-
+      // .borrow(weth.address, ethers.utils.parseEther("0.1"), RateMode.Stable, AAVE_REFERRAL, users[1].address);
+      .borrow(weth.address, ethers.utils.parseEther("0.1"), RateMode.Stable, users[1].address);
     const userReserveData = await helpersContract.getUserReserveData(weth.address, users[1].address);
 
     expect(userReserveData.currentStableDebt.toString()).to.be.eq(ethers.utils.parseEther("0.1"));
