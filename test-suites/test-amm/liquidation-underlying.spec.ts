@@ -62,7 +62,7 @@ makeSuite('LendingPool liquidation - liquidator receiving the underlying asset',
 
     await pool
       .connect(depositor.signer)
-      .deposit(dai.address, amountDAItoDeposit, depositor.address, '0');
+      .deposit(dai.address, amountDAItoDeposit, depositor.address);
     //user 2 deposits 1 ETH
     const amountETHtoDeposit = await convertToCurrencyDecimals(weth.address, '1');
 
@@ -74,7 +74,7 @@ makeSuite('LendingPool liquidation - liquidator receiving the underlying asset',
 
     await pool
       .connect(borrower.signer)
-      .deposit(weth.address, amountETHtoDeposit, borrower.address, '0');
+      .deposit(weth.address, amountETHtoDeposit, borrower.address);
 
     //user 2 borrows
 
@@ -91,7 +91,7 @@ makeSuite('LendingPool liquidation - liquidator receiving the underlying asset',
 
     await pool
       .connect(borrower.signer)
-      .borrow(dai.address, amountDAIToBorrow, RateMode.Variable, '0', borrower.address);
+      .borrow(dai.address, amountDAIToBorrow, RateMode.Variable, borrower.address);
 
     const userGlobalDataAfter = await pool.getUserAccountData(borrower.address);
 
@@ -245,7 +245,7 @@ makeSuite('LendingPool liquidation - liquidator receiving the underlying asset',
 
     await pool
       .connect(depositor.signer)
-      .deposit(usdc.address, amountUSDCtoDeposit, depositor.address, '0');
+      .deposit(usdc.address, amountUSDCtoDeposit, depositor.address);
 
     //borrower deposits 1 ETH
     const amountETHtoDeposit = await convertToCurrencyDecimals(weth.address, '1');
@@ -258,7 +258,7 @@ makeSuite('LendingPool liquidation - liquidator receiving the underlying asset',
 
     await pool
       .connect(borrower.signer)
-      .deposit(weth.address, amountETHtoDeposit, borrower.address, '0');
+      .deposit(weth.address, amountETHtoDeposit, borrower.address);
 
     //borrower borrows
     const userGlobalData = await pool.getUserAccountData(borrower.address);
@@ -275,7 +275,7 @@ makeSuite('LendingPool liquidation - liquidator receiving the underlying asset',
 
     await pool
       .connect(borrower.signer)
-      .borrow(usdc.address, amountUSDCToBorrow, RateMode.Variable, '0', borrower.address);
+      .borrow(usdc.address, amountUSDCToBorrow, RateMode.Variable, borrower.address);
 
     //drops HF below 1
     await oracle.setAssetPrice(
@@ -396,7 +396,7 @@ makeSuite('LendingPool liquidation - liquidator receiving the underlying asset',
 
     await pool
       .connect(borrower.signer)
-      .deposit(aave.address, amountToDeposit, borrower.address, '0');
+      .deposit(aave.address, amountToDeposit, borrower.address);
     const usdcPrice = await oracle.getAssetPrice(usdc.address);
 
     //drops HF below 1

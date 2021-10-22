@@ -374,7 +374,7 @@ makeSuite("LendingPoolConfigurator", (testEnv: TestEnv) => {
     const amountDAItoDeposit = await convertToCurrencyDecimals(dai.address, "1000");
 
     //user 1 deposits 1000 DAI
-    await pool.deposit(dai.address, amountDAItoDeposit, userAddress, "0");
+    await pool.deposit(dai.address, amountDAItoDeposit, userAddress);
 
     await expect(configurator.deactivateReserve(dai.address), LPC_RESERVE_LIQUIDITY_NOT_0).to.be.revertedWith(
       LPC_RESERVE_LIQUIDITY_NOT_0,

@@ -35,7 +35,7 @@ makeSuite('LendingPool liquidation - liquidator receiving aToken', (testEnv) => 
     const amountDAItoDeposit = await convertToCurrencyDecimals(dai.address, '1000');
     await pool
       .connect(depositor.signer)
-      .deposit(dai.address, amountDAItoDeposit, depositor.address, '0');
+      .deposit(dai.address, amountDAItoDeposit, depositor.address);
 
     const amountETHtoDeposit = await convertToCurrencyDecimals(weth.address, '1');
 
@@ -48,7 +48,7 @@ makeSuite('LendingPool liquidation - liquidator receiving aToken', (testEnv) => 
     //user 2 deposits 1 WETH
     await pool
       .connect(borrower.signer)
-      .deposit(weth.address, amountETHtoDeposit, borrower.address, '0');
+      .deposit(weth.address, amountETHtoDeposit, borrower.address);
 
     //user 2 borrows
     const userGlobalData = await pool.getUserAccountData(borrower.address);
@@ -64,7 +64,7 @@ makeSuite('LendingPool liquidation - liquidator receiving aToken', (testEnv) => 
 
     await pool
       .connect(borrower.signer)
-      .borrow(dai.address, amountDAIToBorrow, RateMode.Variable, '0', borrower.address);
+      .borrow(dai.address, amountDAIToBorrow, RateMode.Variable, borrower.address);
 
     const userGlobalDataAfter = await pool.getUserAccountData(borrower.address);
 
@@ -248,7 +248,7 @@ makeSuite('LendingPool liquidation - liquidator receiving aToken', (testEnv) => 
 
     await pool
       .connect(depositor.signer)
-      .deposit(usdc.address, amountUSDCtoDeposit, depositor.address, '0');
+      .deposit(usdc.address, amountUSDCtoDeposit, depositor.address);
 
     //user 4 deposits 1 ETH
     const amountETHtoDeposit = await convertToCurrencyDecimals(weth.address, '1');
@@ -261,7 +261,7 @@ makeSuite('LendingPool liquidation - liquidator receiving aToken', (testEnv) => 
 
     await pool
       .connect(borrower.signer)
-      .deposit(weth.address, amountETHtoDeposit, borrower.address, '0');
+      .deposit(weth.address, amountETHtoDeposit, borrower.address);
 
     //user 4 borrows
     const userGlobalData = await pool.getUserAccountData(borrower.address);
@@ -278,7 +278,7 @@ makeSuite('LendingPool liquidation - liquidator receiving aToken', (testEnv) => 
 
     await pool
       .connect(borrower.signer)
-      .borrow(usdc.address, amountUSDCToBorrow, RateMode.Variable, '0', borrower.address);
+      .borrow(usdc.address, amountUSDCToBorrow, RateMode.Variable, borrower.address);
 
     //drops HF below 1
 

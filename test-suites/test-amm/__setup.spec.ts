@@ -14,7 +14,6 @@ import {
   deployLendingPool,
   deployPriceOracle,
   deployLendingPoolCollateralManager,
-  deployMockFlashLoanReceiver,
   deployWalletBalancerProvider,
   deployAaveProtocolDataProvider,
   deployLendingRateOracle,
@@ -23,9 +22,6 @@ import {
   deployWETHGateway,
   deployWETHMocked,
   deployMockUniswapRouter,
-  deployUniswapLiquiditySwapAdapter,
-  deployUniswapRepayAdapter,
-  deployFlashLiquidationAdapter,
   authorizeWETHGateway,
   deployATokenImplementations,
   deployAaveOracle,
@@ -278,7 +274,7 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
   await waitForTx(
     await addressesProvider.setLendingPoolCollateralManager(collateralManager.address)
   );
-  await deployMockFlashLoanReceiver(addressesProvider.address);
+  // await deployMockFlashLoanReceiver(addressesProvider.address);
 
   const mockUniswapRouter = await deployMockUniswapRouter();
 
@@ -288,9 +284,9 @@ const buildTestEnv = async (deployer: Signer, secondaryWallet: Signer) => {
     mockTokens.WETH.address,
   ];
 
-  await deployUniswapLiquiditySwapAdapter(adapterParams);
-  await deployUniswapRepayAdapter(adapterParams);
-  await deployFlashLiquidationAdapter(adapterParams);
+  // await deployUniswapLiquiditySwapAdapter(adapterParams);
+  // await deployUniswapRepayAdapter(adapterParams);
+  // await deployFlashLiquidationAdapter(adapterParams);
 
   await deployWalletBalancerProvider();
 

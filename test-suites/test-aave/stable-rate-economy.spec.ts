@@ -95,13 +95,13 @@
 //     const amountDAItoDeposit = await convertToCurrencyDecimals(_daiAddress, "1000")
 
 //     //user 1 deposits 1000 DAI
-//     const txResult = await _lendingPoolInstance.deposit(_daiAddress, amountDAItoDeposit, "0", {
+//     const txResult = await _lendingPoolInstance.deposit(_daiAddress, amountDAItoDeposit, {
 //       from: _depositorAddress,
 //     })
 
 //     //user 2 deposits 1000 DAI, tries to borrow. Needs to be reverted as you can't borrow at a stable rate with the same collateral as the currency.
 //     const amountDAIToDepositBorrower = await convertToCurrencyDecimals(_daiAddress, "1000")
-//     await _lendingPoolInstance.deposit(_daiAddress, amountDAIToDepositBorrower, "0", {
+//     await _lendingPoolInstance.deposit(_daiAddress, amountDAIToDepositBorrower, {
 //       from: _borrowerAddress,
 //     })
 
@@ -131,7 +131,7 @@
 
 //     //user 2 deposits 5 ETH tries to borrow. needs to be reverted as you can't borrow more than 25% of the available reserve (250 DAI)
 //     const amountETHToDeposit = await convertToCurrencyDecimals(ETHEREUM_ADDRESS, "5")
-//     await _lendingPoolInstance.deposit(ETHEREUM_ADDRESS, amountETHToDeposit, "0", {
+//     await _lendingPoolInstance.deposit(ETHEREUM_ADDRESS, amountETHToDeposit, {
 //       from: _borrowerAddress,
 //       value: amountETHToDeposit,
 //     })
@@ -164,13 +164,13 @@
 //     })
 
 //     const amountDAIToDeposit = await convertToCurrencyDecimals(daiInstance.address, "1000")
-//     await _lendingPoolInstance.deposit(daiInstance.address, amountDAIToDeposit, "0", {
+//     await _lendingPoolInstance.deposit(daiInstance.address, amountDAIToDeposit, {
 //       from: user,
 //     })
 
 //     //user deposits 5 ETH as collateral
 //     const amountETHToDeposit = await convertToCurrencyDecimals(ETHEREUM_ADDRESS, "5")
-//     await _lendingPoolInstance.deposit(ETHEREUM_ADDRESS, amountETHToDeposit, "0", {
+//     await _lendingPoolInstance.deposit(ETHEREUM_ADDRESS, amountETHToDeposit, {
 //       from: user,
 //       value: amountETHToDeposit,
 //     })

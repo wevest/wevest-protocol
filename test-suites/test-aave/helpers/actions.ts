@@ -156,7 +156,7 @@ export const deposit = async (
 
   if (expectedResult === "success") {
     const txResult = await waitForTx(
-      await pool.connect(sender.signer).deposit(reserve, amountToDeposit, onBehalfOf, "0", txOptions),
+      await pool.connect(sender.signer).deposit(reserve, amountToDeposit, onBehalfOf, txOptions),
     );
 
     const {
@@ -195,10 +195,8 @@ export const deposit = async (
     //   );
     // });
   } else if (expectedResult === "revert") {
-    await expect(
-      pool.connect(sender.signer).deposit(reserve, amountToDeposit, onBehalfOf, "0", txOptions),
-      revertMessage,
-    ).to.be.reverted;
+    await expect(pool.connect(sender.signer).deposit(reserve, amountToDeposit, onBehalfOf, txOptions), revertMessage).to
+      .be.reverted;
   }
 };
 
@@ -331,7 +329,7 @@ export const borrow = async (
 
   if (expectedResult === "success") {
     const txResult = await waitForTx(
-      await pool.connect(user.signer).borrow(reserve, amountToBorrow, interestRateMode, "0", onBehalfOf),
+      await pool.connect(user.signer).borrow(reserve, amountToBorrow, interestRateMode, onBehalfOf),
     );
 
     const { txCost, txTimestamp } = await getTxCostAndTimestamp(txResult);
@@ -391,10 +389,8 @@ export const borrow = async (
     //   );
     // });
   } else if (expectedResult === "revert") {
-    await expect(
-      pool.connect(user.signer).borrow(reserve, amountToBorrow, interestRateMode, "0", onBehalfOf),
-      revertMessage,
-    ).to.be.reverted;
+    await expect(pool.connect(user.signer).borrow(reserve, amountToBorrow, interestRateMode, onBehalfOf), revertMessage)
+      .to.be.reverted;
   }
 };
 
