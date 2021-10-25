@@ -205,9 +205,6 @@ library ValidationLogic {
 
             require(amount <= maxLoanSizeStable, Errors.VL_AMOUNT_BIGGER_THAN_MAX_LOAN_SIZE_STABLE);
         } */
-
-        /** added by SC */
-        vars.availableLiquidity = IERC20(asset).balanceOf(reserve.aTokenAddress);
     }
 
     /**
@@ -215,16 +212,14 @@ library ValidationLogic {
      * @param reserve The reserve state from which the user is repaying
      * @param amountSent The amount sent for the repayment. Can be an actual value or uint(-1)
      * @param onBehalfOf The address of the user msg.sender is repaying for
-     * @param stableDebt The borrow balance of the user
-     * @param variableDebt The borrow balance of the user
+     * stableDebt - The borrow balance of the user
+     * variableDebt - The borrow balance of the user
      */
     function validateRepay(
         DataTypes.ReserveData storage reserve,
         uint256 amountSent,
-        DataTypes.InterestRateMode rateMode,
-        address onBehalfOf,
-        uint256 stableDebt,
-        uint256 variableDebt
+        // DataTypes.InterestRateMode rateMode,
+        address onBehalfOf // uint256 stableDebt, // uint256 variableDebt
     ) external view {
         bool isActive = reserve.configuration.getActive();
 
@@ -232,11 +227,11 @@ library ValidationLogic {
 
         require(amountSent > 0, Errors.VL_INVALID_AMOUNT);
 
-        require(
+        /* require(
             (stableDebt > 0 && DataTypes.InterestRateMode(rateMode) == DataTypes.InterestRateMode.STABLE) ||
                 (variableDebt > 0 && DataTypes.InterestRateMode(rateMode) == DataTypes.InterestRateMode.VARIABLE),
             Errors.VL_NO_DEBT_OF_SELECTED_TYPE
-        );
+        ); */
 
         require(amountSent != uint256(-1) || msg.sender == onBehalfOf, Errors.VL_NO_EXPLICIT_AMOUNT_TO_REPAY_ON_BEHALF);
     }

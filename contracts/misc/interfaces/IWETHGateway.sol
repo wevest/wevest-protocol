@@ -10,12 +10,12 @@ interface IWETHGateway {
         address onBehalfOf
     ) external;
 
-    function repayETH(
+    /* function repayETH(
         address lendingPool,
         uint256 amount,
         uint256 rateMode,
         address onBehalfOf
-    ) external payable;
+    ) external payable; */
 
     /* function borrowETH(
         address lendingPool,
@@ -24,5 +24,12 @@ interface IWETHGateway {
     ) external; */
 
     /** added by SC */
+
+    function repayETH(
+        address lendingPool,
+        uint256 amount,
+        address onBehalfOf
+    ) external payable;
+
     function borrowETH(address lendingPool, uint256 amount) external;
 }

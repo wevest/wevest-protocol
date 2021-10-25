@@ -6,7 +6,7 @@ import { IScaledBalanceToken } from "./IScaledBalanceToken.sol";
 import { IInitializableAToken } from "./IInitializableAToken.sol";
 import { IAaveIncentivesController } from "./IAaveIncentivesController.sol";
 
-interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
+interface IWvToken is IERC20, IScaledBalanceToken, IInitializableAToken {
     /**
      * @dev Emitted after the mint action
      * @param from The address performing the mint
