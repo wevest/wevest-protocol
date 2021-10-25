@@ -85,7 +85,8 @@ makeSuite("LendingPool liquidation - liquidator receiving the underlying asset",
         .toFixed(0),
     );
 
-    await pool.connect(borrower.signer).borrow(dai.address, amountDAIToBorrow, RateMode.Stable, borrower.address);
+    // await pool.connect(borrower.signer).borrow(dai.address, amountDAIToBorrow, RateMode.Stable, borrower.address);
+    await pool.connect(borrower.signer).borrow(dai.address, amountDAIToBorrow, borrower.address);
 
     const userGlobalDataAfter = await pool.getUserAccountData(borrower.address);
 
@@ -230,7 +231,8 @@ makeSuite("LendingPool liquidation - liquidator receiving the underlying asset",
         .toFixed(0),
     );
 
-    await pool.connect(borrower.signer).borrow(usdc.address, amountUSDCToBorrow, RateMode.Stable, borrower.address);
+    // await pool.connect(borrower.signer).borrow(usdc.address, amountUSDCToBorrow, RateMode.Stable, borrower.address);
+    await pool.connect(borrower.signer).borrow(usdc.address, amountUSDCToBorrow, borrower.address);
 
     //drops HF below 1
     await oracle.setAssetPrice(usdc.address, new BigNumber(usdcPrice.toString()).multipliedBy(1.12).toFixed(0));

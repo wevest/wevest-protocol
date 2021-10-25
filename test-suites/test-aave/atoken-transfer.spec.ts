@@ -49,7 +49,7 @@ makeSuite("AToken: Transfer", (testEnv: TestEnv) => {
     await pool
       .connect(users[1].signer)
       // .borrow(weth.address, ethers.utils.parseEther("0.1"), RateMode.Stable, AAVE_REFERRAL, users[1].address);
-      .borrow(weth.address, ethers.utils.parseEther("0.1"), RateMode.Stable, users[1].address);
+      .borrow(weth.address, ethers.utils.parseEther("0.1"), users[1].address);
     const userReserveData = await helpersContract.getUserReserveData(weth.address, users[1].address);
 
     expect(userReserveData.currentStableDebt.toString()).to.be.eq(ethers.utils.parseEther("0.1"));

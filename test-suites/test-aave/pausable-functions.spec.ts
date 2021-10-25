@@ -105,7 +105,8 @@ makeSuite("Pausable Pool", (testEnv: TestEnv) => {
     await configurator.connect(users[1].signer).setPoolPause(true);
 
     // Try to execute liquidation
-    await expect(pool.connect(user.signer).borrow(dai.address, "1", "1", user.address)).revertedWith(LP_IS_PAUSED);
+    // await expect(pool.connect(user.signer).borrow(dai.address, "1", "1", user.address)).revertedWith(LP_IS_PAUSED);
+    await expect(pool.connect(user.signer).borrow(dai.address, "1", user.address)).revertedWith(LP_IS_PAUSED);
 
     // Unpause the pool
     await configurator.connect(users[1].signer).setPoolPause(false);
@@ -165,7 +166,8 @@ makeSuite("Pausable Pool", (testEnv: TestEnv) => {
         .toFixed(0),
     );
 
-    await pool.connect(borrower.signer).borrow(usdc.address, amountUSDCToBorrow, RateMode.Stable, borrower.address);
+    // await pool.connect(borrower.signer).borrow(usdc.address, amountUSDCToBorrow, RateMode.Stable, borrower.address);
+    await pool.connect(borrower.signer).borrow(usdc.address, amountUSDCToBorrow, borrower.address);
 
     // Drops HF below 1
     await oracle.setAssetPrice(usdc.address, new BigNumber(usdcPrice.toString()).multipliedBy(1.2).toFixed(0));
@@ -207,7 +209,8 @@ makeSuite("Pausable Pool", (testEnv: TestEnv) => {
     await dai.connect(user.signer).approve(pool.address, APPROVAL_AMOUNT_LENDING_POOL);
     await pool.connect(user.signer).deposit(dai.address, amountDAIToDeposit, user.address);
 
-    await pool.connect(user.signer).borrow(usdc.address, amountToBorrow, 2, user.address);
+    // await pool.connect(user.signer).borrow(usdc.address, amountToBorrow, 2, user.address);
+    await pool.connect(user.signer).borrow(usdc.address, amountToBorrow, user.address);
 
     // Pause pool
     await configurator.connect(users[1].signer).setPoolPause(true);

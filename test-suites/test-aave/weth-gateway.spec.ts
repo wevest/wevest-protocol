@@ -120,7 +120,8 @@ makeSuite("Use native ETH at LendingPool via WETHGateway", (testEnv: TestEnv) =>
     expect(aTokensBalance).to.be.gte(daiSize);
 
     // Borrow WETH with WETH as collateral
-    await waitForTx(await pool.connect(user.signer).borrow(weth.address, borrowSize, "1", user.address));
+    // await waitForTx(await pool.connect(user.signer).borrow(weth.address, borrowSize, "1", user.address));
+    await waitForTx(await pool.connect(user.signer).borrow(weth.address, borrowSize, user.address));
 
     const debtBalance = await stableDebtToken.balanceOf(user.address);
 
@@ -160,7 +161,8 @@ makeSuite("Use native ETH at LendingPool via WETHGateway", (testEnv: TestEnv) =>
     expect(aTokensBalance).to.be.gte(depositSize);
 
     // Borrow WETH with WETH as collateral
-    await waitForTx(await pool.connect(user.signer).borrow(weth.address, borrowSize, "2", user.address));
+    // await waitForTx(await pool.connect(user.signer).borrow(weth.address, borrowSize, "2", user.address));
+    await waitForTx(await pool.connect(user.signer).borrow(weth.address, borrowSize, user.address));
 
     const debtBalance = await varDebtToken.balanceOf(user.address);
 
