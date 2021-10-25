@@ -22,7 +22,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface ILendingPoolInterface extends ethers.utils.Interface {
   functions: {
-    "borrow(address,uint256,uint256,address)": FunctionFragment;
+    "borrow(address,uint256,address)": FunctionFragment;
     "deposit(address,uint256,address)": FunctionFragment;
     "finalizeTransfer(address,address,address,uint256,uint256,uint256)": FunctionFragment;
     "getAddressesProvider()": FunctionFragment;
@@ -48,7 +48,7 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "borrow",
-    values: [string, BigNumberish, BigNumberish, string]
+    values: [string, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
@@ -201,7 +201,7 @@ interface ILendingPoolInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "Borrow(address,address,address,uint256,uint256,uint256)": EventFragment;
+    "Borrow(address,address,address,uint256)": EventFragment;
     "Deposit(address,address,address,uint256)": EventFragment;
     "LiquidationCall(address,address,address,uint256,uint256,address,bool)": EventFragment;
     "Paused()": EventFragment;
@@ -250,15 +250,13 @@ export class ILendingPool extends Contract {
     borrow(
       asset: string,
       amount: BigNumberish,
-      interestRateMode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "borrow(address,uint256,uint256,address)"(
+    "borrow(address,uint256,address)"(
       asset: string,
       amount: BigNumberish,
-      interestRateMode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -614,15 +612,13 @@ export class ILendingPool extends Contract {
   borrow(
     asset: string,
     amount: BigNumberish,
-    interestRateMode: BigNumberish,
     onBehalfOf: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "borrow(address,uint256,uint256,address)"(
+  "borrow(address,uint256,address)"(
     asset: string,
     amount: BigNumberish,
-    interestRateMode: BigNumberish,
     onBehalfOf: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -946,15 +942,13 @@ export class ILendingPool extends Contract {
     borrow(
       asset: string,
       amount: BigNumberish,
-      interestRateMode: BigNumberish,
       onBehalfOf: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "borrow(address,uint256,uint256,address)"(
+    "borrow(address,uint256,address)"(
       asset: string,
       amount: BigNumberish,
-      interestRateMode: BigNumberish,
       onBehalfOf: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1277,9 +1271,7 @@ export class ILendingPool extends Contract {
       reserve: string | null,
       user: null,
       onBehalfOf: string | null,
-      amount: null,
-      borrowRateMode: null,
-      borrowRate: null
+      amount: null
     ): EventFilter;
 
     Deposit(
@@ -1352,15 +1344,13 @@ export class ILendingPool extends Contract {
     borrow(
       asset: string,
       amount: BigNumberish,
-      interestRateMode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "borrow(address,uint256,uint256,address)"(
+    "borrow(address,uint256,address)"(
       asset: string,
       amount: BigNumberish,
-      interestRateMode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -1606,15 +1596,13 @@ export class ILendingPool extends Contract {
     borrow(
       asset: string,
       amount: BigNumberish,
-      interestRateMode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "borrow(address,uint256,uint256,address)"(
+    "borrow(address,uint256,address)"(
       asset: string,
       amount: BigNumberish,
-      interestRateMode: BigNumberish,
       onBehalfOf: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;

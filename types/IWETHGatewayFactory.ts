@@ -29,11 +29,6 @@ const _abi = [
         name: "amount",
         type: "uint256",
       },
-      {
-        internalType: "uint256",
-        name: "interesRateMode",
-        type: "uint256",
-      },
     ],
     name: "borrowETH",
     outputs: [],

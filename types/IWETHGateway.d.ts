@@ -23,7 +23,7 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface IWETHGatewayInterface extends ethers.utils.Interface {
   functions: {
-    "borrowETH(address,uint256,uint256)": FunctionFragment;
+    "borrowETH(address,uint256)": FunctionFragment;
     "depositETH(address,address)": FunctionFragment;
     "repayETH(address,uint256,uint256,address)": FunctionFragment;
     "withdrawETH(address,uint256,address)": FunctionFragment;
@@ -31,7 +31,7 @@ interface IWETHGatewayInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "borrowETH",
-    values: [string, BigNumberish, BigNumberish]
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "depositETH",
@@ -74,14 +74,12 @@ export class IWETHGateway extends Contract {
     borrowETH(
       lendingPool: string,
       amount: BigNumberish,
-      interesRateMode: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "borrowETH(address,uint256,uint256)"(
+    "borrowETH(address,uint256)"(
       lendingPool: string,
       amount: BigNumberish,
-      interesRateMode: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -131,14 +129,12 @@ export class IWETHGateway extends Contract {
   borrowETH(
     lendingPool: string,
     amount: BigNumberish,
-    interesRateMode: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "borrowETH(address,uint256,uint256)"(
+  "borrowETH(address,uint256)"(
     lendingPool: string,
     amount: BigNumberish,
-    interesRateMode: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -188,14 +184,12 @@ export class IWETHGateway extends Contract {
     borrowETH(
       lendingPool: string,
       amount: BigNumberish,
-      interesRateMode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "borrowETH(address,uint256,uint256)"(
+    "borrowETH(address,uint256)"(
       lendingPool: string,
       amount: BigNumberish,
-      interesRateMode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -248,14 +242,12 @@ export class IWETHGateway extends Contract {
     borrowETH(
       lendingPool: string,
       amount: BigNumberish,
-      interesRateMode: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "borrowETH(address,uint256,uint256)"(
+    "borrowETH(address,uint256)"(
       lendingPool: string,
       amount: BigNumberish,
-      interesRateMode: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -306,14 +298,12 @@ export class IWETHGateway extends Contract {
     borrowETH(
       lendingPool: string,
       amount: BigNumberish,
-      interesRateMode: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "borrowETH(address,uint256,uint256)"(
+    "borrowETH(address,uint256)"(
       lendingPool: string,
       amount: BigNumberish,
-      interesRateMode: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

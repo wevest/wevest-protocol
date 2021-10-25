@@ -44,18 +44,6 @@ const _abi = [
         name: "amount",
         type: "uint256",
       },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "borrowRateMode",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "borrowRate",
-        type: "uint256",
-      },
     ],
     name: "Borrow",
     type: "event",
@@ -349,11 +337,6 @@ const _abi = [
       {
         internalType: "uint256",
         name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "interestRateMode",
         type: "uint256",
       },
       {

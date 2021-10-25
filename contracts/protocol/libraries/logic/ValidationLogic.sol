@@ -108,8 +108,8 @@ library ValidationLogic {
      * @param userAddress The address of the user
      * @param amount The amount to be borrowed
      * @param amountInETH The amount to be borrowed, in ETH
-     * @param interestRateMode The interest rate mode at which the user is borrowing
-     * @param maxStableLoanPercent The max amount of the liquidity that can be borrowed at stable rate, in percentage
+     * interestRateMode - The interest rate mode at which the user is borrowing
+     * maxStableLoanPercent The max amount of the liquidity that can be borrowed at stable rate, in percentage
      * @param reservesData The state of all the reserves
      * @param userConfig The state of the user for the specific reserve
      * @param reserves The addresses of all the active reserves
@@ -122,8 +122,6 @@ library ValidationLogic {
         address userAddress,
         uint256 amount,
         uint256 amountInETH,
-        uint256 interestRateMode,
-        uint256 maxStableLoanPercent,
         mapping(address => DataTypes.ReserveData) storage reservesData,
         DataTypes.UserConfigurationMap storage userConfig,
         mapping(uint256 => address) storage reserves,
@@ -143,11 +141,11 @@ library ValidationLogic {
         require(vars.borrowingEnabled, Errors.VL_BORROWING_NOT_ENABLED);
 
         //validate interest rate mode
-        require(
+        /* require(
             uint256(DataTypes.InterestRateMode.VARIABLE) == interestRateMode ||
                 uint256(DataTypes.InterestRateMode.STABLE) == interestRateMode,
             Errors.VL_INVALID_INTEREST_RATE_MODE_SELECTED
-        );
+        ); */
 
         (
             vars.userCollateralBalanceETH,
@@ -187,7 +185,7 @@ library ValidationLogic {
          * 3. Users will be able to borrow only a portion of the total available liquidity
          **/
 
-        if (interestRateMode == uint256(DataTypes.InterestRateMode.STABLE)) {
+        /* if (interestRateMode == uint256(DataTypes.InterestRateMode.STABLE)) {
             //check if the borrow mode is stable and if stable rate borrowing is enabled on this reserve
 
             require(vars.stableRateBorrowingEnabled, Errors.VL_STABLE_BORROWING_NOT_ENABLED);
@@ -206,7 +204,10 @@ library ValidationLogic {
             uint256 maxLoanSizeStable = vars.availableLiquidity.percentMul(maxStableLoanPercent);
 
             require(amount <= maxLoanSizeStable, Errors.VL_AMOUNT_BIGGER_THAN_MAX_LOAN_SIZE_STABLE);
-        }
+        } */
+
+        /** added by SC */
+        vars.availableLiquidity = IERC20(asset).balanceOf(reserve.aTokenAddress);
     }
 
     /**

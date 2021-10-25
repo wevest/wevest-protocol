@@ -265,12 +265,20 @@
     "kovan": {
       "address": "0xECB3Dee212Af3F4618CBFC942968F1B2CB0d9029",
       "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
+    },
+    "ropsten": {
+      "address": "0x0D3Eb30E20B9B629Cd6dfe00F44a8F964A4589eF",
+      "deployer": "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB"
     }
   },
   "LendingPoolAddressesProviderRegistry": {
     "hardhat": {
       "address": "0x00aD4926D7613c8e00cB6CFa61831D5668265724",
       "deployer": "0xc783df8a850f42e7F7e57013759C285caa701eB6"
+    },
+    "ropsten": {
+      "address": "0x4976237b93E4389531eEA8fef549E8506f4961dc",
+      "deployer": "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB"
     }
   },
   "ReserveLogic": {
@@ -281,6 +289,10 @@
     "kovan": {
       "address": "0xa7e790Dd4cF340e2e12E09b5798f3631Bfb433be",
       "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
+    },
+    "ropsten": {
+      "address": "0x5dBDfA4C7b162BcA03D42CD74AeD7289368eBE9C",
+      "deployer": "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB"
     }
   },
   "GenericLogic": {
@@ -291,6 +303,10 @@
     "kovan": {
       "address": "0xdFeCcAF598b80497e1c8e9566F2396aE0934A536",
       "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
+    },
+    "ropsten": {
+      "address": "0xdFA1164eBD8F7819c546e961d02D0E17E10cdd76",
+      "deployer": "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB"
     }
   },
   "ValidationLogic": {
@@ -301,6 +317,10 @@
     "kovan": {
       "address": "0x458D9124205E1a72Be2967e7879e04dB3869C599",
       "deployer": "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1"
+    },
+    "ropsten": {
+      "address": "0x7f9977DAe94EF384e88a303CF169573b634bC159",
+      "deployer": "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB"
     }
   },
   "LendingPoolImpl": {
@@ -309,6 +329,9 @@
     },
     "kovan": {
       "address": "0x93d632Cb5924D414DEAF9D502651D0D3a06eF239"
+    },
+    "ropsten": {
+      "address": "0x8d95530A10bE1c3d7a8dD9cE852aF2334FCc01a0"
     }
   },
   "LendingPool": {
@@ -318,6 +341,9 @@
     },
     "kovan": {
       "address": "0x4017B94145c9A44f78F8d6c965C120e7798A3421"
+    },
+    "ropsten": {
+      "address": "0x7d78d23f5E9fC3E6FcAC5282C5Bcd98B610b988F"
     }
   },
   "LendingPoolConfiguratorImpl": {
@@ -326,6 +352,9 @@
     },
     "kovan": {
       "address": "0xe65854b3f497652E57fD641B8F869432848980f8"
+    },
+    "ropsten": {
+      "address": "0xBaF35b850e9c7bd6C5E3cD892B37b13F2082D74f"
     }
   },
   "LendingPoolConfigurator": {
@@ -334,6 +363,9 @@
     },
     "kovan": {
       "address": "0xf98c668D9083162B85a4a13c9DF25Fb9dB563bdD"
+    },
+    "ropsten": {
+      "address": "0xC19a86Dd1EfCB7F5436C6d734aA748D4EA192213"
     }
   },
   "StableAndVariableTokensHelper": {

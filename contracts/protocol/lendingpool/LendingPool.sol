@@ -185,12 +185,11 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
      *   and 100 stable/variable debt tokens, depending on the `interestRateMode`
      * @param asset The address of the underlying asset to borrow
      * @param amount The amount to be borrowed
-     * @param interestRateMode The interest rate mode at which the user wants to borrow: 1 for Stable, 2 for Variable
      * @param onBehalfOf Address of the user who will receive the debt. Should be the address of the borrower itself
      * calling the function if he wants to borrow against his own collateral, or the address of the credit delegator
      * if he has been given credit delegation allowance
      **/
-    function borrow(
+    /* function borrow(
         address asset,
         uint256 amount,
         uint256 interestRateMode,
@@ -201,6 +200,15 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         _executeBorrow(
             ExecuteBorrowParams(asset, msg.sender, onBehalfOf, amount, interestRateMode, reserve.aTokenAddress, true)
         );
+    } */
+    function borrow(
+        address asset,
+        uint256 amount,
+        address onBehalfOf
+    ) external override whenNotPaused {
+        DataTypes.ReserveData storage reserve = _reserves[asset];
+
+        _executeBorrow(ExecuteBorrowParams(asset, msg.sender, onBehalfOf, amount, reserve.aTokenAddress, true));
     }
 
     /**
@@ -643,12 +651,20 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         }
     }
 
-    struct ExecuteBorrowParams {
+    /* struct ExecuteBorrowParams {
         address asset;
         address user;
         address onBehalfOf;
         uint256 amount;
         uint256 interestRateMode;
+        address aTokenAddress;
+        bool releaseUnderlying;
+    } */
+    struct ExecuteBorrowParams {
+        address asset;
+        address user;
+        address onBehalfOf;
+        uint256 amount;
         address aTokenAddress;
         bool releaseUnderlying;
     }
@@ -664,7 +680,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
                 10**reserve.configuration.getDecimals()
             );
 
-        ValidationLogic.validateBorrow(
+        /* ValidationLogic.validateBorrow(
             vars.asset,
             reserve,
             vars.onBehalfOf,
@@ -677,6 +693,18 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
             _reservesList,
             _reservesCount,
             oracle
+        ); */
+        ValidationLogic.validateBorrow(
+            vars.asset,
+            reserve,
+            vars.onBehalfOf,
+            vars.amount,
+            amountInETH,
+            _reserves,
+            userConfig,
+            _reservesList,
+            _reservesCount,
+            oracle
         );
 
         reserve.updateState();
@@ -684,7 +712,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         uint256 currentStableRate = 0;
 
         bool isFirstBorrowing = false;
-        if (DataTypes.InterestRateMode(vars.interestRateMode) == DataTypes.InterestRateMode.STABLE) {
+        /* if (DataTypes.InterestRateMode(vars.interestRateMode) == DataTypes.InterestRateMode.STABLE) {
             currentStableRate = reserve.currentStableBorrowRate;
 
             isFirstBorrowing = IStableDebtToken(reserve.stableDebtTokenAddress).mint(
@@ -700,7 +728,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
                 vars.amount,
                 reserve.variableBorrowIndex
             );
-        }
+        } */
 
         if (isFirstBorrowing) {
             userConfig.setBorrowing(reserve.id, true);
@@ -712,7 +740,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
             IAToken(vars.aTokenAddress).transferUnderlyingTo(vars.user, vars.amount);
         }
 
-        emit Borrow(
+        /* emit Borrow(
             vars.asset,
             vars.user,
             vars.onBehalfOf,
@@ -721,7 +749,8 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
             DataTypes.InterestRateMode(vars.interestRateMode) == DataTypes.InterestRateMode.STABLE
                 ? currentStableRate
                 : reserve.currentVariableBorrowRate
-        );
+        ); */
+        emit Borrow(vars.asset, vars.user, vars.onBehalfOf, vars.amount);
     }
 
     function _addReserveToList(address asset) internal {
