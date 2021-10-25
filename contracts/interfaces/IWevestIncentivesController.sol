@@ -2,7 +2,7 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
-interface IAaveIncentivesController {
+interface IWevestIncentivesController {
     event RewardsAccrued(address indexed user, uint256 amount);
 
     event RewardsClaimed(address indexed user, address indexed to, uint256 amount);
@@ -56,10 +56,10 @@ interface IAaveIncentivesController {
 
     /**
      * @dev Configure assets for a certain rewards emission
-     * @param assets The assets to incentivize
+     * @param _assets The assets to incentivize
      * @param emissionsPerSecond The emission for each asset
      */
-    function configureAssets(address[] calldata assets, uint256[] calldata emissionsPerSecond) external;
+    function configureAssets(address[] calldata _assets, uint256[] calldata emissionsPerSecond) external;
 
     /**
      * @dev Called by the corresponding asset on any update that affects the rewards distribution
@@ -78,7 +78,7 @@ interface IAaveIncentivesController {
      * @param user The address of the user
      * @return The rewards
      **/
-    function getRewardsBalance(address[] calldata assets, address user) external view returns (uint256);
+    function getRewardsBalance(address[] calldata _assets, address user) external view returns (uint256);
 
     /**
      * @dev Claims reward for an user, on all the assets of the lending pool, accumulating the pending rewards
@@ -87,7 +87,7 @@ interface IAaveIncentivesController {
      * @return Rewards claimed
      **/
     function claimRewards(
-        address[] calldata assets,
+        address[] calldata _assets,
         uint256 amount,
         address to
     ) external returns (uint256);
@@ -101,7 +101,7 @@ interface IAaveIncentivesController {
      * @return Rewards claimed
      **/
     function claimRewardsOnBehalf(
-        address[] calldata assets,
+        address[] calldata _assets,
         uint256 amount,
         address user,
         address to
