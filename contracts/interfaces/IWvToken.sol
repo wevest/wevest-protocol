@@ -3,10 +3,10 @@ pragma solidity 0.6.12;
 
 import { IERC20 } from "../dependencies/openzeppelin/contracts/IERC20.sol";
 import { IScaledBalanceToken } from "./IScaledBalanceToken.sol";
-import { IInitializableAToken } from "./IInitializableAToken.sol";
-import { IAaveIncentivesController } from "./IAaveIncentivesController.sol";
+import { IInitializableWvToken } from "./IInitializableWvToken.sol";
+import { IWevestIncentivesController } from "./IWevestIncentivesController.sol";
 
-interface IWvToken is IERC20, IScaledBalanceToken, IInitializableAToken {
+interface IWvToken is IERC20, IScaledBalanceToken, IInitializableWvToken {
     /**
      * @dev Emitted after the mint action
      * @param from The address performing the mint
@@ -98,7 +98,7 @@ interface IWvToken is IERC20, IScaledBalanceToken, IInitializableAToken {
     /**
      * @dev Returns the address of the incentives controller contract
      **/
-    function getIncentivesController() external view returns (IAaveIncentivesController);
+    function getIncentivesController() external view returns (IWevestIncentivesController);
 
     /**
      * @dev Returns the address of the underlying asset of this wvToken (E.g. WETH for wvWETH)

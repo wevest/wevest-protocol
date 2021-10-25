@@ -3,7 +3,7 @@ pragma solidity 0.6.12;
 
 import { IScaledBalanceToken } from "./IScaledBalanceToken.sol";
 import { IInitializableDebtToken } from "./IInitializableDebtToken.sol";
-import { IAaveIncentivesController } from "./IAaveIncentivesController.sol";
+import { IWevestIncentivesController } from "./IWevestIncentivesController.sol";
 
 /**
  * @title IVariableDebtToken
@@ -57,5 +57,5 @@ interface IVariableDebtToken is IScaledBalanceToken, IInitializableDebtToken {
     /**
      * @dev Returns the address of the incentives controller contract
      **/
-    function getIncentivesController() external view returns (IAaveIncentivesController);
+    function getIncentivesController() external view returns (IWevestIncentivesController);
 }

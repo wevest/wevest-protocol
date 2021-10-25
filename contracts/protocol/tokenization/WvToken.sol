@@ -4,18 +4,18 @@ pragma solidity 0.6.12;
 import { IERC20 } from "../../dependencies/openzeppelin/contracts/IERC20.sol";
 import { SafeERC20 } from "../../dependencies/openzeppelin/contracts/SafeERC20.sol";
 import { ILendingPool } from "../../interfaces/ILendingPool.sol";
-import { IAToken } from "../../interfaces/IAToken.sol";
+import { IWvToken } from "../../interfaces/IWvToken.sol";
 import { WadRayMath } from "../libraries/math/WadRayMath.sol";
 import { Errors } from "../libraries/helpers/Errors.sol";
 import { VersionedInitializable } from "../libraries/wevest-upgradeability/VersionedInitializable.sol";
 import { IncentivizedERC20 } from "./IncentivizedERC20.sol";
-import { IAaveIncentivesController } from "../../interfaces/IAaveIncentivesController.sol";
+import { IWevestIncentivesController } from "../../interfaces/IWevestIncentivesController.sol";
 
 /**
- * @title Aave ERC20 AToken
- * @dev Implementation of the interest bearing token for the Aave protocol
+ * @title Wevest ERC20 WvToken
+ * @dev Implementation of the interest bearing token for the Wevest protocol
  */
-contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATOKEN_IMPL", 0), IAToken {
+contract WvToken is VersionedInitializable, IncentivizedERC20("WVTOKEN_IMPL", "WVTOKEN_IMPL", 0), IWvToken {
     using WadRayMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -25,7 +25,7 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     bytes32 public constant PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
-    uint256 public constant ATOKEN_REVISION = 0x1;
+    uint256 public constant WVTOKEN_REVISION = 0x1;
 
     /// @dev owner => next valid nonce to submit with permit()
     mapping(address => uint256) public _nonces;
@@ -35,7 +35,7 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     ILendingPool internal _pool;
     address internal _treasury;
     address internal _underlyingAsset;
-    IAaveIncentivesController internal _incentivesController;
+    IWevestIncentivesController internal _incentivesController;
 
     modifier onlyLendingPool {
         require(_msgSender() == address(_pool), Errors.CT_CALLER_MUST_BE_LENDING_POOL);
@@ -43,27 +43,27 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     }
 
     function getRevision() internal pure virtual override returns (uint256) {
-        return ATOKEN_REVISION;
+        return WVTOKEN_REVISION;
     }
 
     /**
-     * @dev Initializes the aToken
-     * @param pool The address of the lending pool where this aToken will be used
-     * @param treasury The address of the Aave treasury, receiving the fees on this aToken
-     * @param underlyingAsset The address of the underlying asset of this aToken (E.g. WETH for aWETH)
+     * @dev Initializes the wvToken
+     * @param pool The address of the lending pool where this wvToken will be used
+     * @param treasury The address of the Wevest treasury, receiving the fees on this wvToken
+     * @param underlyingAsset The address of the underlying asset of this wvToken (E.g. WETH for wvWETH)
      * @param incentivesController The smart contract managing potential incentives distribution
-     * @param aTokenDecimals The decimals of the aToken, same as the underlying asset's
-     * @param aTokenName The name of the aToken
-     * @param aTokenSymbol The symbol of the aToken
+     * @param wvTokenDecimals The decimals of the wvToken, same as the underlying asset's
+     * @param wvTokenName The name of the wvToken
+     * @param wvTokenSymbol The symbol of the wvToken
      */
     function initialize(
         ILendingPool pool,
         address treasury,
         address underlyingAsset,
-        IAaveIncentivesController incentivesController,
-        uint8 aTokenDecimals,
-        string calldata aTokenName,
-        string calldata aTokenSymbol,
+        IWevestIncentivesController incentivesController,
+        uint8 wvTokenDecimals,
+        string calldata wvTokenName,
+        string calldata wvTokenSymbol,
         bytes calldata params
     ) external override initializer {
         uint256 chainId;
@@ -74,12 +74,12 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
         }
 
         DOMAIN_SEPARATOR = keccak256(
-            abi.encode(EIP712_DOMAIN, keccak256(bytes(aTokenName)), keccak256(EIP712_REVISION), chainId, address(this))
+            abi.encode(EIP712_DOMAIN, keccak256(bytes(wvTokenName)), keccak256(EIP712_REVISION), chainId, address(this))
         );
 
-        _setName(aTokenName);
-        _setSymbol(aTokenSymbol);
-        _setDecimals(aTokenDecimals);
+        _setName(wvTokenName);
+        _setSymbol(wvTokenSymbol);
+        _setDecimals(wvTokenDecimals);
 
         _pool = pool;
         _treasury = treasury;
@@ -91,17 +91,17 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
             address(pool),
             treasury,
             address(incentivesController),
-            aTokenDecimals,
-            aTokenName,
-            aTokenSymbol,
+            wvTokenDecimals,
+            wvTokenName,
+            wvTokenSymbol,
             params
         );
     }
 
     /**
-     * @dev Burns aTokens from `user` and sends the equivalent amount of underlying to `receiverOfUnderlying`
+     * @dev Burns wvTokens from `user` and sends the equivalent amount of underlying to `receiverOfUnderlying`
      * - Only callable by the LendingPool, as extra state updates there need to be managed
-     * @param user The owner of the aTokens, getting them burned
+     * @param user The owner of the wvTokens, getting them burned
      * @param receiverOfUnderlying The address that will receive the underlying
      * @param amount The amount being burned
      * @param index The new liquidity index of the reserve
@@ -123,7 +123,7 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     }
 
     /**
-     * @dev Mints `amount` aTokens to `user`
+     * @dev Mints `amount` wvTokens to `user`
      * - Only callable by the LendingPool, as extra state updates there need to be managed
      * @param user The address receiving the minted tokens
      * @param amount The amount of tokens getting minted
@@ -148,7 +148,7 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     }
 
     /**
-     * @dev Mints aTokens to the reserve treasury
+     * @dev Mints wvTokens to the reserve treasury
      * - Only callable by the LendingPool
      * @param amount The amount of tokens getting minted
      * @param index The new liquidity index of the reserve
@@ -171,9 +171,9 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     }
 
     /**
-     * @dev Transfers aTokens in the event of a borrow being liquidated, in case the liquidators reclaims the aToken
+     * @dev Transfers wvTokens in the event of a borrow being liquidated, in case the liquidators reclaims the wvToken
      * - Only callable by the LendingPool
-     * @param from The address getting liquidated, current owner of the aTokens
+     * @param from The address getting liquidated, current owner of the wvTokens
      * @param to The recipient
      * @param value The amount of tokens getting transferred
      **/
@@ -219,7 +219,7 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     }
 
     /**
-     * @dev calculates the total supply of the specific aToken
+     * @dev calculates the total supply of the specific wvToken
      * since the balance of every single user increases over time, the total supply
      * does that too.
      * @return the current total supply
@@ -243,21 +243,21 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     }
 
     /**
-     * @dev Returns the address of the Aave treasury, receiving the fees on this aToken
+     * @dev Returns the address of the Wevest treasury, receiving the fees on this wvToken
      **/
     function RESERVE_TREASURY_ADDRESS() public view returns (address) {
         return _treasury;
     }
 
     /**
-     * @dev Returns the address of the underlying asset of this aToken (E.g. WETH for aWETH)
+     * @dev Returns the address of the underlying asset of this wvToken (E.g. WETH for wvWETH)
      **/
     function UNDERLYING_ASSET_ADDRESS() public view override returns (address) {
         return _underlyingAsset;
     }
 
     /**
-     * @dev Returns the address of the lending pool where this aToken is used
+     * @dev Returns the address of the lending pool where this wvToken is used
      **/
     function POOL() public view returns (ILendingPool) {
         return _pool;
@@ -266,21 +266,21 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     /**
      * @dev For internal usage in the logic of the parent contract IncentivizedERC20
      **/
-    function _getIncentivesController() internal view override returns (IAaveIncentivesController) {
+    function _getIncentivesController() internal view override returns (IWevestIncentivesController) {
         return _incentivesController;
     }
 
     /**
      * @dev Returns the address of the incentives controller contract
      **/
-    function getIncentivesController() external view override returns (IAaveIncentivesController) {
+    function getIncentivesController() external view override returns (IWevestIncentivesController) {
         return _getIncentivesController();
     }
 
     /**
      * @dev Transfers the underlying asset to `target`. Used by the LendingPool to transfer
      * assets in borrow() and withdraw()
-     * @param target The recipient of the aTokens
+     * @param target The recipient of the wvTokens
      * @param amount The amount getting transferred
      * @return The amount transferred
      **/
@@ -290,7 +290,7 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     }
 
     /**
-     * @dev Invoked to execute actions on the aToken side after a repayment.
+     * @dev Invoked to execute actions on the wvToken side after a repayment.
      * @param user The user executing the repayment
      * @param amount The amount getting repaid
      **/
@@ -334,7 +334,7 @@ contract AToken is VersionedInitializable, IncentivizedERC20("ATOKEN_IMPL", "ATO
     }
 
     /**
-     * @dev Transfers the aTokens between two users. Validates the transfer
+     * @dev Transfers the wvTokens between two users. Validates the transfer
      * (ie checks for valid HF after the transfer) if required
      * @param from The source address
      * @param to The destination address

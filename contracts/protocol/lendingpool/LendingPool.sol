@@ -7,7 +7,7 @@ import { IERC20 } from "../../dependencies/openzeppelin/contracts/IERC20.sol";
 import { SafeERC20 } from "../../dependencies/openzeppelin/contracts/SafeERC20.sol";
 import { Address } from "../../dependencies/openzeppelin/contracts/Address.sol";
 import { ILendingPoolAddressesProvider } from "../../interfaces/ILendingPoolAddressesProvider.sol";
-import { IAToken } from "../../interfaces/IAToken.sol";
+import { IWvToken } from "../../interfaces/IWvToken.sol";
 import { IVariableDebtToken } from "../../interfaces/IVariableDebtToken.sol";
 import { IPriceOracleGetter } from "../../interfaces/IPriceOracleGetter.sol";
 import { IStableDebtToken } from "../../interfaces/IStableDebtToken.sol";
@@ -105,14 +105,14 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
         ValidationLogic.validateDeposit(reserve, amount);
 
-        address aToken = reserve.aTokenAddress;
+        address wvToken = reserve.wvTokenAddress;
 
         reserve.updateState();
-        reserve.updateInterestRates(asset, aToken, amount, 0);
+        reserve.updateInterestRates(asset, wvToken, amount, 0);
 
-        IERC20(asset).safeTransferFrom(msg.sender, aToken, amount);
+        IERC20(asset).safeTransferFrom(msg.sender, wvToken, amount);
 
-        bool isFirstDeposit = IAToken(aToken).mint(onBehalfOf, amount, reserve.liquidityIndex);
+        bool isFirstDeposit = IWvToken(wvToken).mint(onBehalfOf, amount, reserve.liquidityIndex);
 
         if (isFirstDeposit) {
             _usersConfig[onBehalfOf].setUsingAsCollateral(reserve.id, true);
@@ -142,7 +142,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
         address aToken = reserve.aTokenAddress;
 
-        uint256 userBalance = IAToken(aToken).balanceOf(msg.sender);
+        uint256 userBalance = IWvToken(aToken).balanceOf(msg.sender);
 
         uint256 amountToWithdraw = amount;
 
@@ -170,7 +170,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
             emit ReserveUsedAsCollateralDisabled(asset, msg.sender);
         }
 
-        IAToken(aToken).burn(msg.sender, to, amountToWithdraw, reserve.liquidityIndex);
+        IWvToken(aToken).burn(msg.sender, to, amountToWithdraw, reserve.liquidityIndex);
 
         emit Withdraw(asset, msg.sender, to, amountToWithdraw);
 
@@ -264,7 +264,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
         IERC20(asset).safeTransferFrom(msg.sender, aToken, paybackAmount);
 
-        IAToken(aToken).handleRepayment(msg.sender, paybackAmount);
+        IWvToken(aToken).handleRepayment(msg.sender, paybackAmount);
 
         emit Repay(asset, onBehalfOf, msg.sender, paybackAmount);
 
@@ -737,7 +737,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         reserve.updateInterestRates(vars.asset, vars.aTokenAddress, 0, vars.releaseUnderlying ? vars.amount : 0);
 
         if (vars.releaseUnderlying) {
-            IAToken(vars.aTokenAddress).transferUnderlyingTo(vars.user, vars.amount);
+            IWvToken(vars.aTokenAddress).transferUnderlyingTo(vars.user, vars.amount);
         }
 
         /* emit Borrow(
