@@ -1,148 +1,99 @@
-import path from 'path';
-import fs from 'fs';
-import { HardhatUserConfig } from 'hardhat/types';
-// @ts-ignore
-import { accounts } from './test-wallets.js';
-import {
-  eAvalancheNetwork,
-  eEthereumNetwork,
-  eNetwork,
-  ePolygonNetwork,
-  eXDaiNetwork,
-} from './helpers/types';
-import { BUIDLEREVM_CHAINID, COVERAGE_CHAINID } from './helpers/buidler-constants';
-import {
-  NETWORKS_RPC_URL,
-  NETWORKS_DEFAULT_GAS,
-  BLOCK_TO_FORK,
-  buildForkConfig,
-} from './helper-hardhat-config';
+import { task } from "hardhat/config";
 
-require('dotenv').config();
+import { config as dotenvConfig } from "dotenv";
+import { resolve } from "path";
+dotenvConfig({ path: resolve(__dirname, "./.env") });
 
-import '@nomiclabs/hardhat-ethers';
-import '@nomiclabs/hardhat-waffle';
-import 'temp-hardhat-etherscan';
-import 'hardhat-gas-reporter';
-import 'hardhat-typechain';
-import '@tenderly/hardhat-tenderly';
-import 'solidity-coverage';
-import { fork } from 'child_process';
+import { HardhatUserConfig } from "hardhat/types";
+import { NetworkUserConfig } from "hardhat/types";
 
-const SKIP_LOAD = process.env.SKIP_LOAD === 'true';
-const DEFAULT_BLOCK_GAS_LIMIT = 8000000;
-const DEFAULT_GAS_MUL = 5;
-const HARDFORK = 'istanbul';
-const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || '';
-const MNEMONIC_PATH = "m/44'/60'/0'/0";
-const MNEMONIC = process.env.MNEMONIC || '';
-const UNLIMITED_BYTECODE_SIZE = process.env.UNLIMITED_BYTECODE_SIZE === 'true';
+import "@nomiclabs/hardhat-waffle";
+import "@typechain/hardhat";
+import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-waffle";
 
-// Prevent to load scripts before compilation and typechain
-if (!SKIP_LOAD) {
-  ['misc', 'migrations', 'dev', 'full', 'verifications', 'deployments', 'helpers'].forEach(
-    (folder) => {
-      const tasksPath = path.join(__dirname, 'tasks', folder);
-      fs.readdirSync(tasksPath)
-        .filter((pth) => pth.includes('.ts'))
-        .forEach((task) => {
-          require(`${tasksPath}/${task}`);
-        });
-    }
-  );
-}
+import "hardhat-gas-reporter";
+import "@nomiclabs/hardhat-etherscan";
 
-require(`${path.join(__dirname, 'tasks/misc')}/set-bre.ts`);
+const chainIds = {
+  ganache: 1337,
+  goerli: 5,
+  hardhat: 31337,
+  kovan: 42,
+  mainnet: 1,
+  rinkeby: 4,
+  ropsten: 3,
+};
 
-const getCommonNetworkConfig = (networkName: eNetwork, networkId: number) => ({
-  url: NETWORKS_RPC_URL[networkName],
-  hardfork: HARDFORK,
-  blockGasLimit: DEFAULT_BLOCK_GAS_LIMIT,
-  gasMultiplier: DEFAULT_GAS_MUL,
-  gasPrice: NETWORKS_DEFAULT_GAS[networkName],
-  chainId: networkId,
-  accounts: {
-    mnemonic: MNEMONIC,
-    path: MNEMONIC_PATH,
-    initialIndex: 0,
-    count: 20,
-  },
+const MNEMONIC = process.env.MNEMONIC || "";
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
+const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
+const ALCHEMY_KEY = process.env.ALCHEMY_KEY || "";
+
+// This is a sample Hardhat task. To learn how to create your own go to
+// https://hardhat.org/guides/create-task.html
+task("accounts", "Prints the list of accounts", async (args, hre) => {
+  const accounts = await hre.ethers.getSigners();
+
+  for (const account of accounts) {
+    console.log(await account.getAddress());
+  }
 });
 
-let forkMode;
-
-const buidlerConfig: HardhatUserConfig = {
-  solidity: {
-    version: '0.6.12',
-    settings: {
-      optimizer: { enabled: true, runs: 200 },
-      evmVersion: 'istanbul',
+function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
+  const url: string = "https://" + network + ".infura.io/v3/" + INFURA_API_KEY;
+  return {
+    accounts: {
+      count: 10,
+      initialIndex: 0,
+      mnemonic: MNEMONIC,
+      path: "m/44'/60'/0'/0",
     },
+    chainId: chainIds[network],
+    url,
+  };
+}
+
+// You need to export an object to set up your config
+// Go to https://hardhat.org/config/ to learn more
+
+const config: HardhatUserConfig = {
+  defaultNetwork: "hardhat",
+  networks: {
+    hardhat: {
+      accounts: {
+        mnemonic: MNEMONIC,
+      },
+      chainId: chainIds.hardhat,
+    },
+    mainnet: createTestnetConfig("mainnet"),
+    goerli: createTestnetConfig("goerli"),
+    kovan: createTestnetConfig("kovan"),
+    rinkeby: createTestnetConfig("rinkeby"),
+    ropsten: createTestnetConfig("ropsten"),
   },
-  typechain: {
-    outDir: 'types',
-    target: 'ethers-v5',
+  solidity: {
+    compilers: [
+      {
+        version: "0.6.12",
+      },
+      {
+        version: "0.5.17",
+      },
+    ],
   },
   etherscan: {
-    apiKey: ETHERSCAN_KEY,
+    apiKey: ETHERSCAN_API_KEY,
   },
-  mocha: {
-    timeout: 0,
+  gasReporter: {
+    currency: "USD",
+    gasPrice: 100,
+    // enabled: process.env.REPORT_GAS ? true : false,
   },
-  tenderly: {
-    project: process.env.TENDERLY_PROJECT || '',
-    username: process.env.TENDERLY_USERNAME || '',
-    forkNetwork: '1', //Network id of the network we want to fork
-  },
-  networks: {
-    coverage: {
-      url: 'http://localhost:8555',
-      chainId: COVERAGE_CHAINID,
-    },
-    kovan: getCommonNetworkConfig(eEthereumNetwork.kovan, 42),
-    ropsten: getCommonNetworkConfig(eEthereumNetwork.ropsten, 3),
-    main: getCommonNetworkConfig(eEthereumNetwork.main, 1),
-    tenderly: getCommonNetworkConfig(eEthereumNetwork.tenderly, 3030),
-    matic: getCommonNetworkConfig(ePolygonNetwork.matic, 137),
-    mumbai: getCommonNetworkConfig(ePolygonNetwork.mumbai, 80001),
-    xdai: getCommonNetworkConfig(eXDaiNetwork.xdai, 100),
-    avalanche: getCommonNetworkConfig(eAvalancheNetwork.avalanche, 43114),
-    fuji: getCommonNetworkConfig(eAvalancheNetwork.fuji, 43113),
-    hardhat: {
-      hardfork: 'berlin',
-      blockGasLimit: DEFAULT_BLOCK_GAS_LIMIT,
-      gas: DEFAULT_BLOCK_GAS_LIMIT,
-      gasPrice: 8000000000,
-      allowUnlimitedContractSize: UNLIMITED_BYTECODE_SIZE,
-      chainId: BUIDLEREVM_CHAINID,
-      throwOnTransactionFailures: true,
-      throwOnCallFailures: true,
-      accounts: accounts.map(({ secretKey, balance }: { secretKey: string; balance: string }) => ({
-        privateKey: secretKey,
-        balance,
-      })),
-      forking: buildForkConfig(),
-    },
-    buidlerevm_docker: {
-      hardfork: 'berlin',
-      blockGasLimit: 9500000,
-      gas: 9500000,
-      gasPrice: 8000000000,
-      chainId: BUIDLEREVM_CHAINID,
-      throwOnTransactionFailures: true,
-      throwOnCallFailures: true,
-      url: 'http://localhost:8545',
-    },
-    ganache: {
-      url: 'http://ganache:8545',
-      accounts: {
-        mnemonic: 'fox sight canyon orphan hotel grow hedgehog build bless august weather swarm',
-        path: "m/44'/60'/0'/0",
-        initialIndex: 0,
-        count: 20,
-      },
-    },
+  typechain: {
+    outDir: "typechain",
+    target: "ethers-v5",
   },
 };
 
-export default buidlerConfig;
+export default config;
