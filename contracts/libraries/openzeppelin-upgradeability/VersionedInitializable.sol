@@ -50,7 +50,6 @@ abstract contract VersionedInitializable {
     /// Needs to be defined in the inherited class as a constant.
     function getRevision() internal pure virtual returns(uint256);
 
-
     /// @dev Returns true if and only if the function is running in the constructor
     function isConstructor() private view returns (bool) {
         // extcodesize checks the size of the code stored in an address, and

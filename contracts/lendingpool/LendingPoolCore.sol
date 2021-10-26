@@ -407,7 +407,7 @@ contract LendingPoolCore is VersionedInitializable {
             ERC20(_reserve).safeTransfer(_user, _amount);
         } else {
             //solium-disable-next-line
-            (bool result, ) = _user.call.value(_amount).gas(50000)("");
+            (bool result, ) = _user.call{value: _amount, gas: 50000}("");
             require(result, "Transfer of ETH failed");
         }
     }
@@ -437,7 +437,7 @@ contract LendingPoolCore is VersionedInitializable {
         } else {
             require(msg.value >= _amount, "The amount and the value sent to deposit do not match");
             //solium-disable-next-line
-            (bool result, ) = feeAddress.call.value(_amount).gas(50000)("");
+            (bool result, ) = feeAddress.call{value: _amount, gas: 50000}("");
             require(result, "Transfer of ETH failed");
         }
     }
@@ -463,7 +463,7 @@ contract LendingPoolCore is VersionedInitializable {
             ERC20(_token).safeTransfer(feeAddress, _amount);
         } else {
             //solium-disable-next-line
-            (bool result, ) = feeAddress.call.value(_amount).gas(50000)("");
+            (bool result, ) = feeAddress.call{value: _amount, gas: 50000}("");
             require(result, "Transfer of ETH failed");
         }
     }
@@ -490,7 +490,7 @@ contract LendingPoolCore is VersionedInitializable {
                 //send back excess ETH
                 uint256 excessAmount = msg.value.sub(_amount);
                 //solium-disable-next-line
-                (bool result, ) = _user.call.value(excessAmount).gas(50000)("");
+                (bool result, ) = _user.call{value: excessAmount, gas: 50000}("");
                 require(result, "Transfer of ETH failed");
             }
         }
@@ -1753,7 +1753,7 @@ contract LendingPoolCore is VersionedInitializable {
             ERC20(_token).safeTransfer(receiver, _amount);
         } else {
             //solium-disable-next-line
-            (bool result, ) = receiver.call.value(_amount)("");
+            (bool result, ) = receiver.call{value: _amount}("");
             require(result, "Transfer to token distributor failed");
         }
     }

@@ -253,7 +253,7 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
         }
 
         //transfers the principal currency to the pool
-        core.transferToReserve.value(msg.value)(_reserve, msg.sender, vars.actualAmountToLiquidate);
+        core.transferToReserve{value: msg.value}(_reserve, msg.sender, vars.actualAmountToLiquidate);
 
         if (vars.feeLiquidated > 0) {
             //if there is enough collateral to liquidate the fee, first transfer burn an equivalent amount of
