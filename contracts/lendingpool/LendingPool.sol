@@ -233,6 +233,12 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @param _reserve the address of the reserve
     * @param _amount the amount to be deposited
     **/
+
+    /** extra comments 
+    * nonReentrant - function modifier to prevent re-entrancy exploit
+    * onlyActiveReserve - function modifier to check if current reserve pool is active or not
+    * onlyAmountGreaterThanZero - deposit amount should be greater than zero
+    */
     function deposit(address _reserve, uint256 _amount)
         external
         payable
@@ -241,30 +247,37 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         onlyUnfreezedReserve(_reserve)
         onlyAmountGreaterThanZero(_amount)
     {
+        // Get wvToken contract address to call mint function
         WvToken wvToken = WvToken(core.getReserveWvTokenAddress(_reserve));
 
+        // Check if this is the first deposit
         bool isFirstDeposit = wvToken.balanceOf(msg.sender) == 0;
 
+        // update reserve pool status at a deposited time
         core.updateStateOnDeposit(_reserve, msg.sender, _amount, isFirstDeposit);
 
-        //minting WvToken to user 1:1 with the specific exchange rate
+        // minting corresponding wvTokens 
         wvToken.mintOnDeposit(msg.sender, _amount);
 
-        //transfer to the core contract
+        //transfer underlying assets to destination reserve contract
         core.transferToReserve{value: msg.value}(_reserve, msg.sender, _amount);
 
         //solium-disable-next-line
         emit Deposit(_reserve, msg.sender, _amount, block.timestamp);
-
     }
 
     /**
-    * @dev Redeems the underlying amount of assets requested by _user.
+    * @dev Withdraws the underlying amount of assets requested by _user.
     * This function is executed by the overlying wToken contract in response to a withdraw action.
     * @param _reserve the address of the reserve
     * @param _user the address of the user performing the action
     * @param _amount the underlying amount to be redeemed
     **/
+
+    /**
+    * onlyOverlyingWvToken(_reserve) - the caller of this function should be 
+    * wvToken contract of this reserve
+     */
     function withdraw(
         address _reserve,
         address payable _user,
@@ -281,14 +294,19 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             currentAvailableLiquidity >= _amount,
             "There is not enough liquidity available to redeem"
         );
+        WvToken wvToken = WvToken(core.getReserveWvTokenAddress(_reserve));
 
+        // updates the state of the lending pool core as a result of a withdraw action
         core.updateStateOnWithdraw(_reserve, _user, _amount);
-
+        
+        // burn wvTokens to redeem underlying assets
+        wvToken.burnOnWithdraw(_amount);
+        
+        // transfers a specific amount from the reserve contract to user address.
         core.transferToUser(_reserve, _user, _amount);
 
         //solium-disable-next-line
         emit Withdraw(_reserve, _user, _amount, block.timestamp);
-
     }
 
     /**

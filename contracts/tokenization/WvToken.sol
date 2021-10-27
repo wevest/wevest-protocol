@@ -20,13 +20,13 @@ contract WvToken is ERC20 {
     uint256 public constant UINT_MAX_VALUE = uint256(-1);
 
     /**
-    * @dev emitted after the redeem action
-    * @param _from the address performing the redeem
-    * @param _value the amount to be redeemed
+    * @dev emitted after the withdraw action
+    * @param _from the address performing the withdraw
+    * @param _value the amount to be withdrawn
     * @param _fromBalanceIncrease the cumulated balance since the last update of the user
     * @param _fromIndex the last index of the user
     **/
-    event Redeem(
+    event Withdraw(
         address indexed _from,
         uint256 _value,
         uint256 _fromBalanceIncrease,
@@ -215,7 +215,7 @@ contract WvToken is ERC20 {
     * @dev redeems wvToken for the underlying asset
     * @param _amount the amount being redeemed
     **/
-    function redeem(uint256 _amount) external {
+    function burnOnWithdraw(uint256 _amount) external {
 
         require(_amount > 0, "Amount to redeem needs to be > 0");
 
@@ -252,14 +252,14 @@ contract WvToken is ERC20 {
         }
 
         // executes redeem of the underlying asset
-        pool.redeemUnderlying(
+        /* pool.withdraw(
             underlyingAssetAddress,
             msg.sender,
             amountToRedeem,
             currentBalance.sub(amountToRedeem)
-        );
+        ); */
 
-        emit Redeem(msg.sender, amountToRedeem, balanceIncrease, userIndexReset ? 0 : index);
+        emit Withdraw(msg.sender, amountToRedeem, balanceIncrease, userIndexReset ? 0 : index);
     }
 
     /**
