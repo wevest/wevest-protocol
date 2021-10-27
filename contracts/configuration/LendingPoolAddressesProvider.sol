@@ -36,7 +36,6 @@ contract LendingPoolAddressesProvider is Ownable, ILendingPoolAddressesProvider,
     bytes32 private constant LENDING_POOL_PARAMETERS_PROVIDER = "PARAMETERS_PROVIDER";
     bytes32 private constant LENDING_POOL_MANAGER = "LENDING_POOL_MANAGER";
     bytes32 private constant LENDING_POOL_LIQUIDATION_MANAGER = "LIQUIDATION_MANAGER";
-    bytes32 private constant LENDING_POOL_FLASHLOAN_PROVIDER = "FLASHLOAN_PROVIDER";
     bytes32 private constant DATA_PROVIDER = "DATA_PROVIDER";
     bytes32 private constant ETHEREUM_ADDRESS = "ETHEREUM_ADDRESS";
     bytes32 private constant PRICE_ORACLE = "PRICE_ORACLE";

@@ -212,7 +212,7 @@ contract WvToken is ERC20 {
     }
 
     /**
-    * @dev redeems aToken for the underlying asset
+    * @dev redeems wvToken for the underlying asset
     * @param _amount the amount being redeemed
     **/
     function redeem(uint256 _amount) external {

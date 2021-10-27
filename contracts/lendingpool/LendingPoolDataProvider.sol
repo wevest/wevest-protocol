@@ -440,35 +440,17 @@ contract LendingPoolDataProvider is VersionedInitializable {
         view
         returns (
             uint256 currentWvTokenBalance,
-            uint256 currentBorrowBalance,
-            uint256 principalBorrowBalance,
-            uint256 borrowRateMode,
-            uint256 borrowRate,
+            uint256 borrowBalance,
             uint256 liquidityRate,
             uint256 originationFee,
-            uint256 variableBorrowIndex,
             uint256 lastUpdateTimestamp,
             bool usageAsCollateralEnabled
         )
     {
         currentWvTokenBalance = WvToken(core.getReserveWvTokenAddress(_reserve)).balanceOf(_user);
-        CoreLibrary.InterestRateMode mode = core.getUserCurrentBorrowRateMode(_reserve, _user);
-        (principalBorrowBalance, currentBorrowBalance, ) = core.getUserBorrowBalances(
-            _reserve,
-            _user
-        );
-
-        //default is 0, if mode == CoreLibrary.InterestRateMode.NONE
-        if (mode == CoreLibrary.InterestRateMode.STABLE) {
-            borrowRate = core.getUserCurrentStableBorrowRate(_reserve, _user);
-        } else if (mode == CoreLibrary.InterestRateMode.VARIABLE) {
-            borrowRate = core.getReserveCurrentVariableBorrowRate(_reserve);
-        }
-
-        borrowRateMode = uint256(mode);
+        borrowBalance = core.getUserBorrowBalance(_reserve, _user);
         liquidityRate = core.getReserveCurrentLiquidityRate(_reserve);
         originationFee = core.getUserOriginationFee(_reserve, _user);
-        variableBorrowIndex = core.getUserVariableBorrowCumulativeIndex(_reserve, _user);
         lastUpdateTimestamp = core.getUserLastUpdate(_reserve, _user);
         usageAsCollateralEnabled = core.isUserUseReserveAsCollateralEnabled(_reserve, _user);
     }
