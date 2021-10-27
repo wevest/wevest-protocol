@@ -178,7 +178,6 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _user the address of the borrower
     * @param _paybackAmountMinusFees the amount being paid back minus fees
     * @param _originationFeeRepaid the fee on the amount that is being repaid
-    * @param _balanceIncrease the accrued interest on the borrowed amount
     * @param _repaidWholeLoan true if the user is repaying the whole loan
     **/
 
@@ -187,25 +186,24 @@ contract LendingPoolCore is VersionedInitializable {
         address _user,
         uint256 _paybackAmountMinusFees,
         uint256 _originationFeeRepaid,
-        uint256 _balanceIncrease,
         bool _repaidWholeLoan
     ) external onlyLendingPool {
         updateReserveStateOnRepayInternal(
             _reserve,
             _user,
-            _paybackAmountMinusFees,
-            _balanceIncrease
+            _paybackAmountMinusFees
         );
         updateUserStateOnRepayInternal(
             _reserve,
             _user,
             _paybackAmountMinusFees,
             _originationFeeRepaid,
-            _balanceIncrease,
             _repaidWholeLoan
         );
 
-        updateReserveInterestRatesAndTimestampInternal(_reserve, _paybackAmountMinusFees, 0);
+        updateReserveInterestRatesAndTimestampInternal(
+            _reserve, _paybackAmountMinusFees, 0
+        );
     }
 
     /**
@@ -1177,37 +1175,21 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _reserve the address of the reserve on which the user is repaying
     * @param _user the address of the borrower
     * @param _paybackAmountMinusFees the amount being paid back minus fees
-    * @param _balanceIncrease the accrued interest on the borrowed amount
     **/
 
     function updateReserveStateOnRepayInternal(
         address _reserve,
         address _user,
-        uint256 _paybackAmountMinusFees,
-        uint256 _balanceIncrease
+        uint256 _paybackAmountMinusFees
     ) internal {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
-        CoreLibrary.InterestRateMode borrowRateMode = getUserCurrentBorrowRateMode(_reserve, _user);
-
         //update the indexes
         reserves[_reserve].updateCumulativeIndexes();
 
-        //compound the cumulated interest to the borrow balance and then subtracting the payback amount
-        if (borrowRateMode == CoreLibrary.InterestRateMode.STABLE) {
-            reserve.increaseTotalBorrowsStableAndUpdateAverageRate(
-                _balanceIncrease,
-                user.stableBorrowRate
-            );
-            reserve.decreaseTotalBorrowsStableAndUpdateAverageRate(
-                _paybackAmountMinusFees,
-                user.stableBorrowRate
-            );
-        } else {
-            reserve.increaseTotalBorrowsVariable(_balanceIncrease);
-            reserve.decreaseTotalBorrowsVariable(_paybackAmountMinusFees);
-        }
+        //subtract the payback amount
+        reserve.decreaseTotalBorrows(_paybackAmountMinusFees);
     }
 
     /**
@@ -1216,7 +1198,6 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _user the address of the borrower
     * @param _paybackAmountMinusFees the amount being paid back minus fees
     * @param _originationFeeRepaid the fee on the amount that is being repaid
-    * @param _balanceIncrease the accrued interest on the borrowed amount
     * @param _repaidWholeLoan true if the user is repaying the whole loan
     **/
     function updateUserStateOnRepayInternal(
@@ -1224,29 +1205,18 @@ contract LendingPoolCore is VersionedInitializable {
         address _user,
         uint256 _paybackAmountMinusFees,
         uint256 _originationFeeRepaid,
-        uint256 _balanceIncrease,
         bool _repaidWholeLoan
     ) internal {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
-        //update the user principal borrow balance, adding the cumulated interest and then subtracting the payback amount
-        user.principalBorrowBalance = user.principalBorrowBalance.add(_balanceIncrease).sub(
-            _paybackAmountMinusFees
-        );
-        user.lastVariableBorrowCumulativeIndex = reserve.lastVariableBorrowCumulativeIndex;
+        //update the user borrow balance, subtracting the payback amount
+        user.borrowBalance = user.borrowBalance.sub(_paybackAmountMinusFees);
 
-        //if the balance decrease is equal to the previous principal (user is repaying the whole loan)
-        //and the rate mode is stable, we reset the interest rate mode of the user
-        if (_repaidWholeLoan) {
-            user.stableBorrowRate = 0;
-            user.lastVariableBorrowCumulativeIndex = 0;
-        }
         user.originationFee = user.originationFee.sub(_originationFeeRepaid);
 
         //solium-disable-next-line
         user.lastUpdateTimestamp = uint40(block.timestamp);
-
     }
 
     /**
@@ -1254,47 +1224,20 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _principalReserve the address of the principal reserve that is being repaid
     * @param _user the address of the borrower
     * @param _amountToLiquidate the amount being repaid by the liquidator
-    * @param _balanceIncrease the accrued interest on the borrowed amount
     **/
 
     function updatePrincipalReserveStateOnLiquidationInternal(
         address _principalReserve,
         address _user,
-        uint256 _amountToLiquidate,
-        uint256 _balanceIncrease
+        uint256 _amountToLiquidate
     ) internal {
         CoreLibrary.ReserveData storage reserve = reserves[_principalReserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_principalReserve];
 
         //update principal reserve data
         reserve.updateCumulativeIndexes();
-
-        CoreLibrary.InterestRateMode borrowRateMode = getUserCurrentBorrowRateMode(
-            _principalReserve,
-            _user
-        );
-
-        if (borrowRateMode == CoreLibrary.InterestRateMode.STABLE) {
-            //increase the total borrows by the compounded interest
-            reserve.increaseTotalBorrowsStableAndUpdateAverageRate(
-                _balanceIncrease,
-                user.stableBorrowRate
-            );
-
-            //decrease by the actual amount to liquidate
-            reserve.decreaseTotalBorrowsStableAndUpdateAverageRate(
-                _amountToLiquidate,
-                user.stableBorrowRate
-            );
-
-        } else {
-            //increase the total borrows by the compounded interest
-            reserve.increaseTotalBorrowsVariable(_balanceIncrease);
-
-            //decrease by the actual amount to liquidate
-            reserve.decreaseTotalBorrowsVariable(_amountToLiquidate);
-        }
-
+        
+        reserve.decreaseTotalBorrows(_amountToLiquidate);
     }
 
     /**
@@ -1315,77 +1258,21 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _user the address of the borrower
     * @param _amountToLiquidate the amount being repaid by the liquidator
     * @param _feeLiquidated the amount of origination fee being liquidated
-    * @param _balanceIncrease the accrued interest on the borrowed amount
     **/
     function updateUserStateOnLiquidationInternal(
         address _reserve,
         address _user,
         uint256 _amountToLiquidate,
-        uint256 _feeLiquidated,
-        uint256 _balanceIncrease
+        uint256 _feeLiquidated
     ) internal {
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         //first increase by the compounded interest, then decrease by the liquidated amount
-        user.principalBorrowBalance = user.principalBorrowBalance.add(_balanceIncrease).sub(
-            _amountToLiquidate
-        );
-
-        if (
-            getUserCurrentBorrowRateMode(_reserve, _user) == CoreLibrary.InterestRateMode.VARIABLE
-        ) {
-            user.lastVariableBorrowCumulativeIndex = reserve.lastVariableBorrowCumulativeIndex;
-        }
+        user.principalBorrowBalance = user.borrowBalance.sub(_amountToLiquidate);
 
         if(_feeLiquidated > 0){
             user.originationFee = user.originationFee.sub(_feeLiquidated);
         }
-
-        //solium-disable-next-line
-        user.lastUpdateTimestamp = uint40(block.timestamp);
-    }
-
-    /**
-    * @dev updates the state of the reserve as a consequence of a stable rate rebalance
-    * @param _reserve the address of the principal reserve where the user borrowed
-    * @param _user the address of the borrower
-    * @param _balanceIncrease the accrued interest on the borrowed amount
-    **/
-
-    function updateReserveStateOnRebalanceInternal(
-        address _reserve,
-        address _user,
-        uint256 _balanceIncrease
-    ) internal {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
-
-        reserve.updateCumulativeIndexes();
-
-        reserve.increaseTotalBorrowsStableAndUpdateAverageRate(
-            _balanceIncrease,
-            user.stableBorrowRate
-        );
-
-    }
-
-    /**
-    * @dev updates the state of the user as a consequence of a stable rate rebalance
-    * @param _reserve the address of the principal reserve where the user borrowed
-    * @param _user the address of the borrower
-    * @param _balanceIncrease the accrued interest on the borrowed amount
-    **/
-
-    function updateUserStateOnRebalanceInternal(
-        address _reserve,
-        address _user,
-        uint256 _balanceIncrease
-    ) internal {
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-
-        user.principalBorrowBalance = user.principalBorrowBalance.add(_balanceIncrease);
-        user.stableBorrowRate = reserve.currentStableBorrowRate;
 
         //solium-disable-next-line
         user.lastUpdateTimestamp = uint40(block.timestamp);
