@@ -143,14 +143,13 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _user the address of the borrower
     * @param _amountBorrowed the new amount borrowed
     * @param _borrowFee the fee on the amount borrowed
-    * @return the new borrow rate for the user
     **/
     function updateStateOnBorrow(
         address _reserve,
         address _user,
         uint256 _amountBorrowed,
         uint256 _borrowFee
-    ) external onlyLendingPool returns (uint256, uint256) {
+    ) external onlyLendingPool {
         // getting the previous borrow balance of the user
         uint256 principalBorrowBalance = getUserBorrowBalance(_reserve, _user);
         updateReserveStateOnBorrowInternal(
@@ -168,8 +167,6 @@ contract LendingPoolCore is VersionedInitializable {
         );
 
         updateReserveInterestRatesAndTimestampInternal(_reserve, 0, _amountBorrowed);
-
-        return getUserLeverageRatio(_reserve, _user);
     }
 
     /**
@@ -258,26 +255,6 @@ contract LendingPoolCore is VersionedInitializable {
             );
         }
 
-    }
-
-    /**
-    * @dev updates the state of the core as a consequence of a stable rate rebalance
-    * @param _reserve the address of the principal reserve where the user borrowed
-    * @param _user the address of the borrower
-    * @param _balanceIncrease the accrued interest on the borrowed amount
-    * @return the new stable rate for the user
-    **/
-    function updateStateOnRebalance(address _reserve, address _user, uint256 _balanceIncrease)
-        external
-        onlyLendingPool
-        returns (uint256)
-    {
-        updateReserveStateOnRebalanceInternal(_reserve, _user, _balanceIncrease);
-
-        //update user data and rebalance the rate
-        updateUserStateOnRebalanceInternal(_reserve, _user, _balanceIncrease);
-        updateReserveInterestRatesAndTimestampInternal(_reserve, 0, 0);
-        return usersReserveData[_user][_reserve].stableBorrowRate;
     }
 
     /**

@@ -55,7 +55,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @param _amount the amount to be deposited
     * @param _timestamp the timestamp of the action
     **/
-    event RedeemUnderlying(
+    event Withdraw(
         address indexed _reserve,
         address indexed _user,
         uint256 _amount,
@@ -88,7 +88,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @param _repayer the address of the user that has performed the repay action
     * @param _amountMinusFees the amount repaid minus fees
     * @param _fees the fees repaid
-    * @param _borrowBalanceIncrease the balance increase since the last action
     * @param _timestamp the timestamp of the action
     **/
     event Repay(
@@ -97,25 +96,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         address indexed _repayer,
         uint256 _amountMinusFees,
         uint256 _fees,
-        uint256 _borrowBalanceIncrease,
-        uint256 _timestamp
-    );
-
-    /**
-    * @dev emitted when a user performs a rate swap
-    * @param _reserve the address of the reserve
-    * @param _user the address of the user executing the swap
-    * @param _newRateMode the new interest rate mode
-    * @param _newRate the new borrow rate
-    * @param _borrowBalanceIncrease the balance increase since the last action
-    * @param _timestamp the timestamp of the action
-    **/
-    event Swap(
-        address indexed _reserve,
-        address indexed _user,
-        uint256 _newRateMode,
-        uint256 _newRate,
-        uint256 _borrowBalanceIncrease,
         uint256 _timestamp
     );
 
@@ -132,40 +112,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @param _user the address of the user
     **/
     event ReserveUsedAsCollateralDisabled(address indexed _reserve, address indexed _user);
-
-    /**
-    * @dev emitted when the stable rate of a user gets rebalanced
-    * @param _reserve the address of the reserve
-    * @param _user the address of the user for which the rebalance has been executed
-    * @param _newStableRate the new stable borrow rate after the rebalance
-    * @param _borrowBalanceIncrease the balance increase since the last action
-    * @param _timestamp the timestamp of the action
-    **/
-    event RebalanceStableBorrowRate(
-        address indexed _reserve,
-        address indexed _user,
-        uint256 _newStableRate,
-        uint256 _borrowBalanceIncrease,
-        uint256 _timestamp
-    );
-
-    /**
-    * @dev emitted when a flashloan is executed
-    * @param _target the address of the flashLoanReceiver
-    * @param _reserve the address of the reserve
-    * @param _amount the amount requested
-    * @param _totalFee the total fee on the amount
-    * @param _protocolFee the part of the fee for the protocol
-    * @param _timestamp the timestamp of the action
-    **/
-    event FlashLoan(
-        address indexed _target,
-        address indexed _reserve,
-        uint256 _amount,
-        uint256 _totalFee,
-        uint256 _protocolFee,
-        uint256 _timestamp
-    );
 
     /**
     * @dev these events are not emitted directly by the LendingPool
@@ -218,13 +164,13 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
 
     /**
     * @dev functions affected by this modifier can only be invoked by the
-    * aToken.sol contract
+    * wvToken.sol contract
     * @param _reserve the address of the reserve
     **/
     modifier onlyOverlyingWvToken(address _reserve) {
         require(
             msg.sender == core.getReserveWvTokenAddress(_reserve),
-            "The caller of this function can only be the aToken contract of this reserve"
+            "The caller of this function can only be the wvToken contract of this reserve"
         );
         _;
     }
@@ -314,16 +260,15 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
 
     /**
     * @dev Redeems the underlying amount of assets requested by _user.
-    * This function is executed by the overlying aToken contract in response to a redeem action.
+    * This function is executed by the overlying wToken contract in response to a withdraw action.
     * @param _reserve the address of the reserve
     * @param _user the address of the user performing the action
     * @param _amount the underlying amount to be redeemed
     **/
-    function redeemUnderlying(
+    function withdraw(
         address _reserve,
         address payable _user,
-        uint256 _amount,
-        uint256 _aTokenBalanceAfterRedeem
+        uint256 _amount
     )
         external
         nonReentrant
@@ -337,12 +282,12 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             "There is not enough liquidity available to redeem"
         );
 
-        core.updateStateOnRedeem(_reserve, _user, _amount, _aTokenBalanceAfterRedeem == 0);
+        core.updateStateOnWithdraw(_reserve, _user, _amount);
 
         core.transferToUser(_reserve, _user, _amount);
 
         //solium-disable-next-line
-        emit RedeemUnderlying(_reserve, _user, _amount, block.timestamp);
+        emit Withdraw(_reserve, _user, _amount, block.timestamp);
 
     }
 
@@ -481,13 +426,10 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     **/
 
     struct RepayLocalVars {
-        uint256 principalBorrowBalance;
-        uint256 compoundedBorrowBalance;
-        uint256 borrowBalanceIncrease;
+        uint256 borrowBalance;
         bool isETH;
         uint256 paybackAmount;
         uint256 paybackAmountMinusFees;
-        uint256 currentStableRate;
         uint256 originationFee;
     }
 
@@ -501,24 +443,24 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         // Usage of a memory struct of vars to avoid "Stack too deep" errors due to local variables
         RepayLocalVars memory vars;
 
-        (
-            vars.principalBorrowBalance,
-            vars.compoundedBorrowBalance,
-            vars.borrowBalanceIncrease
-        ) = core.getUserBorrowBalances(_reserve, _onBehalfOf);
+        vars.borrowBalance = core.getUserBorrowBalance(_reserve, _onBehalfOf);
 
         vars.originationFee = core.getUserOriginationFee(_reserve, _onBehalfOf);
+
         vars.isETH = EthAddressLib.ethAddress() == _reserve;
 
-        require(vars.compoundedBorrowBalance > 0, "The user does not have any borrow pending");
+        // check borrow position
+        require(vars.borrowBalance > 0, "The user does not have any borrow pending");
 
+        // In case of repayments on behalf of another user, 
+        // it's recommended to send an _amount slightly higher than the current borrowed amount.
         require(
             _amount != UINT_MAX_VALUE || msg.sender == _onBehalfOf,
             "To repay on behalf of an user an explicit amount to repay is needed."
         );
 
         //default to max amount
-        vars.paybackAmount = vars.compoundedBorrowBalance.add(vars.originationFee);
+        vars.paybackAmount = vars.borrowBalance.add(vars.originationFee);
 
         if (_amount != UINT_MAX_VALUE && _amount < vars.paybackAmount) {
             vars.paybackAmount = _amount;
@@ -536,7 +478,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
                 _onBehalfOf,
                 0,
                 vars.paybackAmount,
-                vars.borrowBalanceIncrease,
                 false
             );
 
@@ -553,7 +494,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
                 msg.sender,
                 0,
                 vars.paybackAmount,
-                vars.borrowBalanceIncrease,
                 //solium-disable-next-line
                 block.timestamp
             );
@@ -567,8 +507,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             _onBehalfOf,
             vars.paybackAmountMinusFees,
             vars.originationFee,
-            vars.borrowBalanceIncrease,
-            vars.compoundedBorrowBalance == vars.paybackAmountMinusFees
+            vars.borrowBalance == vars.paybackAmountMinusFees
         );
 
         //if the user didn't repay the origination fee, transfer the fee to the fee collection address
@@ -596,133 +535,9 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             msg.sender,
             vars.paybackAmountMinusFees,
             vars.originationFee,
-            vars.borrowBalanceIncrease,
             //solium-disable-next-line
             block.timestamp
         );
-    }
-
-    /**
-    * @dev borrowers can user this function to swap between stable and variable borrow rate modes.
-    * @param _reserve the address of the reserve on which the user borrowed
-    **/
-    function swapBorrowRateMode(address _reserve)
-        external
-        nonReentrant
-        onlyActiveReserve(_reserve)
-        onlyUnfreezedReserve(_reserve)
-    {
-        (uint256 principalBorrowBalance, uint256 compoundedBorrowBalance, uint256 borrowBalanceIncrease) = core
-            .getUserBorrowBalances(_reserve, msg.sender);
-
-        require(
-            compoundedBorrowBalance > 0,
-            "User does not have a borrow in progress on this reserve"
-        );
-
-        CoreLibrary.InterestRateMode currentRateMode = core.getUserCurrentBorrowRateMode(
-            _reserve,
-            msg.sender
-        );
-
-        if (currentRateMode == CoreLibrary.InterestRateMode.VARIABLE) {
-            /**
-            * user wants to swap to stable, before swapping we need to ensure that
-            * 1. stable borrow rate is enabled on the reserve
-            * 2. user is not trying to abuse the reserve by depositing
-            * more collateral than he is borrowing, artificially lowering
-            * the interest rate, borrowing at variable, and switching to stable
-            **/
-            require(
-                core.isUserAllowedToBorrowAtStable(_reserve, msg.sender, compoundedBorrowBalance),
-                "User cannot borrow the selected amount at stable"
-            );
-        }
-
-        (CoreLibrary.InterestRateMode newRateMode, uint256 newBorrowRate) = core
-            .updateStateOnSwapRate(
-            _reserve,
-            msg.sender,
-            principalBorrowBalance,
-            compoundedBorrowBalance,
-            borrowBalanceIncrease,
-            currentRateMode
-        );
-
-        emit Swap(
-            _reserve,
-            msg.sender,
-            uint256(newRateMode),
-            newBorrowRate,
-            borrowBalanceIncrease,
-            //solium-disable-next-line
-            block.timestamp
-        );
-    }
-
-    /**
-    * @dev rebalances the stable interest rate of a user if current liquidity rate > user stable rate.
-    * this is regulated by Wevest to ensure that the protocol is not abused, and the user is paying a fair
-    * rate. Anyone can call this function though.
-    * @param _reserve the address of the reserve
-    * @param _user the address of the user to be rebalanced
-    **/
-    function rebalanceStableBorrowRate(address _reserve, address _user)
-        external
-        nonReentrant
-        onlyActiveReserve(_reserve)
-    {
-        (, uint256 compoundedBalance, uint256 borrowBalanceIncrease) = core.getUserBorrowBalances(
-            _reserve,
-            _user
-        );
-
-        //step 1: user must be borrowing on _reserve at a stable rate
-        require(compoundedBalance > 0, "User does not have any borrow for this reserve");
-
-        require(
-            core.getUserCurrentBorrowRateMode(_reserve, _user) ==
-                CoreLibrary.InterestRateMode.STABLE,
-            "The user borrow is variable and cannot be rebalanced"
-        );
-
-        uint256 userCurrentStableRate = core.getUserCurrentStableBorrowRate(_reserve, _user);
-        uint256 liquidityRate = core.getReserveCurrentLiquidityRate(_reserve);
-        uint256 reserveCurrentStableRate = core.getReserveCurrentStableBorrowRate(_reserve);
-        uint256 rebalanceDownRateThreshold = reserveCurrentStableRate.rayMul(
-            WadRayMath.ray().add(parametersProvider.getRebalanceDownRateDelta())
-        );
-
-        //step 2: we have two possible situations to rebalance:
-
-        //1. user stable borrow rate is below the current liquidity rate. The loan needs to be rebalanced,
-        //as this situation can be abused (user putting back the borrowed liquidity in the same reserve to earn on it)
-        //2. user stable rate is above the market avg borrow rate of a certain delta, and utilization rate is low.
-        //In this case, the user is paying an interest that is too high, and needs to be rescaled down.
-        if (
-            userCurrentStableRate < liquidityRate ||
-            userCurrentStableRate > rebalanceDownRateThreshold
-        ) {
-            uint256 newStableRate = core.updateStateOnRebalance(
-                _reserve,
-                _user,
-                borrowBalanceIncrease
-            );
-
-            emit RebalanceStableBorrowRate(
-                _reserve,
-                _user,
-                newStableRate,
-                borrowBalanceIncrease,
-                //solium-disable-next-line
-                block.timestamp
-            );
-
-            return;
-
-        }
-
-        revert("Interest rate rebalance conditions were not met");
     }
 
     /**
@@ -754,6 +569,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         }
     }
 
+    // to do 
     /**
     * @dev users can invoke this function to liquidate an undercollateralized position.
     * @param _reserve the address of the collateral to liquidated
