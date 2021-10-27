@@ -101,101 +101,25 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
     * @dev calculates the interest rates depending on the available liquidity and the total borrowed.
     * @param _reserve the address of the reserve
     * @param _availableLiquidity the liquidity available in the reserve
-    * @param _totalBorrowsStable the total borrowed from the reserve a stable rate
-    * @param _totalBorrowsVariable the total borrowed from the reserve at a variable rate
-    * @param _averageStableBorrowRate the weighted average of all the stable rate borrows
+    * @param _totalBorrows the total borrowed from the reserve
     * return the liquidity rate, stable borrow rate and variable borrow rate calculated from the input parameters
     **/
     function calculateInterestRates(
         address _reserve,
         uint256 _availableLiquidity,
-        uint256 _totalBorrowsStable,
-        uint256 _totalBorrowsVariable,
-        uint256 _averageStableBorrowRate
-    )
+        uint256 _totalBorrows
+    ) 
         external
         view
         override
-        returns (
-            uint256 currentLiquidityRate,
-            uint256 currentStableBorrowRate,
-            uint256 currentVariableBorrowRate
-        )
+        returns (uint256)
     {
-        uint256 totalBorrows = _totalBorrowsStable.add(_totalBorrowsVariable);
+        uint256 totalBorrows = _totalBorrows;
 
         uint256 utilizationRate = (totalBorrows == 0 && _availableLiquidity == 0)
             ? 0
             : totalBorrows.rayDiv(_availableLiquidity.add(totalBorrows));
 
-        currentStableBorrowRate = ILendingRateOracle(addressesProvider.getLendingRateOracle())
-            .getMarketBorrowRate(_reserve);
-
-        if (utilizationRate > OPTIMAL_UTILIZATION_RATE) {
-            uint256 excessUtilizationRateRatio = utilizationRate
-                .sub(OPTIMAL_UTILIZATION_RATE)
-                .rayDiv(EXCESS_UTILIZATION_RATE);
-
-            currentStableBorrowRate = currentStableBorrowRate.add(stableRateSlope1).add(
-                stableRateSlope2.rayMul(excessUtilizationRateRatio)
-            );
-
-            currentVariableBorrowRate = baseVariableBorrowRate.add(variableRateSlope1).add(
-                variableRateSlope2.rayMul(excessUtilizationRateRatio)
-            );
-        } else {
-            currentStableBorrowRate = currentStableBorrowRate.add(
-                stableRateSlope1.rayMul(
-                    utilizationRate.rayDiv(
-                        OPTIMAL_UTILIZATION_RATE
-                    )
-                )
-            );
-            currentVariableBorrowRate = baseVariableBorrowRate.add(
-                utilizationRate.rayDiv(OPTIMAL_UTILIZATION_RATE).rayMul(variableRateSlope1)
-            );
-        }
-
-        currentLiquidityRate = getOverallBorrowRateInternal(
-            _totalBorrowsStable,
-            _totalBorrowsVariable,
-            currentVariableBorrowRate,
-            _averageStableBorrowRate
-        )
-            .rayMul(utilizationRate);
-
-    }
-
-    /**
-    * @dev calculates the overall borrow rate as the weighted average between the total variable borrows and total stable borrows.
-    * @param _totalBorrowsStable the total borrowed from the reserve a stable rate
-    * @param _totalBorrowsVariable the total borrowed from the reserve at a variable rate
-    * @param _currentVariableBorrowRate the current variable borrow rate
-    * @param _currentAverageStableBorrowRate the weighted average of all the stable rate borrows
-    * @return the weighted averaged borrow rate
-    **/
-    function getOverallBorrowRateInternal(
-        uint256 _totalBorrowsStable,
-        uint256 _totalBorrowsVariable,
-        uint256 _currentVariableBorrowRate,
-        uint256 _currentAverageStableBorrowRate
-    ) internal pure returns (uint256) {
-        uint256 totalBorrows = _totalBorrowsStable.add(_totalBorrowsVariable);
-
-        if (totalBorrows == 0) return 0;
-
-        uint256 weightedVariableRate = _totalBorrowsVariable.wadToRay().rayMul(
-            _currentVariableBorrowRate
-        );
-
-        uint256 weightedStableRate = _totalBorrowsStable.wadToRay().rayMul(
-            _currentAverageStableBorrowRate
-        );
-
-        uint256 overallBorrowRate = weightedVariableRate.add(weightedStableRate).rayDiv(
-            totalBorrows.wadToRay()
-        );
-
-        return overallBorrowRate;
+        return utilizationRate;
     }
 }

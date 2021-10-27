@@ -13,7 +13,13 @@ library CoreLibrary {
     using SafeMath for uint256;
     using WadRayMath for uint256;
 
-    enum LeverageRateMode {HALF, ONE, TWO, THREE}
+    enum LeverageRatio {
+        NONE, 
+        HALF, 
+        ONE, 
+        TWO, 
+        THREE
+    }
 
     uint256 internal constant SECONDS_PER_YEAR = 365 days;
 

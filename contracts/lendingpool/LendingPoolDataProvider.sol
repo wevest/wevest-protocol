@@ -49,7 +49,7 @@ contract LendingPoolDataProvider is VersionedInitializable {
         uint256 reserveUnitPrice;
         uint256 tokenUnit;
         uint256 compoundedLiquidityBalance;
-        uint256 compoundedBorrowBalance;
+        uint256 borrowBalance;
         uint256 reserveDecimals;
         uint256 baseLtv;
         uint256 liquidationThreshold;
@@ -93,12 +93,12 @@ contract LendingPoolDataProvider is VersionedInitializable {
 
             (
                 vars.compoundedLiquidityBalance,
-                vars.compoundedBorrowBalance,
+                vars.borrowBalance,
                 vars.originationFee,
                 vars.userUsesReserveAsCollateral
             ) = core.getUserBasicReserveData(vars.currentReserve, _user);
 
-            if (vars.compoundedLiquidityBalance == 0 && vars.compoundedBorrowBalance == 0) {
+            if (vars.compoundedLiquidityBalance == 0 && vars.borrowBalance == 0) {
                 continue;
             }
 
@@ -130,9 +130,9 @@ contract LendingPoolDataProvider is VersionedInitializable {
                 }
             }
 
-            if (vars.compoundedBorrowBalance > 0) {
+            if (vars.borrowBalance > 0) {
                 totalBorrowBalanceETH = totalBorrowBalanceETH.add(
-                    vars.reserveUnitPrice.mul(vars.compoundedBorrowBalance).div(vars.tokenUnit)
+                    vars.reserveUnitPrice.mul(vars.borrowBalance).div(vars.tokenUnit)
                 );
                 totalFeesETH = totalFeesETH.add(
                     vars.originationFee.mul(vars.reserveUnitPrice).div(vars.tokenUnit)

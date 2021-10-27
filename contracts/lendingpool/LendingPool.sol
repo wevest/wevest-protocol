@@ -67,11 +67,8 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @param _reserve the address of the reserve
     * @param _user the address of the user
     * @param _amount the amount to be deposited
-    * @param _borrowRateMode the rate mode, can be either 1-stable or 2-variable
-    * @param _borrowRate the rate at which the user has borrowed
+    * @param _leverageRatio the rate mode, can be either 1-stable or 2-variable
     * @param _originationFee the origination fee to be paid by the user
-    * @param _borrowBalanceIncrease the balance increase since the last borrow, 0 if it's the first time borrowing
-    * @param _referral the referral number of the action
     * @param _timestamp the timestamp of the action
     **/
 
@@ -79,11 +76,8 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         address indexed _reserve,
         address indexed _user,
         uint256 _amount,
-        uint256 _borrowRateMode,
-        uint256 _borrowRate,
+        uint256 _leverageRatio,
         uint256 _originationFee,
-        uint256 _borrowBalanceIncrease,
-        uint16 indexed _referral,
         uint256 _timestamp
     );
 
@@ -425,6 +419,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             ,
             vars.healthFactorBelowThreshold
         ) = dataProvider.calculateUserGlobalData(msg.sender);
+
         /** callateral balance should be greater than 0 */
         require(vars.userCollateralBalanceETH > 0, "The collateral balance is 0");
 
@@ -453,24 +448,15 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             "There is not enough collateral to cover a new borrow"
         );
 
-        /**
-        * Following conditions need to be met if the user is borrowing at a stable rate:
-        * 1. Reserve must be enabled for stable rate borrowing
-        * 2. Users cannot borrow from the reserve if their collateral is (mostly) the same currency
-        *    they are borrowing, to prevent abuses.
-        * 3. Users will be able to borrow only a relatively small, configurable amount of the total
-        *    liquidity
-        **/
-
         //all conditions passed - borrow is accepted
-        (vars.finalUserBorrowRate, vars.borrowBalanceIncrease) = core.updateStateOnBorrow(
+        core.updateStateOnBorrow(
             _reserve,
             msg.sender,
-            _amount,
-            vars.borrowFee,
-            vars.rateMode
+            _amount.mul(_leverageRatio),
+            vars.borrowFee
         );
 
+        vars.ratio = _leverageRatio;
         //if we reached this point, we can transfer
         core.transferToUser(_reserve, msg.sender, _amount);
 
@@ -478,9 +464,8 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             _reserve,
             msg.sender,
             _amount,
-            vars.finalUserBorrowRate,
+            vars.ratio,
             vars.borrowFee,
-            vars.borrowBalanceIncrease,
             //solium-disable-next-line
             block.timestamp
         );

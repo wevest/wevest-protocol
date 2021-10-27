@@ -16,7 +16,6 @@ contract FeeProvider is IFeeProvider, VersionedInitializable {
     // percentage of the fee to be calculated on the loan amount
     uint256 public originationFeePercentage;
 
-
     uint256 constant public FEE_PROVIDER_REVISION = 0x1;
 
     function getRevision() internal pure override returns(uint256) {
