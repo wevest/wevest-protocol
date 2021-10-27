@@ -121,22 +121,20 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _reserve the address of the reserve in which the redeem is happening
     * @param _user the address of the the user redeeming
     * @param _amountRedeemed the amount being redeemed
-    * @param _userRedeemedEverything true if the user is redeeming everything
     **/
-    function updateStateOnRedeem(
+    function updateStateOnWithdraw(
         address _reserve,
         address _user,
-        uint256 _amountRedeemed,
-        bool _userRedeemedEverything
+        uint256 _amountRedeemed
     ) external onlyLendingPool {
         //compound liquidity and variable borrow interests
         reserves[_reserve].updateCumulativeIndexes();
         updateReserveInterestRatesAndTimestampInternal(_reserve, 0, _amountRedeemed);
 
         //if user redeemed everything the useReserveAsCollateral flag is reset
-        if (_userRedeemedEverything) {
+        /* if (_userRedeemedEverything) {
             setUserUseReserveAsCollateral(_reserve, _user, false);
-        }
+        } */
     }
 
     /**
@@ -208,43 +206,6 @@ contract LendingPoolCore is VersionedInitializable {
         );
 
         updateReserveInterestRatesAndTimestampInternal(_reserve, _paybackAmountMinusFees, 0);
-    }
-
-    /**
-    * @dev updates the state of the core as a consequence of a swap rate action.
-    * @param _reserve the address of the reserve on which the user is repaying
-    * @param _user the address of the borrower
-    * @param _principalBorrowBalance the amount borrowed by the user
-    * @param _compoundedBorrowBalance the amount borrowed plus accrued interest
-    * @param _balanceIncrease the accrued interest on the borrowed amount
-    * @param _currentRateMode the current interest rate mode for the user
-    **/
-    function updateStateOnSwapRate(
-        address _reserve,
-        address _user,
-        uint256 _principalBorrowBalance,
-        uint256 _compoundedBorrowBalance,
-        uint256 _balanceIncrease,
-        CoreLibrary.InterestRateMode _currentRateMode
-    ) external onlyLendingPool returns (CoreLibrary.InterestRateMode, uint256) {
-        updateReserveStateOnSwapRateInternal(
-            _reserve,
-            _user,
-            _principalBorrowBalance,
-            _compoundedBorrowBalance,
-            _currentRateMode
-        );
-
-        CoreLibrary.InterestRateMode newRateMode = updateUserStateOnSwapRateInternal(
-            _reserve,
-            _user,
-            _balanceIncrease,
-            _currentRateMode
-        );
-
-        updateReserveInterestRatesAndTimestampInternal(_reserve, 0, 0);
-
-        return (newRateMode, getUserCurrentBorrowRate(_reserve, _user));
     }
 
     /**
@@ -1286,89 +1247,6 @@ contract LendingPoolCore is VersionedInitializable {
         //solium-disable-next-line
         user.lastUpdateTimestamp = uint40(block.timestamp);
 
-    }
-
-    /**
-    * @dev updates the state of the user as a consequence of a swap rate action.
-    * @param _reserve the address of the reserve on which the user is performing the rate swap
-    * @param _user the address of the borrower
-    * @param _principalBorrowBalance the the principal amount borrowed by the user
-    * @param _compoundedBorrowBalance the principal amount plus the accrued interest
-    * @param _currentRateMode the rate mode at which the user borrowed
-    **/
-    function updateReserveStateOnSwapRateInternal(
-        address _reserve,
-        address _user,
-        uint256 _principalBorrowBalance,
-        uint256 _compoundedBorrowBalance,
-        CoreLibrary.InterestRateMode _currentRateMode
-    ) internal {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
-
-        //compounding reserve indexes
-        reserve.updateCumulativeIndexes();
-
-        if (_currentRateMode == CoreLibrary.InterestRateMode.STABLE) {
-            uint256 userCurrentStableRate = user.stableBorrowRate;
-
-            //swap to variable
-            reserve.decreaseTotalBorrowsStableAndUpdateAverageRate(
-                _principalBorrowBalance,
-                userCurrentStableRate
-            ); //decreasing stable from old principal balance
-            reserve.increaseTotalBorrowsVariable(_compoundedBorrowBalance); //increase variable borrows
-        } else if (_currentRateMode == CoreLibrary.InterestRateMode.VARIABLE) {
-            //swap to stable
-            uint256 currentStableRate = reserve.currentStableBorrowRate;
-            reserve.decreaseTotalBorrowsVariable(_principalBorrowBalance);
-            reserve.increaseTotalBorrowsStableAndUpdateAverageRate(
-                _compoundedBorrowBalance,
-                currentStableRate
-            );
-
-        } else {
-            revert("Invalid rate mode received");
-        }
-    }
-
-    /**
-    * @dev updates the state of the user as a consequence of a swap rate action.
-    * @param _reserve the address of the reserve on which the user is performing the swap
-    * @param _user the address of the borrower
-    * @param _balanceIncrease the accrued interest on the borrowed amount
-    * @param _currentRateMode the current rate mode of the user
-    **/
-
-    function updateUserStateOnSwapRateInternal(
-        address _reserve,
-        address _user,
-        uint256 _balanceIncrease,
-        CoreLibrary.InterestRateMode _currentRateMode
-    ) internal returns (CoreLibrary.InterestRateMode) {
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-
-        CoreLibrary.InterestRateMode newMode = CoreLibrary.InterestRateMode.NONE;
-
-        if (_currentRateMode == CoreLibrary.InterestRateMode.VARIABLE) {
-            //switch to stable
-            newMode = CoreLibrary.InterestRateMode.STABLE;
-            user.stableBorrowRate = reserve.currentStableBorrowRate;
-            user.lastVariableBorrowCumulativeIndex = 0;
-        } else if (_currentRateMode == CoreLibrary.InterestRateMode.STABLE) {
-            newMode = CoreLibrary.InterestRateMode.VARIABLE;
-            user.stableBorrowRate = 0;
-            user.lastVariableBorrowCumulativeIndex = reserve.lastVariableBorrowCumulativeIndex;
-        } else {
-            revert("Invalid interest rate mode received");
-        }
-        //compounding cumulated interest
-        user.principalBorrowBalance = user.principalBorrowBalance.add(_balanceIncrease);
-        //solium-disable-next-line
-        user.lastUpdateTimestamp = uint40(block.timestamp);
-
-        return newMode;
     }
 
     /**
