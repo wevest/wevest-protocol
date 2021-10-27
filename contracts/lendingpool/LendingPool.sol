@@ -39,14 +39,12 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @param _reserve the address of the reserve
     * @param _user the address of the user
     * @param _amount the amount to be deposited
-    * @param _referral the referral number of the action
     * @param _timestamp the timestamp of the action
     **/
     event Deposit(
         address indexed _reserve,
         address indexed _user,
         uint256 _amount,
-        uint16 indexed _referral,
         uint256 _timestamp
     );
 
@@ -294,9 +292,8 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * is minted.
     * @param _reserve the address of the reserve
     * @param _amount the amount to be deposited
-    * @param _referralCode integrators are assigned a referral code and can potentially receive rewards.
     **/
-    function deposit(address _reserve, uint256 _amount, uint16 _referralCode)
+    function deposit(address _reserve, uint256 _amount)
         external
         payable
         nonReentrant
@@ -304,20 +301,20 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         onlyUnfreezedReserve(_reserve)
         onlyAmountGreaterThanZero(_amount)
     {
-        WvToken aToken = WvToken(core.getReserveWvTokenAddress(_reserve));
+        WvToken wvToken = WvToken(core.getReserveWvTokenAddress(_reserve));
 
-        bool isFirstDeposit = aToken.balanceOf(msg.sender) == 0;
+        bool isFirstDeposit = wvToken.balanceOf(msg.sender) == 0;
 
         core.updateStateOnDeposit(_reserve, msg.sender, _amount, isFirstDeposit);
 
         //minting WvToken to user 1:1 with the specific exchange rate
-        aToken.mintOnDeposit(msg.sender, _amount);
+        wvToken.mintOnDeposit(msg.sender, _amount);
 
         //transfer to the core contract
         core.transferToReserve{value: msg.value}(_reserve, msg.sender, _amount);
 
         //solium-disable-next-line
-        emit Deposit(_reserve, msg.sender, _amount, _referralCode, block.timestamp);
+        emit Deposit(_reserve, msg.sender, _amount, block.timestamp);
 
     }
 
@@ -374,7 +371,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         uint256 availableLiquidity;
         uint256 reserveDecimals;
         uint256 finalUserBorrowRate;
-        CoreLibrary.InterestRateMode rateMode;
+        CoreLibrary.LeverageRatio ratio;
         bool healthFactorBelowThreshold;
     }
 
@@ -383,13 +380,11 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * already deposited enough collateral.
     * @param _reserve the address of the reserve
     * @param _amount the amount to be borrowed
-    * @param _interestRateMode the interest rate mode at which the user wants to borrow. Can be 0 (STABLE) or 1 (VARIABLE)
     **/
     function borrow(
         address _reserve,
         uint256 _amount,
-        uint256 _interestRateMode,
-        uint16 _referralCode
+        uint256 _leverageRatio
     )
         external
         nonReentrant
@@ -402,21 +397,21 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
 
         //check that the reserve is enabled for borrowing
         require(core.isReserveBorrowingEnabled(_reserve), "Reserve is not enabled for borrowing");
-        //validate interest rate mode
-        require(
-            uint256(CoreLibrary.InterestRateMode.VARIABLE) == _interestRateMode ||
-                uint256(CoreLibrary.InterestRateMode.STABLE) == _interestRateMode,
-            "Invalid interest rate mode selected"
-        );
 
-        //cast the rateMode to coreLibrary.interestRateMode
-        vars.rateMode = CoreLibrary.InterestRateMode(_interestRateMode);
+        //validate leverage ratio
+        require(
+            uint256(CoreLibrary.LeverageRatio.HALF) == _leverageRatio ||
+            uint256(CoreLibrary.LeverageRatio.ONE) == _leverageRatio || 
+            uint256(CoreLibrary.LeverageRatio.TWO) == _leverageRatio ||
+            uint256(CoreLibrary.LeverageRatio.THREE) == _leverageRatio,
+            "Invalid leverage ratio selected"
+        );
 
         //check that the amount is available in the reserve
         vars.availableLiquidity = core.getReserveAvailableLiquidity(_reserve);
 
         require(
-            vars.availableLiquidity >= _amount,
+            vars.availableLiquidity >= _amount.mul(_leverageRatio),
             "There is not enough liquidity available in the reserve"
         );
 
@@ -430,22 +425,23 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             ,
             vars.healthFactorBelowThreshold
         ) = dataProvider.calculateUserGlobalData(msg.sender);
-
+        /** callateral balance should be greater than 0 */
         require(vars.userCollateralBalanceETH > 0, "The collateral balance is 0");
 
+        /** liquidation condition */
         require(
             !vars.healthFactorBelowThreshold,
             "The borrower can already be liquidated so he cannot borrow more"
         );
 
-        //calculating fees
-        vars.borrowFee = feeProvider.calculateLoanOriginationFee(msg.sender, _amount);
+        //calculating fees applied by the protocol
+        vars.borrowFee = feeProvider.calculateLoanOriginationFee(msg.sender, _amount.mul(_leverageRatio));
 
         require(vars.borrowFee > 0, "The amount to borrow is too small");
 
         vars.amountOfCollateralNeededETH = dataProvider.calculateCollateralNeededInETH(
             _reserve,
-            _amount,
+            _amount.mul(_leverageRatio),
             vars.borrowFee,
             vars.userBorrowBalanceETH,
             vars.userTotalFeesETH,
@@ -466,24 +462,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         *    liquidity
         **/
 
-        if (vars.rateMode == CoreLibrary.InterestRateMode.STABLE) {
-            //check if the borrow mode is stable and if stable rate borrowing is enabled on this reserve
-            require(
-                core.isUserAllowedToBorrowAtStable(_reserve, msg.sender, _amount),
-                "User cannot borrow the selected amount with a stable rate"
-            );
-
-            //calculate the max available loan size in stable rate mode as a percentage of the
-            //available liquidity
-            uint256 maxLoanPercent = parametersProvider.getMaxStableRateBorrowSizePercent();
-            uint256 maxLoanSizeStable = vars.availableLiquidity.mul(maxLoanPercent).div(100);
-
-            require(
-                _amount <= maxLoanSizeStable,
-                "User is trying to borrow too much liquidity at a stable rate"
-            );
-        }
-
         //all conditions passed - borrow is accepted
         (vars.finalUserBorrowRate, vars.borrowBalanceIncrease) = core.updateStateOnBorrow(
             _reserve,
@@ -500,11 +478,9 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             _reserve,
             msg.sender,
             _amount,
-            _interestRateMode,
             vars.finalUserBorrowRate,
             vars.borrowFee,
             vars.borrowBalanceIncrease,
-            _referralCode,
             //solium-disable-next-line
             block.timestamp
         );
