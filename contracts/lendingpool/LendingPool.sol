@@ -147,7 +147,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @param _liquidatedCollateralAmount the amount of collateral being liquidated
     * @param _accruedBorrowInterest the amount of interest accrued by the borrower since the last action
     * @param _liquidator the address of the liquidator
-    * @param _receiveWvToken true if the liquidator wants to receive aTokens, false otherwise
+    * @param _receiveWvToken true if the liquidator wants to receive wvTokens, false otherwise
     * @param _timestamp the timestamp of the action
     **/
     event LiquidationCall(
@@ -228,7 +228,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     }
 
     /**
-    * @dev deposits The underlying asset into the reserve. A corresponding amount of the overlying asset (aTokens)
+    * @dev deposits The underlying asset into the reserve. A corresponding amount of the overlying asset (wvTokens)
     * is minted.
     * @param _reserve the address of the reserve
     * @param _amount the amount to be deposited
@@ -301,7 +301,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         
         // burn wvTokens to redeem underlying assets
         wvToken.burnOnWithdraw(_amount);
-        
+
         // transfers a specific amount from the reserve contract to user address.
         core.transferToUser(_reserve, _user, _amount);
 
@@ -314,7 +314,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     */
 
     struct BorrowLocalVars {
-        uint256 principalBorrowBalance;
+        uint256 borrowBalance;
         uint256 currentLtv;
         uint256 currentLiquidationThreshold;
         uint256 borrowFee;
@@ -323,12 +323,9 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         uint256 userCollateralBalanceETH;
         uint256 userBorrowBalanceETH;
         uint256 userTotalFeesETH;
-        uint256 borrowBalanceIncrease;
-        uint256 currentReserveStableRate;
         uint256 availableLiquidity;
         uint256 reserveDecimals;
-        uint256 finalUserBorrowRate;
-        CoreLibrary.LeverageRatio ratio;
+        CoreLibrary.LeverageRatioMode ratio;
         bool healthFactorBelowThreshold;
     }
 
@@ -357,10 +354,9 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
 
         //validate leverage ratio
         require(
-            uint256(CoreLibrary.LeverageRatio.HALF) == _leverageRatio ||
-            uint256(CoreLibrary.LeverageRatio.ONE) == _leverageRatio || 
-            uint256(CoreLibrary.LeverageRatio.TWO) == _leverageRatio ||
-            uint256(CoreLibrary.LeverageRatio.THREE) == _leverageRatio,
+            uint256(CoreLibrary.LeverageRatioMode.ONE) == _leverageRatio || 
+            uint256(CoreLibrary.LeverageRatioMode.TWO) == _leverageRatio ||
+            uint256(CoreLibrary.LeverageRatioMode.THREE) == _leverageRatio,
             "Invalid leverage ratio selected"
         );
 
@@ -418,8 +414,8 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             _amount.mul(_leverageRatio),
             vars.borrowFee
         );
-
-        vars.ratio = _leverageRatio;
+        // to do, should get leverage ratio as Enum
+        vars.ratio = CoreLibrary.LeverageRatioMode(_leverageRatio);
         //if we reached this point, we can transfer
         core.transferToUser(_reserve, msg.sender, _amount);
 
@@ -427,7 +423,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             _reserve,
             msg.sender,
             _amount,
-            vars.ratio,
+            _leverageRatio,
             vars.borrowFee,
             //solium-disable-next-line
             block.timestamp
@@ -495,8 +491,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
                 _reserve,
                 _onBehalfOf,
                 0,
-                vars.paybackAmount,
-                false
+                vars.paybackAmount
             );
 
             core.transferToFeeCollectionAddress{value: vars.isETH ? vars.paybackAmount : 0}(
@@ -524,8 +519,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             _reserve,
             _onBehalfOf,
             vars.paybackAmountMinusFees,
-            vars.originationFee,
-            vars.borrowBalance == vars.paybackAmountMinusFees
+            vars.originationFee
         );
 
         //if the user didn't repay the origination fee, transfer the fee to the fee collection address
@@ -594,7 +588,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @param _reserve the address of the principal reserve
     * @param _user the address of the borrower
     * @param _purchaseAmount the amount of principal that the liquidator wants to repay
-    * @param _receiveWvToken true if the liquidators wants to receive the aTokens, false if
+    * @param _receiveWvToken true if the liquidators wants to receive the wvTokens, false if
     * he wants to receive the underlying asset directly
     **/
     function liquidationCall(
@@ -641,7 +635,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             address interestRateStrategyAddress,
             bool usageAsCollateralEnabled,
             bool borrowingEnabled,
-            bool stableBorrowRateEnabled,
             bool isActive
         )
     {
@@ -654,15 +647,10 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         returns (
             uint256 totalLiquidity,
             uint256 availableLiquidity,
-            uint256 totalBorrowsStable,
-            uint256 totalBorrowsVariable,
+            uint256 totalBorrows,
             uint256 liquidityRate,
-            uint256 variableBorrowRate,
-            uint256 stableBorrowRate,
-            uint256 averageStableBorrowRate,
             uint256 utilizationRate,
             uint256 liquidityIndex,
-            uint256 variableBorrowIndex,
             address wvTokenAddress,
             uint40 lastUpdateTimestamp
         )
@@ -692,13 +680,9 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         view
         returns (
             uint256 currentWvTokenBalance,
-            uint256 currentBorrowBalance,
-            uint256 principalBorrowBalance,
-            uint256 borrowRateMode,
-            uint256 borrowRate,
+            uint256 borrowBalance,
             uint256 liquidityRate,
             uint256 originationFee,
-            uint256 variableBorrowIndex,
             uint256 lastUpdateTimestamp,
             bool usageAsCollateralEnabled
         )

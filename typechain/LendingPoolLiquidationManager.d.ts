@@ -45,7 +45,7 @@ interface LendingPoolLiquidationManagerInterface
   ): Result;
 
   events: {
-    "LiquidationCall(address,address,address,uint256,uint256,uint256,address,bool,uint256)": EventFragment;
+    "LiquidationCall(address,address,address,uint256,uint256,address,bool,uint256)": EventFragment;
     "OriginationFeeLiquidated(address,address,address,uint256,uint256,uint256)": EventFragment;
   };
 
@@ -54,23 +54,12 @@ interface LendingPoolLiquidationManagerInterface
 }
 
 export type LiquidationCallEvent = TypedEvent<
-  [
-    string,
-    string,
-    string,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    string,
-    boolean,
-    BigNumber
-  ] & {
+  [string, string, string, BigNumber, BigNumber, string, boolean, BigNumber] & {
     _collateral: string;
     _reserve: string;
     _user: string;
     _purchaseAmount: BigNumber;
     _liquidatedCollateralAmount: BigNumber;
-    _accruedBorrowInterest: BigNumber;
     _liquidator: string;
     _receiveWvToken: boolean;
     _timestamp: BigNumber;
@@ -169,13 +158,12 @@ export class LendingPoolLiquidationManager extends BaseContract {
   };
 
   filters: {
-    "LiquidationCall(address,address,address,uint256,uint256,uint256,address,bool,uint256)"(
+    "LiquidationCall(address,address,address,uint256,uint256,address,bool,uint256)"(
       _collateral?: string | null,
       _reserve?: string | null,
       _user?: string | null,
       _purchaseAmount?: null,
       _liquidatedCollateralAmount?: null,
-      _accruedBorrowInterest?: null,
       _liquidator?: null,
       _receiveWvToken?: null,
       _timestamp?: null
@@ -184,7 +172,6 @@ export class LendingPoolLiquidationManager extends BaseContract {
         string,
         string,
         string,
-        BigNumber,
         BigNumber,
         BigNumber,
         string,
@@ -197,7 +184,6 @@ export class LendingPoolLiquidationManager extends BaseContract {
         _user: string;
         _purchaseAmount: BigNumber;
         _liquidatedCollateralAmount: BigNumber;
-        _accruedBorrowInterest: BigNumber;
         _liquidator: string;
         _receiveWvToken: boolean;
         _timestamp: BigNumber;
@@ -210,7 +196,6 @@ export class LendingPoolLiquidationManager extends BaseContract {
       _user?: string | null,
       _purchaseAmount?: null,
       _liquidatedCollateralAmount?: null,
-      _accruedBorrowInterest?: null,
       _liquidator?: null,
       _receiveWvToken?: null,
       _timestamp?: null
@@ -219,7 +204,6 @@ export class LendingPoolLiquidationManager extends BaseContract {
         string,
         string,
         string,
-        BigNumber,
         BigNumber,
         BigNumber,
         string,
@@ -232,7 +216,6 @@ export class LendingPoolLiquidationManager extends BaseContract {
         _user: string;
         _purchaseAmount: BigNumber;
         _liquidatedCollateralAmount: BigNumber;
-        _accruedBorrowInterest: BigNumber;
         _liquidator: string;
         _receiveWvToken: boolean;
         _timestamp: BigNumber;

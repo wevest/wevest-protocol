@@ -13,9 +13,7 @@ library CoreLibrary {
     using SafeMath for uint256;
     using WadRayMath for uint256;
 
-    enum LeverageRatio {
-        NONE, 
-        HALF, 
+    enum LeverageRatioMode {
         ONE, 
         TWO, 
         THREE

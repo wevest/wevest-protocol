@@ -17,7 +17,6 @@ import "../libraries/EthAddressLib.sol";
 
 /**
 * @title LendingPoolCore contract
-* @author Aave
 * @notice Holds the state of the lending pool and all the funds deposited
 * @dev NOTE: The core does not enforce security checks on the update of the state
 * (eg, updateStateOnBorrow() does not enforce that borrowed is enabled on the reserve).
@@ -175,27 +174,23 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _user the address of the borrower
     * @param _paybackAmountMinusFees the amount being paid back minus fees
     * @param _originationFeeRepaid the fee on the amount that is being repaid
-    * @param _repaidWholeLoan true if the user is repaying the whole loan
     **/
 
     function updateStateOnRepay(
         address _reserve,
         address _user,
         uint256 _paybackAmountMinusFees,
-        uint256 _originationFeeRepaid,
-        bool _repaidWholeLoan
+        uint256 _originationFeeRepaid
     ) external onlyLendingPool {
         updateReserveStateOnRepayInternal(
             _reserve,
-            _user,
             _paybackAmountMinusFees
         );
         updateUserStateOnRepayInternal(
             _reserve,
             _user,
             _paybackAmountMinusFees,
-            _originationFeeRepaid,
-            _repaidWholeLoan
+            _originationFeeRepaid
         );
 
         updateReserveInterestRatesAndTimestampInternal(
@@ -212,7 +207,6 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _collateralToLiquidate the amount of collateral being liquidated
     * @param _feeLiquidated the amount of origination fee being liquidated
     * @param _liquidatedCollateralForFee the amount of collateral equivalent to the origination fee + bonus
-    * @param _balanceIncrease the accrued interest on the borrowed amount
     * @param _liquidatorReceivesWvToken true if the liquidator will receive aTokens, false otherwise
     **/
     function updateStateOnLiquidation(
@@ -223,14 +217,12 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _collateralToLiquidate,
         uint256 _feeLiquidated,
         uint256 _liquidatedCollateralForFee,
-        uint256 _balanceIncrease,
         bool _liquidatorReceivesWvToken
     ) external onlyLendingPool {
         updatePrincipalReserveStateOnLiquidationInternal(
             _principalReserve,
             _user,
-            _amountToLiquidate,
-            _balanceIncrease
+            _amountToLiquidate
         );
 
         updateCollateralReserveStateOnLiquidationInternal(
@@ -241,11 +233,12 @@ contract LendingPoolCore is VersionedInitializable {
             _principalReserve,
             _user,
             _amountToLiquidate,
-            _feeLiquidated,
-            _balanceIncrease
+            _feeLiquidated
         );
 
-        updateReserveInterestRatesAndTimestampInternal(_principalReserve, _amountToLiquidate, 0);
+        updateReserveInterestRatesAndTimestampInternal(
+            _principalReserve, _amountToLiquidate, 0
+        );
 
         if (!_liquidatorReceivesWvToken) {
             updateReserveInterestRatesAndTimestampInternal(
@@ -254,7 +247,6 @@ contract LendingPoolCore is VersionedInitializable {
                 _collateralToLiquidate.add(_liquidatedCollateralForFee)
             );
         }
-
     }
 
     /**
@@ -405,7 +397,6 @@ contract LendingPoolCore is VersionedInitializable {
         view
         returns (uint256, uint256, uint256, bool)
     {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
         uint256 underlyingBalance = getUserUnderlyingAssetBalance(_reserve, _user);
@@ -420,30 +411,6 @@ contract LendingPoolCore is VersionedInitializable {
             user.originationFee,
             user.useAsCollateral
         );
-    }
-
-    /**
-    * @dev checks if a user is allowed to borrow at a stable rate
-    * @param _reserve the reserve address
-    * @param _user the user
-    * @param _amount the amount the the user wants to borrow
-    * @return true if the user is allowed to borrow at a stable rate, false otherwise
-    **/
-
-    function isUserAllowedToBorrowAtStable(address _reserve, address _user, uint256 _amount)
-        external
-        view
-        returns (bool)
-    {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
-
-        if (!reserve.isStableBorrowRateEnabled) return false;
-
-        return
-            !user.useAsCollateral ||
-            !reserve.usageAsCollateralEnabled ||
-            _amount > getUserUnderlyingAssetBalance(_reserve, _user);
     }
 
     /**
@@ -531,27 +498,6 @@ contract LendingPoolCore is VersionedInitializable {
     }
 
     /**
-    * @dev gets the reserve total borrows stable
-    * @param _reserve the reserve address
-    * @return the total borrows stable
-    **/
-    function getReserveTotalBorrowsStable(address _reserve) external view returns (uint256) {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        return reserve.totalBorrowsStable;
-    }
-
-    /**
-    * @dev gets the reserve total borrows variable
-    * @param _reserve the reserve address
-    * @return the total borrows variable
-    **/
-
-    function getReserveTotalBorrowsVariable(address _reserve) external view returns (uint256) {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        return reserve.totalBorrowsVariable;
-    }
-
-    /**
     * @dev gets the reserve liquidation threshold
     * @param _reserve the reserve address
     * @return the reserve liquidation threshold
@@ -574,56 +520,6 @@ contract LendingPoolCore is VersionedInitializable {
     }
 
     /**
-    * @dev gets the reserve current variable borrow rate. Is the base variable borrow rate if the reserve is empty
-    * @param _reserve the reserve address
-    * @return the reserve current variable borrow rate
-    **/
-
-    function getReserveCurrentVariableBorrowRate(address _reserve) external view returns (uint256) {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-
-        if (reserve.currentVariableBorrowRate == 0) {
-            return
-                IReserveInterestRateStrategy(reserve.interestRateStrategyAddress)
-                .getBaseVariableBorrowRate();
-        }
-        return reserve.currentVariableBorrowRate;
-    }
-
-    /**
-    * @dev gets the reserve current stable borrow rate. Is the market rate if the reserve is empty
-    * @param _reserve the reserve address
-    * @return the reserve current stable borrow rate
-    **/
-
-    function getReserveCurrentStableBorrowRate(address _reserve) public view returns (uint256) {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        ILendingRateOracle oracle = ILendingRateOracle(addressesProvider.getLendingRateOracle());
-
-        if (reserve.currentStableBorrowRate == 0) {
-            //no stable rate borrows yet
-            return oracle.getMarketBorrowRate(_reserve);
-        }
-
-        return reserve.currentStableBorrowRate;
-    }
-
-    /**
-    * @dev gets the reserve average stable borrow rate. The average stable rate is the weighted average
-    * of all the loans taken at stable rate.
-    * @param _reserve the reserve address
-    * @return the reserve current average borrow rate
-    **/
-    function getReserveCurrentAverageStableBorrowRate(address _reserve)
-        external
-        view
-        returns (uint256)
-    {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        return reserve.currentAverageStableBorrowRate;
-    }
-
-    /**
     * @dev gets the reserve liquidity rate
     * @param _reserve the reserve address
     * @return the reserve liquidity rate
@@ -641,20 +537,6 @@ contract LendingPoolCore is VersionedInitializable {
     function getReserveLiquidityCumulativeIndex(address _reserve) external view returns (uint256) {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         return reserve.lastLiquidityCumulativeIndex;
-    }
-
-    /**
-    * @dev gets the reserve variable borrow index
-    * @param _reserve the reserve address
-    * @return the reserve variable borrow index
-    **/
-    function getReserveVariableBorrowsCumulativeIndex(address _reserve)
-        external
-        view
-        returns (uint256)
-    {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        return reserve.lastVariableBorrowCumulativeIndex;
     }
 
     /**
@@ -715,16 +597,6 @@ contract LendingPoolCore is VersionedInitializable {
     function isReserveUsageAsCollateralEnabled(address _reserve) external view returns (bool) {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         return reserve.usageAsCollateralEnabled;
-    }
-
-    /**
-    * @dev returns true if the stable rate is enabled on reserve
-    * @param _reserve the reserve address
-    * @return true if the stable rate is enabled on reserve, false otherwise
-    **/
-    function getReserveIsStableBorrowRateEnabled(address _reserve) external view returns (bool) {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        return reserve.isStableBorrowRateEnabled;
     }
 
     /**
@@ -834,22 +706,6 @@ contract LendingPoolCore is VersionedInitializable {
     * @dev the variable borrow index of the user is 0 if the user is not borrowing or borrowing at stable
     * @param _reserve the address of the reserve for which the information is needed
     * @param _user the address of the user for which the information is needed
-    * @return the variable borrow index for the user
-    **/
-
-    function getUserVariableBorrowCumulativeIndex(address _reserve, address _user)
-        external
-        view
-        returns (uint256)
-    {
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
-        return user.lastVariableBorrowCumulativeIndex;
-    }
-
-    /**
-    * @dev the variable borrow index of the user is 0 if the user is not borrowing or borrowing at stable
-    * @param _reserve the address of the reserve for which the information is needed
-    * @param _user the address of the user for which the information is needed
     * return the variable borrow index for the user
     **/
 
@@ -887,8 +743,6 @@ contract LendingPoolCore is VersionedInitializable {
 
     }
 
-
-
     /**
     * @dev removes the last added reserve in the reservesList array
     * @param _reserveToRemove the address of the reserve
@@ -907,7 +761,6 @@ contract LendingPoolCore is VersionedInitializable {
         reserves[lastReserve].wvTokenAddress = address(0);
         reserves[lastReserve].decimals = 0;
         reserves[lastReserve].lastLiquidityCumulativeIndex = 0;
-        reserves[lastReserve].lastVariableBorrowCumulativeIndex = 0;
         reserves[lastReserve].borrowingEnabled = false;
         reserves[lastReserve].usageAsCollateralEnabled = false;
         reserves[lastReserve].baseLTVasCollateral = 0;
@@ -934,14 +787,13 @@ contract LendingPoolCore is VersionedInitializable {
     /**
     * @dev enables borrowing on a reserve. Also sets the stable rate borrowing
     * @param _reserve the address of the reserve
-    * @param _stableBorrowRateEnabled true if the stable rate needs to be enabled, false otherwise
     **/
 
-    function enableBorrowingOnReserve(address _reserve, bool _stableBorrowRateEnabled)
+    function enableBorrowingOnReserve(address _reserve)
         external
         onlyLendingPoolConfigurator
     {
-        reserves[_reserve].enableBorrowing(_stableBorrowRateEnabled);
+        reserves[_reserve].enableBorrowing();
     }
 
     /**
@@ -979,24 +831,6 @@ contract LendingPoolCore is VersionedInitializable {
     }
 
     /**
-    * @dev enable the stable borrow rate mode on a reserve
-    * @param _reserve the address of the reserve
-    **/
-    function enableReserveStableBorrowRate(address _reserve) external onlyLendingPoolConfigurator {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        reserve.isStableBorrowRateEnabled = true;
-    }
-
-    /**
-    * @dev disable the stable borrow rate mode on a reserve
-    * @param _reserve the address of the reserve
-    **/
-    function disableReserveStableBorrowRate(address _reserve) external onlyLendingPoolConfigurator {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        reserve.isStableBorrowRateEnabled = false;
-    }
-
-    /**
     * @dev activates a reserve
     * @param _reserve the address of the reserve
     **/
@@ -1004,8 +838,7 @@ contract LendingPoolCore is VersionedInitializable {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
 
         require(
-            reserve.lastLiquidityCumulativeIndex > 0 &&
-                reserve.lastVariableBorrowCumulativeIndex > 0,
+            reserve.lastLiquidityCumulativeIndex > 0,
             "Reserve has not been initialized yet"
         );
         reserve.isActive = true;
@@ -1136,11 +969,10 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _amountBorrowed,
         uint256 _fee
     ) internal {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
         //increase the principal borrows and the origination fee
-        user.principalBorrowBalance = user.borrowBalance.add(_amountBorrowed);
+        user.borrowBalance = user.borrowBalance.add(_amountBorrowed);
         user.originationFee = user.originationFee.add(_fee);
 
         //solium-disable-next-line
@@ -1150,17 +982,15 @@ contract LendingPoolCore is VersionedInitializable {
     /**
     * @dev updates the state of the reserve as a consequence of a repay action.
     * @param _reserve the address of the reserve on which the user is repaying
-    * @param _user the address of the borrower
+    * _user the address of the borrower
     * @param _paybackAmountMinusFees the amount being paid back minus fees
     **/
 
     function updateReserveStateOnRepayInternal(
         address _reserve,
-        address _user,
         uint256 _paybackAmountMinusFees
     ) internal {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
         //update the indexes
         reserves[_reserve].updateCumulativeIndexes();
@@ -1175,16 +1005,13 @@ contract LendingPoolCore is VersionedInitializable {
     * @param _user the address of the borrower
     * @param _paybackAmountMinusFees the amount being paid back minus fees
     * @param _originationFeeRepaid the fee on the amount that is being repaid
-    * @param _repaidWholeLoan true if the user is repaying the whole loan
     **/
     function updateUserStateOnRepayInternal(
         address _reserve,
         address _user,
         uint256 _paybackAmountMinusFees,
-        uint256 _originationFeeRepaid,
-        bool _repaidWholeLoan
+        uint256 _originationFeeRepaid
     ) internal {
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
         //update the user borrow balance, subtracting the payback amount
@@ -1209,7 +1036,7 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _amountToLiquidate
     ) internal {
         CoreLibrary.ReserveData storage reserve = reserves[_principalReserve];
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_principalReserve];
+        // CoreLibrary.UserReserveData storage user = usersReserveData[_user][_principalReserve];
 
         //update principal reserve data
         reserve.updateCumulativeIndexes();
@@ -1243,9 +1070,8 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _feeLiquidated
     ) internal {
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         //first increase by the compounded interest, then decrease by the liquidated amount
-        user.principalBorrowBalance = user.borrowBalance.sub(_amountToLiquidate);
+        user.borrowBalance = user.borrowBalance.sub(_amountToLiquidate);
 
         if(_feeLiquidated > 0){
             user.originationFee = user.originationFee.sub(_feeLiquidated);

@@ -25,10 +25,10 @@ interface LendingPoolInterface extends ethers.utils.Interface {
     "LENDINGPOOL_REVISION()": FunctionFragment;
     "UINT_MAX_VALUE()": FunctionFragment;
     "addressesProvider()": FunctionFragment;
-    "borrow(address,uint256,uint256,uint16)": FunctionFragment;
+    "borrow(address,uint256,uint256)": FunctionFragment;
     "core()": FunctionFragment;
     "dataProvider()": FunctionFragment;
-    "deposit(address,uint256,uint16)": FunctionFragment;
+    "deposit(address,uint256)": FunctionFragment;
     "getReserveConfigurationData(address)": FunctionFragment;
     "getReserveData(address)": FunctionFragment;
     "getReserves()": FunctionFragment;
@@ -37,11 +37,9 @@ interface LendingPoolInterface extends ethers.utils.Interface {
     "initialize(address)": FunctionFragment;
     "liquidationCall(address,address,address,uint256,bool)": FunctionFragment;
     "parametersProvider()": FunctionFragment;
-    "rebalanceStableBorrowRate(address,address)": FunctionFragment;
-    "redeemUnderlying(address,address,uint256,uint256)": FunctionFragment;
     "repay(address,uint256,address)": FunctionFragment;
     "setUserUseReserveAsCollateral(address,bool)": FunctionFragment;
-    "swapBorrowRateMode(address)": FunctionFragment;
+    "withdraw(address,address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -58,7 +56,7 @@ interface LendingPoolInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "borrow",
-    values: [string, BigNumberish, BigNumberish, BigNumberish]
+    values: [string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "core", values?: undefined): string;
   encodeFunctionData(
@@ -67,7 +65,7 @@ interface LendingPoolInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
-    values: [string, BigNumberish, BigNumberish]
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getReserveConfigurationData",
@@ -99,14 +97,6 @@ interface LendingPoolInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "rebalanceStableBorrowRate",
-    values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "redeemUnderlying",
-    values: [string, string, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "repay",
     values: [string, BigNumberish, string]
   ): string;
@@ -115,8 +105,8 @@ interface LendingPoolInterface extends ethers.utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "swapBorrowRateMode",
-    values: [string]
+    functionFragment: "withdraw",
+    values: [string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -167,45 +157,28 @@ interface LendingPoolInterface extends ethers.utils.Interface {
     functionFragment: "parametersProvider",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "rebalanceStableBorrowRate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "redeemUnderlying",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "repay", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setUserUseReserveAsCollateral",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapBorrowRateMode",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "Borrow(address,address,uint256,uint256,uint256,uint256,uint256,uint16,uint256)": EventFragment;
-    "Deposit(address,address,uint256,uint16,uint256)": EventFragment;
-    "FlashLoan(address,address,uint256,uint256,uint256,uint256)": EventFragment;
+    "Borrow(address,address,uint256,uint256,uint256,uint256)": EventFragment;
+    "Deposit(address,address,uint256,uint256)": EventFragment;
     "LiquidationCall(address,address,address,uint256,uint256,uint256,address,bool,uint256)": EventFragment;
     "OriginationFeeLiquidated(address,address,address,uint256,uint256,uint256)": EventFragment;
-    "RebalanceStableBorrowRate(address,address,uint256,uint256,uint256)": EventFragment;
-    "RedeemUnderlying(address,address,uint256,uint256)": EventFragment;
-    "Repay(address,address,address,uint256,uint256,uint256,uint256)": EventFragment;
+    "Repay(address,address,address,uint256,uint256,uint256)": EventFragment;
     "ReserveUsedAsCollateralDisabled(address,address)": EventFragment;
     "ReserveUsedAsCollateralEnabled(address,address)": EventFragment;
-    "Swap(address,address,uint256,uint256,uint256,uint256)": EventFragment;
+    "Withdraw(address,address,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Borrow"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LiquidationCall"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OriginationFeeLiquidated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RebalanceStableBorrowRate"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RedeemUnderlying"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Repay"): EventFragment;
   getEvent(
     nameOrSignatureOrTopic: "ReserveUsedAsCollateralDisabled"
@@ -213,50 +186,25 @@ interface LendingPoolInterface extends ethers.utils.Interface {
   getEvent(
     nameOrSignatureOrTopic: "ReserveUsedAsCollateralEnabled"
   ): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Swap"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
 
 export type BorrowEvent = TypedEvent<
-  [
-    string,
-    string,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    number,
-    BigNumber
-  ] & {
+  [string, string, BigNumber, BigNumber, BigNumber, BigNumber] & {
     _reserve: string;
     _user: string;
     _amount: BigNumber;
-    _borrowRateMode: BigNumber;
-    _borrowRate: BigNumber;
+    _leverageRatio: BigNumber;
     _originationFee: BigNumber;
-    _borrowBalanceIncrease: BigNumber;
-    _referral: number;
     _timestamp: BigNumber;
   }
 >;
 
 export type DepositEvent = TypedEvent<
-  [string, string, BigNumber, number, BigNumber] & {
+  [string, string, BigNumber, BigNumber] & {
     _reserve: string;
     _user: string;
     _amount: BigNumber;
-    _referral: number;
-    _timestamp: BigNumber;
-  }
->;
-
-export type FlashLoanEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber, BigNumber, BigNumber] & {
-    _target: string;
-    _reserve: string;
-    _amount: BigNumber;
-    _totalFee: BigNumber;
-    _protocolFee: BigNumber;
     _timestamp: BigNumber;
   }
 >;
@@ -296,33 +244,13 @@ export type OriginationFeeLiquidatedEvent = TypedEvent<
   }
 >;
 
-export type RebalanceStableBorrowRateEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber, BigNumber] & {
-    _reserve: string;
-    _user: string;
-    _newStableRate: BigNumber;
-    _borrowBalanceIncrease: BigNumber;
-    _timestamp: BigNumber;
-  }
->;
-
-export type RedeemUnderlyingEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber] & {
-    _reserve: string;
-    _user: string;
-    _amount: BigNumber;
-    _timestamp: BigNumber;
-  }
->;
-
 export type RepayEvent = TypedEvent<
-  [string, string, string, BigNumber, BigNumber, BigNumber, BigNumber] & {
+  [string, string, string, BigNumber, BigNumber, BigNumber] & {
     _reserve: string;
     _user: string;
     _repayer: string;
     _amountMinusFees: BigNumber;
     _fees: BigNumber;
-    _borrowBalanceIncrease: BigNumber;
     _timestamp: BigNumber;
   }
 >;
@@ -335,13 +263,11 @@ export type ReserveUsedAsCollateralEnabledEvent = TypedEvent<
   [string, string] & { _reserve: string; _user: string }
 >;
 
-export type SwapEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber, BigNumber, BigNumber] & {
+export type WithdrawEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber] & {
     _reserve: string;
     _user: string;
-    _newRateMode: BigNumber;
-    _newRate: BigNumber;
-    _borrowBalanceIncrease: BigNumber;
+    _amount: BigNumber;
     _timestamp: BigNumber;
   }
 >;
@@ -399,8 +325,7 @@ export class LendingPool extends BaseContract {
     borrow(
       _reserve: string,
       _amount: BigNumberish,
-      _interestRateMode: BigNumberish,
-      _referralCode: BigNumberish,
+      _leverageRatio: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -411,7 +336,6 @@ export class LendingPool extends BaseContract {
     deposit(
       _reserve: string,
       _amount: BigNumberish,
-      _referralCode: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -419,23 +343,13 @@ export class LendingPool extends BaseContract {
       _reserve: string,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        string,
-        boolean,
-        boolean,
-        boolean,
-        boolean
-      ] & {
+      [BigNumber, BigNumber, BigNumber, string, boolean, boolean, boolean] & {
         ltv: BigNumber;
         liquidationThreshold: BigNumber;
         liquidationBonus: BigNumber;
         interestRateStrategyAddress: string;
         usageAsCollateralEnabled: boolean;
         borrowingEnabled: boolean;
-        stableBorrowRateEnabled: boolean;
         isActive: boolean;
       }
     >;
@@ -451,25 +365,15 @@ export class LendingPool extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
         string,
         number
       ] & {
         totalLiquidity: BigNumber;
         availableLiquidity: BigNumber;
-        totalBorrowsStable: BigNumber;
-        totalBorrowsVariable: BigNumber;
+        totalBorrows: BigNumber;
         liquidityRate: BigNumber;
-        variableBorrowRate: BigNumber;
-        stableBorrowRate: BigNumber;
-        averageStableBorrowRate: BigNumber;
         utilizationRate: BigNumber;
         liquidityIndex: BigNumber;
-        variableBorrowIndex: BigNumber;
         wvTokenAddress: string;
         lastUpdateTimestamp: number;
       }
@@ -507,26 +411,11 @@ export class LendingPool extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        boolean
-      ] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean] & {
         currentWvTokenBalance: BigNumber;
-        currentBorrowBalance: BigNumber;
-        principalBorrowBalance: BigNumber;
-        borrowRateMode: BigNumber;
-        borrowRate: BigNumber;
+        borrowBalance: BigNumber;
         liquidityRate: BigNumber;
         originationFee: BigNumber;
-        variableBorrowIndex: BigNumber;
         lastUpdateTimestamp: BigNumber;
         usageAsCollateralEnabled: boolean;
       }
@@ -548,20 +437,6 @@ export class LendingPool extends BaseContract {
 
     parametersProvider(overrides?: CallOverrides): Promise<[string]>;
 
-    rebalanceStableBorrowRate(
-      _reserve: string,
-      _user: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    redeemUnderlying(
-      _reserve: string,
-      _user: string,
-      _amount: BigNumberish,
-      _aTokenBalanceAfterRedeem: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     repay(
       _reserve: string,
       _amount: BigNumberish,
@@ -575,8 +450,10 @@ export class LendingPool extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    swapBorrowRateMode(
+    withdraw(
       _reserve: string,
+      _user: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -590,8 +467,7 @@ export class LendingPool extends BaseContract {
   borrow(
     _reserve: string,
     _amount: BigNumberish,
-    _interestRateMode: BigNumberish,
-    _referralCode: BigNumberish,
+    _leverageRatio: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -602,7 +478,6 @@ export class LendingPool extends BaseContract {
   deposit(
     _reserve: string,
     _amount: BigNumberish,
-    _referralCode: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -610,23 +485,13 @@ export class LendingPool extends BaseContract {
     _reserve: string,
     overrides?: CallOverrides
   ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      string,
-      boolean,
-      boolean,
-      boolean,
-      boolean
-    ] & {
+    [BigNumber, BigNumber, BigNumber, string, boolean, boolean, boolean] & {
       ltv: BigNumber;
       liquidationThreshold: BigNumber;
       liquidationBonus: BigNumber;
       interestRateStrategyAddress: string;
       usageAsCollateralEnabled: boolean;
       borrowingEnabled: boolean;
-      stableBorrowRateEnabled: boolean;
       isActive: boolean;
     }
   >;
@@ -642,25 +507,15 @@ export class LendingPool extends BaseContract {
       BigNumber,
       BigNumber,
       BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
       string,
       number
     ] & {
       totalLiquidity: BigNumber;
       availableLiquidity: BigNumber;
-      totalBorrowsStable: BigNumber;
-      totalBorrowsVariable: BigNumber;
+      totalBorrows: BigNumber;
       liquidityRate: BigNumber;
-      variableBorrowRate: BigNumber;
-      stableBorrowRate: BigNumber;
-      averageStableBorrowRate: BigNumber;
       utilizationRate: BigNumber;
       liquidityIndex: BigNumber;
-      variableBorrowIndex: BigNumber;
       wvTokenAddress: string;
       lastUpdateTimestamp: number;
     }
@@ -698,26 +553,11 @@ export class LendingPool extends BaseContract {
     _user: string,
     overrides?: CallOverrides
   ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      boolean
-    ] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean] & {
       currentWvTokenBalance: BigNumber;
-      currentBorrowBalance: BigNumber;
-      principalBorrowBalance: BigNumber;
-      borrowRateMode: BigNumber;
-      borrowRate: BigNumber;
+      borrowBalance: BigNumber;
       liquidityRate: BigNumber;
       originationFee: BigNumber;
-      variableBorrowIndex: BigNumber;
       lastUpdateTimestamp: BigNumber;
       usageAsCollateralEnabled: boolean;
     }
@@ -739,20 +579,6 @@ export class LendingPool extends BaseContract {
 
   parametersProvider(overrides?: CallOverrides): Promise<string>;
 
-  rebalanceStableBorrowRate(
-    _reserve: string,
-    _user: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  redeemUnderlying(
-    _reserve: string,
-    _user: string,
-    _amount: BigNumberish,
-    _aTokenBalanceAfterRedeem: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   repay(
     _reserve: string,
     _amount: BigNumberish,
@@ -766,8 +592,10 @@ export class LendingPool extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  swapBorrowRateMode(
+  withdraw(
     _reserve: string,
+    _user: string,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -781,8 +609,7 @@ export class LendingPool extends BaseContract {
     borrow(
       _reserve: string,
       _amount: BigNumberish,
-      _interestRateMode: BigNumberish,
-      _referralCode: BigNumberish,
+      _leverageRatio: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -793,7 +620,6 @@ export class LendingPool extends BaseContract {
     deposit(
       _reserve: string,
       _amount: BigNumberish,
-      _referralCode: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -801,23 +627,13 @@ export class LendingPool extends BaseContract {
       _reserve: string,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        string,
-        boolean,
-        boolean,
-        boolean,
-        boolean
-      ] & {
+      [BigNumber, BigNumber, BigNumber, string, boolean, boolean, boolean] & {
         ltv: BigNumber;
         liquidationThreshold: BigNumber;
         liquidationBonus: BigNumber;
         interestRateStrategyAddress: string;
         usageAsCollateralEnabled: boolean;
         borrowingEnabled: boolean;
-        stableBorrowRateEnabled: boolean;
         isActive: boolean;
       }
     >;
@@ -833,25 +649,15 @@ export class LendingPool extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
         string,
         number
       ] & {
         totalLiquidity: BigNumber;
         availableLiquidity: BigNumber;
-        totalBorrowsStable: BigNumber;
-        totalBorrowsVariable: BigNumber;
+        totalBorrows: BigNumber;
         liquidityRate: BigNumber;
-        variableBorrowRate: BigNumber;
-        stableBorrowRate: BigNumber;
-        averageStableBorrowRate: BigNumber;
         utilizationRate: BigNumber;
         liquidityIndex: BigNumber;
-        variableBorrowIndex: BigNumber;
         wvTokenAddress: string;
         lastUpdateTimestamp: number;
       }
@@ -889,26 +695,11 @@ export class LendingPool extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        boolean
-      ] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean] & {
         currentWvTokenBalance: BigNumber;
-        currentBorrowBalance: BigNumber;
-        principalBorrowBalance: BigNumber;
-        borrowRateMode: BigNumber;
-        borrowRate: BigNumber;
+        borrowBalance: BigNumber;
         liquidityRate: BigNumber;
         originationFee: BigNumber;
-        variableBorrowIndex: BigNumber;
         lastUpdateTimestamp: BigNumber;
         usageAsCollateralEnabled: boolean;
       }
@@ -930,20 +721,6 @@ export class LendingPool extends BaseContract {
 
     parametersProvider(overrides?: CallOverrides): Promise<string>;
 
-    rebalanceStableBorrowRate(
-      _reserve: string,
-      _user: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    redeemUnderlying(
-      _reserve: string,
-      _user: string,
-      _amount: BigNumberish,
-      _aTokenBalanceAfterRedeem: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     repay(
       _reserve: string,
       _amount: BigNumberish,
@@ -957,44 +734,30 @@ export class LendingPool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    swapBorrowRateMode(
+    withdraw(
       _reserve: string,
+      _user: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
 
   filters: {
-    "Borrow(address,address,uint256,uint256,uint256,uint256,uint256,uint16,uint256)"(
+    "Borrow(address,address,uint256,uint256,uint256,uint256)"(
       _reserve?: string | null,
       _user?: string | null,
       _amount?: null,
-      _borrowRateMode?: null,
-      _borrowRate?: null,
+      _leverageRatio?: null,
       _originationFee?: null,
-      _borrowBalanceIncrease?: null,
-      _referral?: BigNumberish | null,
       _timestamp?: null
     ): TypedEventFilter<
-      [
-        string,
-        string,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        number,
-        BigNumber
-      ],
+      [string, string, BigNumber, BigNumber, BigNumber, BigNumber],
       {
         _reserve: string;
         _user: string;
         _amount: BigNumber;
-        _borrowRateMode: BigNumber;
-        _borrowRate: BigNumber;
+        _leverageRatio: BigNumber;
         _originationFee: BigNumber;
-        _borrowBalanceIncrease: BigNumber;
-        _referral: number;
         _timestamp: BigNumber;
       }
     >;
@@ -1003,50 +766,32 @@ export class LendingPool extends BaseContract {
       _reserve?: string | null,
       _user?: string | null,
       _amount?: null,
-      _borrowRateMode?: null,
-      _borrowRate?: null,
+      _leverageRatio?: null,
       _originationFee?: null,
-      _borrowBalanceIncrease?: null,
-      _referral?: BigNumberish | null,
       _timestamp?: null
     ): TypedEventFilter<
-      [
-        string,
-        string,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        number,
-        BigNumber
-      ],
+      [string, string, BigNumber, BigNumber, BigNumber, BigNumber],
       {
         _reserve: string;
         _user: string;
         _amount: BigNumber;
-        _borrowRateMode: BigNumber;
-        _borrowRate: BigNumber;
+        _leverageRatio: BigNumber;
         _originationFee: BigNumber;
-        _borrowBalanceIncrease: BigNumber;
-        _referral: number;
         _timestamp: BigNumber;
       }
     >;
 
-    "Deposit(address,address,uint256,uint16,uint256)"(
+    "Deposit(address,address,uint256,uint256)"(
       _reserve?: string | null,
       _user?: string | null,
       _amount?: null,
-      _referral?: BigNumberish | null,
       _timestamp?: null
     ): TypedEventFilter<
-      [string, string, BigNumber, number, BigNumber],
+      [string, string, BigNumber, BigNumber],
       {
         _reserve: string;
         _user: string;
         _amount: BigNumber;
-        _referral: number;
         _timestamp: BigNumber;
       }
     >;
@@ -1055,53 +800,13 @@ export class LendingPool extends BaseContract {
       _reserve?: string | null,
       _user?: string | null,
       _amount?: null,
-      _referral?: BigNumberish | null,
       _timestamp?: null
     ): TypedEventFilter<
-      [string, string, BigNumber, number, BigNumber],
+      [string, string, BigNumber, BigNumber],
       {
         _reserve: string;
         _user: string;
         _amount: BigNumber;
-        _referral: number;
-        _timestamp: BigNumber;
-      }
-    >;
-
-    "FlashLoan(address,address,uint256,uint256,uint256,uint256)"(
-      _target?: string | null,
-      _reserve?: string | null,
-      _amount?: null,
-      _totalFee?: null,
-      _protocolFee?: null,
-      _timestamp?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber, BigNumber, BigNumber],
-      {
-        _target: string;
-        _reserve: string;
-        _amount: BigNumber;
-        _totalFee: BigNumber;
-        _protocolFee: BigNumber;
-        _timestamp: BigNumber;
-      }
-    >;
-
-    FlashLoan(
-      _target?: string | null,
-      _reserve?: string | null,
-      _amount?: null,
-      _totalFee?: null,
-      _protocolFee?: null,
-      _timestamp?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber, BigNumber, BigNumber],
-      {
-        _target: string;
-        _reserve: string;
-        _amount: BigNumber;
-        _totalFee: BigNumber;
-        _protocolFee: BigNumber;
         _timestamp: BigNumber;
       }
     >;
@@ -1214,87 +919,21 @@ export class LendingPool extends BaseContract {
       }
     >;
 
-    "RebalanceStableBorrowRate(address,address,uint256,uint256,uint256)"(
-      _reserve?: string | null,
-      _user?: string | null,
-      _newStableRate?: null,
-      _borrowBalanceIncrease?: null,
-      _timestamp?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber, BigNumber],
-      {
-        _reserve: string;
-        _user: string;
-        _newStableRate: BigNumber;
-        _borrowBalanceIncrease: BigNumber;
-        _timestamp: BigNumber;
-      }
-    >;
-
-    RebalanceStableBorrowRate(
-      _reserve?: string | null,
-      _user?: string | null,
-      _newStableRate?: null,
-      _borrowBalanceIncrease?: null,
-      _timestamp?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber, BigNumber],
-      {
-        _reserve: string;
-        _user: string;
-        _newStableRate: BigNumber;
-        _borrowBalanceIncrease: BigNumber;
-        _timestamp: BigNumber;
-      }
-    >;
-
-    "RedeemUnderlying(address,address,uint256,uint256)"(
-      _reserve?: string | null,
-      _user?: string | null,
-      _amount?: null,
-      _timestamp?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber],
-      {
-        _reserve: string;
-        _user: string;
-        _amount: BigNumber;
-        _timestamp: BigNumber;
-      }
-    >;
-
-    RedeemUnderlying(
-      _reserve?: string | null,
-      _user?: string | null,
-      _amount?: null,
-      _timestamp?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber],
-      {
-        _reserve: string;
-        _user: string;
-        _amount: BigNumber;
-        _timestamp: BigNumber;
-      }
-    >;
-
-    "Repay(address,address,address,uint256,uint256,uint256,uint256)"(
+    "Repay(address,address,address,uint256,uint256,uint256)"(
       _reserve?: string | null,
       _user?: string | null,
       _repayer?: string | null,
       _amountMinusFees?: null,
       _fees?: null,
-      _borrowBalanceIncrease?: null,
       _timestamp?: null
     ): TypedEventFilter<
-      [string, string, string, BigNumber, BigNumber, BigNumber, BigNumber],
+      [string, string, string, BigNumber, BigNumber, BigNumber],
       {
         _reserve: string;
         _user: string;
         _repayer: string;
         _amountMinusFees: BigNumber;
         _fees: BigNumber;
-        _borrowBalanceIncrease: BigNumber;
         _timestamp: BigNumber;
       }
     >;
@@ -1305,17 +944,15 @@ export class LendingPool extends BaseContract {
       _repayer?: string | null,
       _amountMinusFees?: null,
       _fees?: null,
-      _borrowBalanceIncrease?: null,
       _timestamp?: null
     ): TypedEventFilter<
-      [string, string, string, BigNumber, BigNumber, BigNumber, BigNumber],
+      [string, string, string, BigNumber, BigNumber, BigNumber],
       {
         _reserve: string;
         _user: string;
         _repayer: string;
         _amountMinusFees: BigNumber;
         _fees: BigNumber;
-        _borrowBalanceIncrease: BigNumber;
         _timestamp: BigNumber;
       }
     >;
@@ -1340,40 +977,32 @@ export class LendingPool extends BaseContract {
       _user?: string | null
     ): TypedEventFilter<[string, string], { _reserve: string; _user: string }>;
 
-    "Swap(address,address,uint256,uint256,uint256,uint256)"(
+    "Withdraw(address,address,uint256,uint256)"(
       _reserve?: string | null,
       _user?: string | null,
-      _newRateMode?: null,
-      _newRate?: null,
-      _borrowBalanceIncrease?: null,
+      _amount?: null,
       _timestamp?: null
     ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber, BigNumber, BigNumber],
+      [string, string, BigNumber, BigNumber],
       {
         _reserve: string;
         _user: string;
-        _newRateMode: BigNumber;
-        _newRate: BigNumber;
-        _borrowBalanceIncrease: BigNumber;
+        _amount: BigNumber;
         _timestamp: BigNumber;
       }
     >;
 
-    Swap(
+    Withdraw(
       _reserve?: string | null,
       _user?: string | null,
-      _newRateMode?: null,
-      _newRate?: null,
-      _borrowBalanceIncrease?: null,
+      _amount?: null,
       _timestamp?: null
     ): TypedEventFilter<
-      [string, string, BigNumber, BigNumber, BigNumber, BigNumber],
+      [string, string, BigNumber, BigNumber],
       {
         _reserve: string;
         _user: string;
-        _newRateMode: BigNumber;
-        _newRate: BigNumber;
-        _borrowBalanceIncrease: BigNumber;
+        _amount: BigNumber;
         _timestamp: BigNumber;
       }
     >;
@@ -1389,8 +1018,7 @@ export class LendingPool extends BaseContract {
     borrow(
       _reserve: string,
       _amount: BigNumberish,
-      _interestRateMode: BigNumberish,
-      _referralCode: BigNumberish,
+      _leverageRatio: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1401,7 +1029,6 @@ export class LendingPool extends BaseContract {
     deposit(
       _reserve: string,
       _amount: BigNumberish,
-      _referralCode: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1444,20 +1071,6 @@ export class LendingPool extends BaseContract {
 
     parametersProvider(overrides?: CallOverrides): Promise<BigNumber>;
 
-    rebalanceStableBorrowRate(
-      _reserve: string,
-      _user: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    redeemUnderlying(
-      _reserve: string,
-      _user: string,
-      _amount: BigNumberish,
-      _aTokenBalanceAfterRedeem: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     repay(
       _reserve: string,
       _amount: BigNumberish,
@@ -1471,8 +1084,10 @@ export class LendingPool extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    swapBorrowRateMode(
+    withdraw(
       _reserve: string,
+      _user: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -1489,8 +1104,7 @@ export class LendingPool extends BaseContract {
     borrow(
       _reserve: string,
       _amount: BigNumberish,
-      _interestRateMode: BigNumberish,
-      _referralCode: BigNumberish,
+      _leverageRatio: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1501,7 +1115,6 @@ export class LendingPool extends BaseContract {
     deposit(
       _reserve: string,
       _amount: BigNumberish,
-      _referralCode: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1546,20 +1159,6 @@ export class LendingPool extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    rebalanceStableBorrowRate(
-      _reserve: string,
-      _user: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    redeemUnderlying(
-      _reserve: string,
-      _user: string,
-      _amount: BigNumberish,
-      _aTokenBalanceAfterRedeem: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     repay(
       _reserve: string,
       _amount: BigNumberish,
@@ -1573,8 +1172,10 @@ export class LendingPool extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    swapBorrowRateMode(
+    withdraw(
       _reserve: string,
+      _user: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

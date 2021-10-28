@@ -57,6 +57,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IChainlinkAggregator__factory>;
     getContractFactory(
+      name: "IERC20Detailed",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC20Detailed__factory>;
+    getContractFactory(
       name: "IFeeProvider",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IFeeProvider__factory>;
@@ -348,6 +352,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IChainlinkAggregator>;
+    getContractAt(
+      name: "IERC20Detailed",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC20Detailed>;
     getContractAt(
       name: "IFeeProvider",
       address: string,

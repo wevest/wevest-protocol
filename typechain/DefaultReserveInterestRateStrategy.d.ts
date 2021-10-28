@@ -25,7 +25,7 @@ interface DefaultReserveInterestRateStrategyInterface
     "OPTIMAL_UTILIZATION_RATE()": FunctionFragment;
     "addressesProvider()": FunctionFragment;
     "baseVariableBorrowRate()": FunctionFragment;
-    "calculateInterestRates(address,uint256,uint256,uint256,uint256)": FunctionFragment;
+    "calculateInterestRates(address,uint256,uint256)": FunctionFragment;
     "getBaseVariableBorrowRate()": FunctionFragment;
     "getStableRateSlope1()": FunctionFragment;
     "getStableRateSlope2()": FunctionFragment;
@@ -56,7 +56,7 @@ interface DefaultReserveInterestRateStrategyInterface
   ): string;
   encodeFunctionData(
     functionFragment: "calculateInterestRates",
-    values: [string, BigNumberish, BigNumberish, BigNumberish, BigNumberish]
+    values: [string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getBaseVariableBorrowRate",
@@ -212,17 +212,9 @@ export class DefaultReserveInterestRateStrategy extends BaseContract {
     calculateInterestRates(
       _reserve: string,
       _availableLiquidity: BigNumberish,
-      _totalBorrowsStable: BigNumberish,
-      _totalBorrowsVariable: BigNumberish,
-      _averageStableBorrowRate: BigNumberish,
+      _totalBorrows: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        currentLiquidityRate: BigNumber;
-        currentStableBorrowRate: BigNumber;
-        currentVariableBorrowRate: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber]>;
 
     getBaseVariableBorrowRate(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -256,17 +248,9 @@ export class DefaultReserveInterestRateStrategy extends BaseContract {
   calculateInterestRates(
     _reserve: string,
     _availableLiquidity: BigNumberish,
-    _totalBorrowsStable: BigNumberish,
-    _totalBorrowsVariable: BigNumberish,
-    _averageStableBorrowRate: BigNumberish,
+    _totalBorrows: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
-      currentLiquidityRate: BigNumber;
-      currentStableBorrowRate: BigNumber;
-      currentVariableBorrowRate: BigNumber;
-    }
-  >;
+  ): Promise<BigNumber>;
 
   getBaseVariableBorrowRate(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -300,17 +284,9 @@ export class DefaultReserveInterestRateStrategy extends BaseContract {
     calculateInterestRates(
       _reserve: string,
       _availableLiquidity: BigNumberish,
-      _totalBorrowsStable: BigNumberish,
-      _totalBorrowsVariable: BigNumberish,
-      _averageStableBorrowRate: BigNumberish,
+      _totalBorrows: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        currentLiquidityRate: BigNumber;
-        currentStableBorrowRate: BigNumber;
-        currentVariableBorrowRate: BigNumber;
-      }
-    >;
+    ): Promise<BigNumber>;
 
     getBaseVariableBorrowRate(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -347,9 +323,7 @@ export class DefaultReserveInterestRateStrategy extends BaseContract {
     calculateInterestRates(
       _reserve: string,
       _availableLiquidity: BigNumberish,
-      _totalBorrowsStable: BigNumberish,
-      _totalBorrowsVariable: BigNumberish,
-      _averageStableBorrowRate: BigNumberish,
+      _totalBorrows: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -392,9 +366,7 @@ export class DefaultReserveInterestRateStrategy extends BaseContract {
     calculateInterestRates(
       _reserve: string,
       _availableLiquidity: BigNumberish,
-      _totalBorrowsStable: BigNumberish,
-      _totalBorrowsVariable: BigNumberish,
-      _averageStableBorrowRate: BigNumberish,
+      _totalBorrows: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

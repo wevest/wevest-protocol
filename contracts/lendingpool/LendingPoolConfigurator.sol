@@ -41,9 +41,8 @@ contract LendingPoolConfigurator is VersionedInitializable {
     /**
     * @dev emitted when borrowing is enabled on a reserve
     * @param _reserve the address of the reserve
-    * @param _stableRateEnabled true if stable rate borrowing is enabled, false otherwise
     **/
-    event BorrowingEnabledOnReserve(address _reserve, bool _stableRateEnabled);
+    event BorrowingEnabledOnReserve(address _reserve);
 
     /**
     * @dev emitted when borrowing is disabled on a reserve
@@ -70,18 +69,6 @@ contract LendingPoolConfigurator is VersionedInitializable {
     * @param _reserve the address of the reserve
     **/
     event ReserveDisabledAsCollateral(address indexed _reserve);
-
-    /**
-    * @dev emitted when stable rate borrowing is enabled on a reserve
-    * @param _reserve the address of the reserve
-    **/
-    event StableRateEnabledOnReserve(address indexed _reserve);
-
-    /**
-    * @dev emitted when stable rate borrowing is disabled on a reserve
-    * @param _reserve the address of the reserve
-    **/
-    event StableRateDisabledOnReserve(address indexed _reserve);
 
     /**
     * @dev emitted when a reserve is activated
@@ -134,7 +121,6 @@ contract LendingPoolConfigurator is VersionedInitializable {
     * @param _decimals the new decimals
     **/
     event ReserveDecimalsChanged(address _reserve, uint256 _decimals);
-
 
     /**
     * @dev emitted when a reserve interest strategy contract is updated
@@ -242,15 +228,15 @@ contract LendingPoolConfigurator is VersionedInitializable {
     /**
     * @dev enables borrowing on a reserve
     * @param _reserve the address of the reserve
-    * @param _stableBorrowRateEnabled true if stable borrow rate needs to be enabled by default on this reserve
     **/
-    function enableBorrowingOnReserve(address _reserve, bool _stableBorrowRateEnabled)
+
+    function enableBorrowingOnReserve(address _reserve)
         external
         onlyLendingPoolManager
     {
         LendingPoolCore core = LendingPoolCore(poolAddressesProvider.getLendingPoolCore());
-        core.enableBorrowingOnReserve(_reserve, _stableBorrowRateEnabled);
-        emit BorrowingEnabledOnReserve(_reserve, _stableBorrowRateEnabled);
+        core.enableBorrowingOnReserve(_reserve);
+        emit BorrowingEnabledOnReserve(_reserve);
     }
 
     /**
@@ -301,28 +287,6 @@ contract LendingPoolConfigurator is VersionedInitializable {
         core.disableReserveAsCollateral(_reserve);
 
         emit ReserveDisabledAsCollateral(_reserve);
-    }
-
-    /**
-    * @dev enable stable rate borrowing on a reserve
-    * @param _reserve the address of the reserve
-    **/
-    function enableReserveStableBorrowRate(address _reserve) external onlyLendingPoolManager {
-        LendingPoolCore core = LendingPoolCore(poolAddressesProvider.getLendingPoolCore());
-        core.enableReserveStableBorrowRate(_reserve);
-
-        emit StableRateEnabledOnReserve(_reserve);
-    }
-
-    /**
-    * @dev disable stable rate borrowing on a reserve
-    * @param _reserve the address of the reserve
-    **/
-    function disableReserveStableBorrowRate(address _reserve) external onlyLendingPoolManager {
-        LendingPoolCore core = LendingPoolCore(poolAddressesProvider.getLendingPoolCore());
-        core.disableReserveStableBorrowRate(_reserve);
-
-        emit StableRateDisabledOnReserve(_reserve);
     }
 
     /**

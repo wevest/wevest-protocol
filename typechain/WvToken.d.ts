@@ -27,6 +27,7 @@ interface WvTokenInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burnOnLiquidation(address,uint256)": FunctionFragment;
+    "burnOnWithdraw(uint256)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "getInterestRedirectionAddress(address)": FunctionFragment;
@@ -37,7 +38,6 @@ interface WvTokenInterface extends ethers.utils.Interface {
     "mintOnDeposit(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "principalBalanceOf(address)": FunctionFragment;
-    "redeem(uint256)": FunctionFragment;
     "redirectInterestStream(address)": FunctionFragment;
     "redirectInterestStreamOf(address,address)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -68,6 +68,10 @@ interface WvTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "burnOnLiquidation",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "burnOnWithdraw",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
@@ -102,10 +106,6 @@ interface WvTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "principalBalanceOf",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "redeem",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "redirectInterestStream",
@@ -152,6 +152,10 @@ interface WvTokenInterface extends ethers.utils.Interface {
     functionFragment: "burnOnLiquidation",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "burnOnWithdraw",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -186,7 +190,6 @@ interface WvTokenInterface extends ethers.utils.Interface {
     functionFragment: "principalBalanceOf",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "redirectInterestStream",
     data: BytesLike
@@ -221,9 +224,9 @@ interface WvTokenInterface extends ethers.utils.Interface {
     "InterestRedirectionAllowanceChanged(address,address)": EventFragment;
     "InterestStreamRedirected(address,address,uint256,uint256,uint256)": EventFragment;
     "MintOnDeposit(address,uint256,uint256,uint256)": EventFragment;
-    "Redeem(address,uint256,uint256,uint256)": EventFragment;
     "RedirectedBalanceUpdated(address,uint256,uint256,uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
+    "Withdraw(address,uint256,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
@@ -234,9 +237,9 @@ interface WvTokenInterface extends ethers.utils.Interface {
   ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InterestStreamRedirected"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MintOnDeposit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Redeem"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RedirectedBalanceUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -291,15 +294,6 @@ export type MintOnDepositEvent = TypedEvent<
   }
 >;
 
-export type RedeemEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber] & {
-    _from: string;
-    _value: BigNumber;
-    _fromBalanceIncrease: BigNumber;
-    _fromIndex: BigNumber;
-  }
->;
-
 export type RedirectedBalanceUpdatedEvent = TypedEvent<
   [string, BigNumber, BigNumber, BigNumber, BigNumber] & {
     _targetAddress: string;
@@ -312,6 +306,15 @@ export type RedirectedBalanceUpdatedEvent = TypedEvent<
 
 export type TransferEvent = TypedEvent<
   [string, string, BigNumber] & { from: string; to: string; value: BigNumber }
+>;
+
+export type WithdrawEvent = TypedEvent<
+  [string, BigNumber, BigNumber, BigNumber] & {
+    _from: string;
+    _value: BigNumber;
+    _fromBalanceIncrease: BigNumber;
+    _fromIndex: BigNumber;
+  }
 >;
 
 export class WvToken extends BaseContract {
@@ -385,6 +388,11 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    burnOnWithdraw(
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     decreaseAllowance(
@@ -432,11 +440,6 @@ export class WvToken extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
-
-    redeem(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     redirectInterestStream(
       _to: string,
@@ -503,6 +506,11 @@ export class WvToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  burnOnWithdraw(
+    _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   decimals(overrides?: CallOverrides): Promise<number>;
 
   decreaseAllowance(
@@ -547,11 +555,6 @@ export class WvToken extends BaseContract {
     _user: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
-
-  redeem(
-    _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   redirectInterestStream(
     _to: string,
@@ -618,6 +621,11 @@ export class WvToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    burnOnWithdraw(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     decimals(overrides?: CallOverrides): Promise<number>;
 
     decreaseAllowance(
@@ -662,8 +670,6 @@ export class WvToken extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    redeem(_amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     redirectInterestStream(
       _to: string,
@@ -868,36 +874,6 @@ export class WvToken extends BaseContract {
       }
     >;
 
-    "Redeem(address,uint256,uint256,uint256)"(
-      _from?: string | null,
-      _value?: null,
-      _fromBalanceIncrease?: null,
-      _fromIndex?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber, BigNumber],
-      {
-        _from: string;
-        _value: BigNumber;
-        _fromBalanceIncrease: BigNumber;
-        _fromIndex: BigNumber;
-      }
-    >;
-
-    Redeem(
-      _from?: string | null,
-      _value?: null,
-      _fromBalanceIncrease?: null,
-      _fromIndex?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber, BigNumber],
-      {
-        _from: string;
-        _value: BigNumber;
-        _fromBalanceIncrease: BigNumber;
-        _fromIndex: BigNumber;
-      }
-    >;
-
     "RedirectedBalanceUpdated(address,uint256,uint256,uint256,uint256)"(
       _targetAddress?: string | null,
       _targetBalanceIncrease?: null,
@@ -949,6 +925,36 @@ export class WvToken extends BaseContract {
       [string, string, BigNumber],
       { from: string; to: string; value: BigNumber }
     >;
+
+    "Withdraw(address,uint256,uint256,uint256)"(
+      _from?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber],
+      {
+        _from: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+      }
+    >;
+
+    Withdraw(
+      _from?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber],
+      {
+        _from: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+      }
+    >;
   };
 
   estimateGas: {
@@ -976,6 +982,11 @@ export class WvToken extends BaseContract {
     burnOnLiquidation(
       _account: string,
       _value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    burnOnWithdraw(
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1022,11 +1033,6 @@ export class WvToken extends BaseContract {
     principalBalanceOf(
       _user: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    redeem(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     redirectInterestStream(
@@ -1098,6 +1104,11 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    burnOnWithdraw(
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     decreaseAllowance(
@@ -1144,11 +1155,6 @@ export class WvToken extends BaseContract {
     principalBalanceOf(
       _user: string,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    redeem(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     redirectInterestStream(

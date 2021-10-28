@@ -22,38 +22,11 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface LendingPoolParametersProviderInterface
   extends ethers.utils.Interface {
   functions: {
-    "getFlashLoanFeesInBips()": FunctionFragment;
-    "getMaxStableRateBorrowSizePercent()": FunctionFragment;
-    "getRebalanceDownRateDelta()": FunctionFragment;
     "initialize(address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "getFlashLoanFeesInBips",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMaxStableRateBorrowSizePercent",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRebalanceDownRateDelta",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "initialize", values: [string]): string;
 
-  decodeFunctionResult(
-    functionFragment: "getFlashLoanFeesInBips",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMaxStableRateBorrowSizePercent",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRebalanceDownRateDelta",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
 
   events: {};
@@ -103,31 +76,11 @@ export class LendingPoolParametersProvider extends BaseContract {
   interface: LendingPoolParametersProviderInterface;
 
   functions: {
-    getFlashLoanFeesInBips(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber]>;
-
-    getMaxStableRateBorrowSizePercent(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    getRebalanceDownRateDelta(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     initialize(
       _addressesProvider: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  getFlashLoanFeesInBips(
-    overrides?: CallOverrides
-  ): Promise<[BigNumber, BigNumber]>;
-
-  getMaxStableRateBorrowSizePercent(
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getRebalanceDownRateDelta(overrides?: CallOverrides): Promise<BigNumber>;
 
   initialize(
     _addressesProvider: string,
@@ -135,16 +88,6 @@ export class LendingPoolParametersProvider extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    getFlashLoanFeesInBips(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber]>;
-
-    getMaxStableRateBorrowSizePercent(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRebalanceDownRateDelta(overrides?: CallOverrides): Promise<BigNumber>;
-
     initialize(
       _addressesProvider: string,
       overrides?: CallOverrides
@@ -154,14 +97,6 @@ export class LendingPoolParametersProvider extends BaseContract {
   filters: {};
 
   estimateGas: {
-    getFlashLoanFeesInBips(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getMaxStableRateBorrowSizePercent(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRebalanceDownRateDelta(overrides?: CallOverrides): Promise<BigNumber>;
-
     initialize(
       _addressesProvider: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -169,18 +104,6 @@ export class LendingPoolParametersProvider extends BaseContract {
   };
 
   populateTransaction: {
-    getFlashLoanFeesInBips(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getMaxStableRateBorrowSizePercent(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRebalanceDownRateDelta(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     initialize(
       _addressesProvider: string,
       overrides?: Overrides & { from?: string | Promise<string> }

@@ -26,10 +26,8 @@ interface LendingPoolConfiguratorInterface extends ethers.utils.Interface {
     "deactivateReserve(address)": FunctionFragment;
     "disableBorrowingOnReserve(address)": FunctionFragment;
     "disableReserveAsCollateral(address)": FunctionFragment;
-    "disableReserveStableBorrowRate(address)": FunctionFragment;
-    "enableBorrowingOnReserve(address,bool)": FunctionFragment;
+    "enableBorrowingOnReserve(address)": FunctionFragment;
     "enableReserveAsCollateral(address,uint256,uint256,uint256)": FunctionFragment;
-    "enableReserveStableBorrowRate(address)": FunctionFragment;
     "freezeReserve(address)": FunctionFragment;
     "initReserve(address,uint8,address)": FunctionFragment;
     "initReserveWithData(address,string,string,uint8,address)": FunctionFragment;
@@ -66,20 +64,12 @@ interface LendingPoolConfiguratorInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "disableReserveStableBorrowRate",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "enableBorrowingOnReserve",
-    values: [string, boolean]
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "enableReserveAsCollateral",
     values: [string, BigNumberish, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "enableReserveStableBorrowRate",
-    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "freezeReserve",
@@ -152,19 +142,11 @@ interface LendingPoolConfiguratorInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "disableReserveStableBorrowRate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "enableBorrowingOnReserve",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "enableReserveAsCollateral",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "enableReserveStableBorrowRate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -219,7 +201,7 @@ interface LendingPoolConfiguratorInterface extends ethers.utils.Interface {
 
   events: {
     "BorrowingDisabledOnReserve(address)": EventFragment;
-    "BorrowingEnabledOnReserve(address,bool)": EventFragment;
+    "BorrowingEnabledOnReserve(address)": EventFragment;
     "ReserveActivated(address)": EventFragment;
     "ReserveBaseLtvChanged(address,uint256)": EventFragment;
     "ReserveDeactivated(address)": EventFragment;
@@ -233,8 +215,6 @@ interface LendingPoolConfiguratorInterface extends ethers.utils.Interface {
     "ReserveLiquidationThresholdChanged(address,uint256)": EventFragment;
     "ReserveRemoved(address)": EventFragment;
     "ReserveUnfreezed(address)": EventFragment;
-    "StableRateDisabledOnReserve(address)": EventFragment;
-    "StableRateEnabledOnReserve(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "BorrowingDisabledOnReserve"): EventFragment;
@@ -260,10 +240,6 @@ interface LendingPoolConfiguratorInterface extends ethers.utils.Interface {
   ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ReserveRemoved"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ReserveUnfreezed"): EventFragment;
-  getEvent(
-    nameOrSignatureOrTopic: "StableRateDisabledOnReserve"
-  ): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "StableRateEnabledOnReserve"): EventFragment;
 }
 
 export type BorrowingDisabledOnReserveEvent = TypedEvent<
@@ -271,7 +247,7 @@ export type BorrowingDisabledOnReserveEvent = TypedEvent<
 >;
 
 export type BorrowingEnabledOnReserveEvent = TypedEvent<
-  [string, boolean] & { _reserve: string; _stableRateEnabled: boolean }
+  [string] & { _reserve: string }
 >;
 
 export type ReserveActivatedEvent = TypedEvent<[string] & { _reserve: string }>;
@@ -326,14 +302,6 @@ export type ReserveLiquidationThresholdChangedEvent = TypedEvent<
 export type ReserveRemovedEvent = TypedEvent<[string] & { _reserve: string }>;
 
 export type ReserveUnfreezedEvent = TypedEvent<[string] & { _reserve: string }>;
-
-export type StableRateDisabledOnReserveEvent = TypedEvent<
-  [string] & { _reserve: string }
->;
-
-export type StableRateEnabledOnReserveEvent = TypedEvent<
-  [string] & { _reserve: string }
->;
 
 export class LendingPoolConfigurator extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -401,14 +369,8 @@ export class LendingPoolConfigurator extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    disableReserveStableBorrowRate(
-      _reserve: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     enableBorrowingOnReserve(
       _reserve: string,
-      _stableBorrowRateEnabled: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -417,11 +379,6 @@ export class LendingPoolConfigurator extends BaseContract {
       _baseLTVasCollateral: BigNumberish,
       _liquidationThreshold: BigNumberish,
       _liquidationBonus: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    enableReserveStableBorrowRate(
-      _reserve: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -520,14 +477,8 @@ export class LendingPoolConfigurator extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  disableReserveStableBorrowRate(
-    _reserve: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   enableBorrowingOnReserve(
     _reserve: string,
-    _stableBorrowRateEnabled: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -536,11 +487,6 @@ export class LendingPoolConfigurator extends BaseContract {
     _baseLTVasCollateral: BigNumberish,
     _liquidationThreshold: BigNumberish,
     _liquidationBonus: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  enableReserveStableBorrowRate(
-    _reserve: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -636,14 +582,8 @@ export class LendingPoolConfigurator extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    disableReserveStableBorrowRate(
-      _reserve: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     enableBorrowingOnReserve(
       _reserve: string,
-      _stableBorrowRateEnabled: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -652,11 +592,6 @@ export class LendingPoolConfigurator extends BaseContract {
       _baseLTVasCollateral: BigNumberish,
       _liquidationThreshold: BigNumberish,
       _liquidationBonus: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    enableReserveStableBorrowRate(
-      _reserve: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -736,21 +671,13 @@ export class LendingPoolConfigurator extends BaseContract {
       _reserve?: string | null
     ): TypedEventFilter<[string], { _reserve: string }>;
 
-    "BorrowingEnabledOnReserve(address,bool)"(
-      _reserve?: null,
-      _stableRateEnabled?: null
-    ): TypedEventFilter<
-      [string, boolean],
-      { _reserve: string; _stableRateEnabled: boolean }
-    >;
+    "BorrowingEnabledOnReserve(address)"(
+      _reserve?: null
+    ): TypedEventFilter<[string], { _reserve: string }>;
 
     BorrowingEnabledOnReserve(
-      _reserve?: null,
-      _stableRateEnabled?: null
-    ): TypedEventFilter<
-      [string, boolean],
-      { _reserve: string; _stableRateEnabled: boolean }
-    >;
+      _reserve?: null
+    ): TypedEventFilter<[string], { _reserve: string }>;
 
     "ReserveActivated(address)"(
       _reserve?: string | null
@@ -935,22 +862,6 @@ export class LendingPoolConfigurator extends BaseContract {
     ReserveUnfreezed(
       _reserve?: string | null
     ): TypedEventFilter<[string], { _reserve: string }>;
-
-    "StableRateDisabledOnReserve(address)"(
-      _reserve?: string | null
-    ): TypedEventFilter<[string], { _reserve: string }>;
-
-    StableRateDisabledOnReserve(
-      _reserve?: string | null
-    ): TypedEventFilter<[string], { _reserve: string }>;
-
-    "StableRateEnabledOnReserve(address)"(
-      _reserve?: string | null
-    ): TypedEventFilter<[string], { _reserve: string }>;
-
-    StableRateEnabledOnReserve(
-      _reserve?: string | null
-    ): TypedEventFilter<[string], { _reserve: string }>;
   };
 
   estimateGas: {
@@ -976,14 +887,8 @@ export class LendingPoolConfigurator extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    disableReserveStableBorrowRate(
-      _reserve: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     enableBorrowingOnReserve(
       _reserve: string,
-      _stableBorrowRateEnabled: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -992,11 +897,6 @@ export class LendingPoolConfigurator extends BaseContract {
       _baseLTVasCollateral: BigNumberish,
       _liquidationThreshold: BigNumberish,
       _liquidationBonus: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    enableReserveStableBorrowRate(
-      _reserve: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1098,14 +998,8 @@ export class LendingPoolConfigurator extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    disableReserveStableBorrowRate(
-      _reserve: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     enableBorrowingOnReserve(
       _reserve: string,
-      _stableBorrowRateEnabled: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1114,11 +1008,6 @@ export class LendingPoolConfigurator extends BaseContract {
       _baseLTVasCollateral: BigNumberish,
       _liquidationThreshold: BigNumberish,
       _liquidationBonus: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    enableReserveStableBorrowRate(
-      _reserve: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.6.0;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
@@ -9,9 +10,11 @@ import "../configuration/LendingPoolAddressesProvider.sol";
 import "../libraries/WadRayMath.sol";
 import "../interfaces/IPriceOracleGetter.sol";
 import "../interfaces/IFeeProvider.sol";
+import "../interfaces/IERC20Detailed.sol";
 import "../tokenization/WvToken.sol";
 
 import "./LendingPoolCore.sol";
+import "./LendingPool.sol";
 
 /**
 * @notice Implements functions to fetch data from the core, and aggregate them in order to allow computation
@@ -21,6 +24,7 @@ import "./LendingPoolCore.sol";
 contract LendingPoolDataProvider is VersionedInitializable {
     using SafeMath for uint256;
     using WadRayMath for uint256;
+    using CoreLibrary for CoreLibrary.ReserveData;
 
     LendingPoolCore public core;
     LendingPoolAddressesProvider public addressesProvider;
@@ -353,14 +357,12 @@ contract LendingPoolDataProvider is VersionedInitializable {
             address rateStrategyAddress,
             bool usageAsCollateralEnabled,
             bool borrowingEnabled,
-            bool stableBorrowRateEnabled,
             bool isActive
         )
     {
         (, ltv, liquidationThreshold, usageAsCollateralEnabled) = core.getReserveConfiguration(
             _reserve
         );
-        stableBorrowRateEnabled = core.getReserveIsStableBorrowRateEnabled(_reserve);
         borrowingEnabled = core.isReserveBorrowingEnabled(_reserve);
         isActive = core.getReserveIsActive(_reserve);
         liquidationBonus = core.getReserveLiquidationBonus(_reserve);
@@ -374,30 +376,20 @@ contract LendingPoolDataProvider is VersionedInitializable {
         returns (
             uint256 totalLiquidity,
             uint256 availableLiquidity,
-            uint256 totalBorrowsStable,
-            uint256 totalBorrowsVariable,
+            uint256 totalBorrows,
             uint256 liquidityRate,
-            uint256 variableBorrowRate,
-            uint256 stableBorrowRate,
-            uint256 averageStableBorrowRate,
             uint256 utilizationRate,
             uint256 liquidityIndex,
-            uint256 variableBorrowIndex,
             address wvTokenAddress,
             uint40 lastUpdateTimestamp
         )
     {
         totalLiquidity = core.getReserveTotalLiquidity(_reserve);
         availableLiquidity = core.getReserveAvailableLiquidity(_reserve);
-        totalBorrowsStable = core.getReserveTotalBorrowsStable(_reserve);
-        totalBorrowsVariable = core.getReserveTotalBorrowsVariable(_reserve);
+        totalBorrows = core.getReserveTotalBorrows(_reserve);
         liquidityRate = core.getReserveCurrentLiquidityRate(_reserve);
-        variableBorrowRate = core.getReserveCurrentVariableBorrowRate(_reserve);
-        stableBorrowRate = core.getReserveCurrentStableBorrowRate(_reserve);
-        averageStableBorrowRate = core.getReserveCurrentAverageStableBorrowRate(_reserve);
         utilizationRate = core.getReserveUtilizationRate(_reserve);
         liquidityIndex = core.getReserveLiquidityCumulativeIndex(_reserve);
-        variableBorrowIndex = core.getReserveVariableBorrowsCumulativeIndex(_reserve);
         wvTokenAddress = core.getReserveWvTokenAddress(_reserve);
         lastUpdateTimestamp = core.getReserveLastUpdate(_reserve);
     }
@@ -453,5 +445,38 @@ contract LendingPoolDataProvider is VersionedInitializable {
         originationFee = core.getUserOriginationFee(_reserve, _user);
         lastUpdateTimestamp = core.getUserLastUpdate(_reserve, _user);
         usageAsCollateralEnabled = core.isUserUseReserveAsCollateralEnabled(_reserve, _user);
+    }
+
+    struct TokenData {
+        string symbol;
+        address tokenAddress;
+    }
+
+    function getAllReservesTokens() external view returns (TokenData[] memory) {
+        LendingPool pool = LendingPool(addressesProvider.getLendingPool());
+        address[] memory reserves = pool.getReserves();
+        TokenData[] memory reservesTokens = new TokenData[](reserves.length);
+        for (uint256 i = 0; i < reserves.length; i++) {
+            reservesTokens[i] = TokenData({ 
+                symbol: IERC20Detailed(reserves[i]).symbol(), 
+                tokenAddress: reserves[i] 
+            });
+        }
+        return reservesTokens;
+    }
+
+    function getAllWvTokens() external view returns (TokenData[] memory) {
+        LendingPool pool = LendingPool(addressesProvider.getLendingPool());
+        address[] memory reserves = pool.getReserves();
+        TokenData[] memory wvTokens = new TokenData[](reserves.length);
+        address wvTokenAddress;
+        for (uint256 i = 0; i < reserves.length; i++) {
+            (, , , , , ,wvTokenAddress ,) = pool.getReserveData(reserves[i]);
+            wvTokens[i] = TokenData({
+                symbol: IERC20Detailed(wvTokenAddress).symbol(),
+                tokenAddress: wvTokenAddress
+            });
+        }
+        return wvTokens;
     }
 }

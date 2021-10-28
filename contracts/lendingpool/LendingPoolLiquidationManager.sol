@@ -61,7 +61,6 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
     * @param _user the address of the user being liquidated
     * @param _purchaseAmount the total amount liquidated
     * @param _liquidatedCollateralAmount the amount of collateral being liquidated
-    * @param _accruedBorrowInterest the amount of interest accrued by the borrower since the last action
     * @param _liquidator the address of the liquidator
     * @param _receiveWvToken true if the liquidator wants to receive aTokens, false otherwise
     * @param _timestamp the timestamp of the action
@@ -72,7 +71,6 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
         address indexed _user,
         uint256 _purchaseAmount,
         uint256 _liquidatedCollateralAmount,
-        uint256 _accruedBorrowInterest,
         address _liquidator,
         bool _receiveWvToken,
         uint256 _timestamp
@@ -89,8 +87,7 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
 
     struct LiquidationCallLocalVars {
         uint256 userCollateralBalance;
-        uint256 userCompoundedBorrowBalance;
-        uint256 borrowBalanceIncrease;
+        uint256 userBorrowBalance;
         uint256 maxPrincipalAmountToLiquidate;
         uint256 actualAmountToLiquidate;
         uint256 liquidationRatio;
@@ -100,8 +97,6 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
         uint256 originationFee;
         uint256 feeLiquidated;
         uint256 liquidatedCollateralForFee;
-        CoreLibrary.InterestRateMode borrowRateMode;
-        uint256 userStableRate;
         bool isCollateralEnabled;
         bool healthFactorBelowThreshold;
     }
@@ -167,10 +162,9 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
         }
 
         //if the user hasn't borrowed the specific currency defined by _reserve, it cannot be liquidated
-        (, vars.userCompoundedBorrowBalance, vars.borrowBalanceIncrease) = core
-            .getUserBorrowBalances(_reserve, _user);
+        vars.userBorrowBalance = core.getUserBorrowBalance(_reserve, _user);
 
-        if (vars.userCompoundedBorrowBalance == 0) {
+        if (vars.userBorrowBalance == 0) {
             return (
                 uint256(LiquidationErrors.CURRRENCY_NOT_BORROWED),
                 "User did not borrow the specified currency"
@@ -179,7 +173,7 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
 
         //all clear - calculate the max principal amount that can be liquidated
         vars.maxPrincipalAmountToLiquidate = vars
-            .userCompoundedBorrowBalance
+            .userBorrowBalance
             .mul(LIQUIDATION_CLOSE_FACTOR_PERCENT)
             .div(100);
 
@@ -236,7 +230,6 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
             maxCollateralToLiquidate,
             vars.feeLiquidated,
             vars.liquidatedCollateralForFee,
-            vars.borrowBalanceIncrease,
             _receiveWvToken
         );
 
@@ -284,7 +277,6 @@ contract LendingPoolLiquidationManager is ReentrancyGuard, VersionedInitializabl
             _user,
             vars.actualAmountToLiquidate,
             maxCollateralToLiquidate,
-            vars.borrowBalanceIncrease,
             msg.sender,
             _receiveWvToken,
             //solium-disable-next-line

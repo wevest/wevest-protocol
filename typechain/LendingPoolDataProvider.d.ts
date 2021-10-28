@@ -28,6 +28,8 @@ interface LendingPoolDataProviderInterface extends ethers.utils.Interface {
     "calculateCollateralNeededInETH(address,uint256,uint256,uint256,uint256,uint256)": FunctionFragment;
     "calculateUserGlobalData(address)": FunctionFragment;
     "core()": FunctionFragment;
+    "getAllReservesTokens()": FunctionFragment;
+    "getAllWvTokens()": FunctionFragment;
     "getHealthFactorLiquidationThreshold()": FunctionFragment;
     "getReserveConfigurationData(address)": FunctionFragment;
     "getReserveData(address)": FunctionFragment;
@@ -68,6 +70,14 @@ interface LendingPoolDataProviderInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "core", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getAllReservesTokens",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAllWvTokens",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getHealthFactorLiquidationThreshold",
     values?: undefined
@@ -115,6 +125,14 @@ interface LendingPoolDataProviderInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "core", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllReservesTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllWvTokens",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getHealthFactorLiquidationThreshold",
     data: BytesLike
@@ -236,6 +254,18 @@ export class LendingPoolDataProvider extends BaseContract {
 
     core(overrides?: CallOverrides): Promise<[string]>;
 
+    getAllReservesTokens(
+      overrides?: CallOverrides
+    ): Promise<
+      [([string, string] & { symbol: string; tokenAddress: string })[]]
+    >;
+
+    getAllWvTokens(
+      overrides?: CallOverrides
+    ): Promise<
+      [([string, string] & { symbol: string; tokenAddress: string })[]]
+    >;
+
     getHealthFactorLiquidationThreshold(
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -244,23 +274,13 @@ export class LendingPoolDataProvider extends BaseContract {
       _reserve: string,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        string,
-        boolean,
-        boolean,
-        boolean,
-        boolean
-      ] & {
+      [BigNumber, BigNumber, BigNumber, string, boolean, boolean, boolean] & {
         ltv: BigNumber;
         liquidationThreshold: BigNumber;
         liquidationBonus: BigNumber;
         rateStrategyAddress: string;
         usageAsCollateralEnabled: boolean;
         borrowingEnabled: boolean;
-        stableBorrowRateEnabled: boolean;
         isActive: boolean;
       }
     >;
@@ -276,25 +296,15 @@ export class LendingPoolDataProvider extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
         string,
         number
       ] & {
         totalLiquidity: BigNumber;
         availableLiquidity: BigNumber;
-        totalBorrowsStable: BigNumber;
-        totalBorrowsVariable: BigNumber;
+        totalBorrows: BigNumber;
         liquidityRate: BigNumber;
-        variableBorrowRate: BigNumber;
-        stableBorrowRate: BigNumber;
-        averageStableBorrowRate: BigNumber;
         utilizationRate: BigNumber;
         liquidityIndex: BigNumber;
-        variableBorrowIndex: BigNumber;
         wvTokenAddress: string;
         lastUpdateTimestamp: number;
       }
@@ -330,26 +340,11 @@ export class LendingPoolDataProvider extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        boolean
-      ] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean] & {
         currentWvTokenBalance: BigNumber;
-        currentBorrowBalance: BigNumber;
-        principalBorrowBalance: BigNumber;
-        borrowRateMode: BigNumber;
-        borrowRate: BigNumber;
+        borrowBalance: BigNumber;
         liquidityRate: BigNumber;
         originationFee: BigNumber;
-        variableBorrowIndex: BigNumber;
         lastUpdateTimestamp: BigNumber;
         usageAsCollateralEnabled: boolean;
       }
@@ -413,6 +408,14 @@ export class LendingPoolDataProvider extends BaseContract {
 
   core(overrides?: CallOverrides): Promise<string>;
 
+  getAllReservesTokens(
+    overrides?: CallOverrides
+  ): Promise<([string, string] & { symbol: string; tokenAddress: string })[]>;
+
+  getAllWvTokens(
+    overrides?: CallOverrides
+  ): Promise<([string, string] & { symbol: string; tokenAddress: string })[]>;
+
   getHealthFactorLiquidationThreshold(
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -421,23 +424,13 @@ export class LendingPoolDataProvider extends BaseContract {
     _reserve: string,
     overrides?: CallOverrides
   ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      string,
-      boolean,
-      boolean,
-      boolean,
-      boolean
-    ] & {
+    [BigNumber, BigNumber, BigNumber, string, boolean, boolean, boolean] & {
       ltv: BigNumber;
       liquidationThreshold: BigNumber;
       liquidationBonus: BigNumber;
       rateStrategyAddress: string;
       usageAsCollateralEnabled: boolean;
       borrowingEnabled: boolean;
-      stableBorrowRateEnabled: boolean;
       isActive: boolean;
     }
   >;
@@ -453,25 +446,15 @@ export class LendingPoolDataProvider extends BaseContract {
       BigNumber,
       BigNumber,
       BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
       string,
       number
     ] & {
       totalLiquidity: BigNumber;
       availableLiquidity: BigNumber;
-      totalBorrowsStable: BigNumber;
-      totalBorrowsVariable: BigNumber;
+      totalBorrows: BigNumber;
       liquidityRate: BigNumber;
-      variableBorrowRate: BigNumber;
-      stableBorrowRate: BigNumber;
-      averageStableBorrowRate: BigNumber;
       utilizationRate: BigNumber;
       liquidityIndex: BigNumber;
-      variableBorrowIndex: BigNumber;
       wvTokenAddress: string;
       lastUpdateTimestamp: number;
     }
@@ -507,26 +490,11 @@ export class LendingPoolDataProvider extends BaseContract {
     _user: string,
     overrides?: CallOverrides
   ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      boolean
-    ] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean] & {
       currentWvTokenBalance: BigNumber;
-      currentBorrowBalance: BigNumber;
-      principalBorrowBalance: BigNumber;
-      borrowRateMode: BigNumber;
-      borrowRate: BigNumber;
+      borrowBalance: BigNumber;
       liquidityRate: BigNumber;
       originationFee: BigNumber;
-      variableBorrowIndex: BigNumber;
       lastUpdateTimestamp: BigNumber;
       usageAsCollateralEnabled: boolean;
     }
@@ -590,6 +558,14 @@ export class LendingPoolDataProvider extends BaseContract {
 
     core(overrides?: CallOverrides): Promise<string>;
 
+    getAllReservesTokens(
+      overrides?: CallOverrides
+    ): Promise<([string, string] & { symbol: string; tokenAddress: string })[]>;
+
+    getAllWvTokens(
+      overrides?: CallOverrides
+    ): Promise<([string, string] & { symbol: string; tokenAddress: string })[]>;
+
     getHealthFactorLiquidationThreshold(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -598,23 +574,13 @@ export class LendingPoolDataProvider extends BaseContract {
       _reserve: string,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        string,
-        boolean,
-        boolean,
-        boolean,
-        boolean
-      ] & {
+      [BigNumber, BigNumber, BigNumber, string, boolean, boolean, boolean] & {
         ltv: BigNumber;
         liquidationThreshold: BigNumber;
         liquidationBonus: BigNumber;
         rateStrategyAddress: string;
         usageAsCollateralEnabled: boolean;
         borrowingEnabled: boolean;
-        stableBorrowRateEnabled: boolean;
         isActive: boolean;
       }
     >;
@@ -630,25 +596,15 @@ export class LendingPoolDataProvider extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
         string,
         number
       ] & {
         totalLiquidity: BigNumber;
         availableLiquidity: BigNumber;
-        totalBorrowsStable: BigNumber;
-        totalBorrowsVariable: BigNumber;
+        totalBorrows: BigNumber;
         liquidityRate: BigNumber;
-        variableBorrowRate: BigNumber;
-        stableBorrowRate: BigNumber;
-        averageStableBorrowRate: BigNumber;
         utilizationRate: BigNumber;
         liquidityIndex: BigNumber;
-        variableBorrowIndex: BigNumber;
         wvTokenAddress: string;
         lastUpdateTimestamp: number;
       }
@@ -684,26 +640,11 @@ export class LendingPoolDataProvider extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        boolean
-      ] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean] & {
         currentWvTokenBalance: BigNumber;
-        currentBorrowBalance: BigNumber;
-        principalBorrowBalance: BigNumber;
-        borrowRateMode: BigNumber;
-        borrowRate: BigNumber;
+        borrowBalance: BigNumber;
         liquidityRate: BigNumber;
         originationFee: BigNumber;
-        variableBorrowIndex: BigNumber;
         lastUpdateTimestamp: BigNumber;
         usageAsCollateralEnabled: boolean;
       }
@@ -749,6 +690,10 @@ export class LendingPoolDataProvider extends BaseContract {
     ): Promise<BigNumber>;
 
     core(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAllReservesTokens(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAllWvTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     getHealthFactorLiquidationThreshold(
       overrides?: CallOverrides
@@ -815,6 +760,12 @@ export class LendingPoolDataProvider extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     core(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getAllReservesTokens(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getAllWvTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getHealthFactorLiquidationThreshold(
       overrides?: CallOverrides
