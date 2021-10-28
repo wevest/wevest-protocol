@@ -5,10 +5,13 @@ import {
     getEthersSigners, 
     getLendingPool,
     getLendingPoolAddressesProvider,
-    getMintableERC20 
+    getLendingPoolDataProvider,
+    getMintableERC20,
+    getWvToken 
 } from './helpers';
 import { eContractid } from './constants';
 import { solidity } from "ethereum-waffle";
+import chai from "chai";
 
 chai.use(solidity);
 
@@ -35,24 +38,6 @@ const testEnv: TestEnv = {
     wvDai: {} as WvToken,
 } as TestEnv;
 
-export const getWvToken = async (
-    underlyingAsset: string, 
-    decimal: number, 
-    name: string, 
-    symbol: string
-) => {
-    const WvTokenFactory = await ethers.getContractFactory(eContractid.WvToken);
-    let addressesProvider = await getLendingPoolAddressesProvider();
-    const WvTokenContract = await WvTokenFactory.deploy(
-        addressesProvider, 
-        underlyingAsset,
-        decimal,
-        name,
-        symbol
-    );
-    return WvTokenContract;
-};
-
 export async function initialize() {
     const [_deployer, ...restSigners] = await getEthersSigners();
     const deployer: SignerWithAddress = {
@@ -68,8 +53,10 @@ export async function initialize() {
     }
     testEnv.deployer = deployer;
     testEnv.pool = await getLendingPool();
+    testEnv.poolDataProvider = await getLendingPoolDataProvider();
 
     const allTokens = await testEnv.poolDataProvider.getAllWvTokens();
+
     const wvDaiAddress = allTokens.find(wvToken => wvToken.symbol === "wvDAI")?.tokenAddress;
   
     const reservesTokens = await testEnv.poolDataProvider.getAllReservesTokens();
@@ -83,6 +70,6 @@ export async function initialize() {
       process.exit(1);
     }
   
-    testEnv.wvDai = await getWvToken(daiAddress, 18, "DAI", "DAI");
     testEnv.dai = await getMintableERC20(daiAddress);
+    testEnv.wvDai = await getWvToken(daiAddress);
 }

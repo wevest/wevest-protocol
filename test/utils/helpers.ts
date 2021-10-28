@@ -1,11 +1,14 @@
 import { ethers } from "hardhat";
 import { Signer } from "ethers";
 import { ERC20__factory } from "../../typechain";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { LendingPool__factory } from "../../typechain";
+import { 
+    LendingPool__factory,
+    LendingPoolDataProvider__factory, 
+    MintableERC20__factory, 
+    WvToken__factory, 
+} from "../../typechain";
 import { eContractid } from './constants';
 
-let DRE: HardhatRuntimeEnvironment;
 export const getFirstSigner = async () => (await getEthersSigners())[0];
 
 export const convertToCurrencyDecimals = async (tokenAddress: string, amount: string) => {
@@ -17,7 +20,7 @@ export const convertToCurrencyDecimals = async (tokenAddress: string, amount: st
 };
 
 export const getEthersSigners = async (): Promise<Signer[]> => {
-    const ethersSigners = await Promise.all(await DRE.ethers.getSigners());
+    const ethersSigners = await Promise.all(await ethers.getSigners());
     return ethersSigners;
 };
 
@@ -33,8 +36,15 @@ export const getLendingPool = async () => {
     return lendingPoolContract;
 };
 
-export const getMintableERC20 = async () => {
-    const MintableERC20Factory = await ethers.getContractFactory(eContractid.MintableERC20);
-    const MintableERC20Contract = await MintableERC20Factory.deploy();
-    return MintableERC20Contract;
+export const getLendingPoolDataProvider = async () => {
+    const lendingPoolDataProviderFactory = new LendingPoolDataProvider__factory(await getFirstSigner());
+    return await lendingPoolDataProviderFactory.deploy();
+};
+
+export const getMintableERC20 = async (address: string) => {
+    return await MintableERC20__factory.connect(address, await getFirstSigner());
+};
+
+export const getWvToken = async (address: string) => {
+    return await WvToken__factory.connect(address, await getFirstSigner());
 };

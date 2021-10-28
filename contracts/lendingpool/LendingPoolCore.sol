@@ -728,7 +728,7 @@ contract LendingPoolCore is VersionedInitializable {
     /**
     * @dev initializes a reserve
     * @param _reserve the address of the reserve
-    * @param _wvTokenAddress the address of the overlying aToken contract
+    * @param _wvTokenAddress the address of the overlying wvToken contract
     * @param _decimals the decimals of the reserve currency
     * @param _interestRateStrategyAddress the address of the interest rate strategy contract
     **/

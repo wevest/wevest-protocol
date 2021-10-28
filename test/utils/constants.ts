@@ -8,6 +8,7 @@ export enum eContractid {
     MintableERC20 = "MintableERC20",
     LendingPoolParametersProvider = "LendingPoolParametersProvider",
     LendingPoolConfigurator = "LendingPoolConfigurator",
+    LendingPoolDataProvider = "LendingPoolDataProvider",
     LendingPool = "LendingPool",
     PriceOracle = "PriceOracle",
     Proxy = "Proxy",

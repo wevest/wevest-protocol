@@ -293,6 +293,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.TestToken__factory>;
     getContractFactory(
+      name: "IncentivizedERC20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IncentivizedERC20__factory>;
+    getContractFactory(
       name: "WvToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.WvToken__factory>;
@@ -647,6 +651,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.TestToken>;
+    getContractAt(
+      name: "IncentivizedERC20",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IncentivizedERC20>;
     getContractAt(
       name: "WvToken",
       address: string,
