@@ -17,4 +17,9 @@ abstract contract MintableERC20 is ERC20 {
         _mint(msg.sender, value);
         return true;
     }
+
+    function transfer(address recipient, uint256 amount) public override returns (bool) {
+        _transfer(msg.sender, recipient, amount);
+        return true;
+    }
 }

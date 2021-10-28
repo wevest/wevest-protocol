@@ -57,16 +57,21 @@ describe("Lending Pool", () => {
             const user1 = await signers[0].getAddress();
             const user2 = await signers[1].getAddress();
 
-            // await wvDaiContract._transfer(user1, user2, amountDAItoDeposit);
-
             const fromBalance = await wvDaiContract.balanceOf(user1);
             const toBalance = await wvDaiContract.balanceOf(user2);
-        
+
             expect(fromBalance.toString()).to.be.equal('0', 'Invalid from balance after transfer');
-            /* expect(toBalance.toString()).to.be.equal(
-                amountDAItoDeposit.toString(),
-                'Invalid from balance after transfer'
-            ); */
+        });
+    });
+
+    describe("Withdraw", async () => {
+        it('User2 burn 500 wvDAI and get corresponding 500 DAI from Dai reserve', async() => {
+            const user2 = await signers[1].getAddress();
+            const amountDAItoWithdraw = ethers.utils.parseUnits("500", 18);
+            await mockDaiContract.mint(amountDAItoWithdraw);
+            await mockDaiContract.transfer(user2, amountDAItoWithdraw);
+            const toBalance = await mockDaiContract.balanceOf(mockDaiContract.address);
+            expect(toBalance.toString()).to.be.equal('0', 'Invalid from balance after transfer');
         });
     });
 });
