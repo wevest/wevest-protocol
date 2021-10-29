@@ -19,9 +19,6 @@ interface ILendingPoolAddressesProvider {
     function getLendingPoolDataProvider() external view returns (address);
     function setLendingPoolDataProviderImpl(address _provider) external;
 
-    function getLendingPoolParametersProvider() external view returns (address);
-    function setLendingPoolParametersProviderImpl(address _parametersProvider) external;
-
     function getTokenDistributor() external view returns (address);
     function setTokenDistributor(address _tokenDistributor) external;
 

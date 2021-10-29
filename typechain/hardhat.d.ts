@@ -41,10 +41,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.LendingPoolParametersProvider__factory>;
     getContractFactory(
-      name: "UintStorage",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.UintStorage__factory>;
-    getContractFactory(
       name: "FeeProvider",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FeeProvider__factory>;
@@ -336,11 +332,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.LendingPoolParametersProvider>;
-    getContractAt(
-      name: "UintStorage",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.UintStorage>;
     getContractAt(
       name: "FeeProvider",
       address: string,
