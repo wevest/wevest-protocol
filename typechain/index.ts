@@ -13,7 +13,6 @@ export type { IChainlinkAggregator } from "./IChainlinkAggregator";
 export type { IERC20Detailed } from "./IERC20Detailed";
 export type { IFeeProvider } from "./IFeeProvider";
 export type { ILendingPoolAddressesProvider } from "./ILendingPoolAddressesProvider";
-export type { ILendingRateOracle } from "./ILendingRateOracle";
 export type { IPriceOracle } from "./IPriceOracle";
 export type { IPriceOracleGetter } from "./IPriceOracleGetter";
 export type { IReserveInterestRateStrategy } from "./IReserveInterestRateStrategy";
@@ -83,7 +82,6 @@ export { IChainlinkAggregator__factory } from "./factories/IChainlinkAggregator_
 export { IERC20Detailed__factory } from "./factories/IERC20Detailed__factory";
 export { IFeeProvider__factory } from "./factories/IFeeProvider__factory";
 export { ILendingPoolAddressesProvider__factory } from "./factories/ILendingPoolAddressesProvider__factory";
-export { ILendingRateOracle__factory } from "./factories/ILendingRateOracle__factory";
 export { IPriceOracle__factory } from "./factories/IPriceOracle__factory";
 export { IPriceOracleGetter__factory } from "./factories/IPriceOracleGetter__factory";
 export { IReserveInterestRateStrategy__factory } from "./factories/IReserveInterestRateStrategy__factory";

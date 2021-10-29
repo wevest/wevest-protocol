@@ -61,10 +61,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ILendingPoolAddressesProvider__factory>;
     getContractFactory(
-      name: "ILendingRateOracle",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ILendingRateOracle__factory>;
-    getContractFactory(
       name: "IPriceOracle",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IPriceOracle__factory>;
@@ -349,11 +345,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ILendingPoolAddressesProvider>;
-    getContractAt(
-      name: "ILendingRateOracle",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ILendingRateOracle>;
     getContractAt(
       name: "IPriceOracle",
       address: string,

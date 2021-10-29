@@ -62,10 +62,11 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      accounts: {
+      /* accounts: {
         mnemonic: MNEMONIC,
       },
-      chainId: chainIds.hardhat,
+      chainId: chainIds.hardhat, */
+      chainId: chainIds.ganache,
     },
     mainnet: createTestnetConfig("mainnet"),
     goerli: createTestnetConfig("goerli"),
