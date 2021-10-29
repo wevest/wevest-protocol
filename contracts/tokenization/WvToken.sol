@@ -251,7 +251,7 @@ contract WvToken is ERC20 {
             userIndexReset = resetDataOnZeroBalanceInternal(msg.sender);
         }
 
-        // executes redeem of the underlying asset
+        // executes withdraw of the underlying asset
         /* pool.withdraw(
             underlyingAssetAddress,
             msg.sender,
