@@ -57,10 +57,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IFeeProvider__factory>;
     getContractFactory(
-      name: "IKyberNetworkProxyInterface",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IKyberNetworkProxyInterface__factory>;
-    getContractFactory(
       name: "ILendingPoolAddressesProvider",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ILendingPoolAddressesProvider__factory>;
@@ -348,11 +344,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IFeeProvider>;
-    getContractAt(
-      name: "IKyberNetworkProxyInterface",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IKyberNetworkProxyInterface>;
     getContractAt(
       name: "ILendingPoolAddressesProvider",
       address: string,

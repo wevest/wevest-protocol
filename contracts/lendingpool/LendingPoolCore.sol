@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "../libraries/openzeppelin-upgradeability/VersionedInitializable.sol";
 import "../libraries/CoreLibrary.sol";
 import "../configuration/LendingPoolAddressesProvider.sol";
-import "../interfaces/ILendingRateOracle.sol";
 import "../interfaces/IReserveInterestRateStrategy.sol";
 import "../libraries/WadRayMath.sol";
 import "../tokenization/WvToken.sol";

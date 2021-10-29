@@ -22,7 +22,6 @@ interface ILendingPoolAddressesProvider {
     function getTokenDistributor() external view returns (address);
     function setTokenDistributor(address _tokenDistributor) external;
 
-
     function getFeeProvider() external view returns (address);
     function setFeeProviderImpl(address _feeProvider) external;
 

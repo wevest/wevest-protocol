@@ -12,7 +12,6 @@ export type { TokenDistributor } from "./TokenDistributor";
 export type { IChainlinkAggregator } from "./IChainlinkAggregator";
 export type { IERC20Detailed } from "./IERC20Detailed";
 export type { IFeeProvider } from "./IFeeProvider";
-export type { IKyberNetworkProxyInterface } from "./IKyberNetworkProxyInterface";
 export type { ILendingPoolAddressesProvider } from "./ILendingPoolAddressesProvider";
 export type { ILendingRateOracle } from "./ILendingRateOracle";
 export type { IPriceOracle } from "./IPriceOracle";
@@ -83,7 +82,6 @@ export { TokenDistributor__factory } from "./factories/TokenDistributor__factory
 export { IChainlinkAggregator__factory } from "./factories/IChainlinkAggregator__factory";
 export { IERC20Detailed__factory } from "./factories/IERC20Detailed__factory";
 export { IFeeProvider__factory } from "./factories/IFeeProvider__factory";
-export { IKyberNetworkProxyInterface__factory } from "./factories/IKyberNetworkProxyInterface__factory";
 export { ILendingPoolAddressesProvider__factory } from "./factories/ILendingPoolAddressesProvider__factory";
 export { ILendingRateOracle__factory } from "./factories/ILendingRateOracle__factory";
 export { IPriceOracle__factory } from "./factories/IPriceOracle__factory";
