@@ -2,7 +2,6 @@
 pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "hardhat/console.sol";
 
 /**
  * @title ERC20Mintable
@@ -16,12 +15,6 @@ abstract contract MintableERC20 is ERC20 {
      */
     function mint(uint256 value) public returns (bool) {
         _mint(msg.sender, value);
-        return true;
-    }
-
-    function transfer(address recipient, uint256 amount) public override returns (bool) {
-        console.log("Trying to send %s tokens to %s", amount, recipient);
-        _transfer(msg.sender, recipient, amount);
         return true;
     }
 }
