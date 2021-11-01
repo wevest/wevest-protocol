@@ -81,26 +81,32 @@ export class IPriceOracleGetter extends BaseContract {
 
   functions: {
     getAssetPrice(
-      asset: string,
+      _asset: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
   };
 
-  getAssetPrice(asset: string, overrides?: CallOverrides): Promise<BigNumber>;
+  getAssetPrice(_asset: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    getAssetPrice(asset: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getAssetPrice(
+      _asset: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {};
 
   estimateGas: {
-    getAssetPrice(asset: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getAssetPrice(
+      _asset: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     getAssetPrice(
-      asset: string,
+      _asset: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

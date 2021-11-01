@@ -91,31 +91,34 @@ export class IPriceOracle extends BaseContract {
 
   functions: {
     getAssetPrice(
-      asset: string,
+      _asset: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     setAssetPrice(
-      asset: string,
-      price: BigNumberish,
+      _asset: string,
+      _price: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  getAssetPrice(asset: string, overrides?: CallOverrides): Promise<BigNumber>;
+  getAssetPrice(_asset: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   setAssetPrice(
-    asset: string,
-    price: BigNumberish,
+    _asset: string,
+    _price: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    getAssetPrice(asset: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getAssetPrice(
+      _asset: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     setAssetPrice(
-      asset: string,
-      price: BigNumberish,
+      _asset: string,
+      _price: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -123,24 +126,27 @@ export class IPriceOracle extends BaseContract {
   filters: {};
 
   estimateGas: {
-    getAssetPrice(asset: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getAssetPrice(
+      _asset: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     setAssetPrice(
-      asset: string,
-      price: BigNumberish,
+      _asset: string,
+      _price: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     getAssetPrice(
-      asset: string,
+      _asset: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     setAssetPrice(
-      asset: string,
-      price: BigNumberish,
+      _asset: string,
+      _price: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -1,59 +1,40 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.6.12;
+pragma solidity ^0.6.0;
 
 /**
- * @title LendingPoolAddressesProvider contract
- * @dev Main registry of addresses part of or connected to the protocol, including permissioned roles
- * - Acting also as factory of proxies and admin of those, so with right to change its implementations
- * - Owned by the Wevest Governance
- **/
+provides the interface to fetch the LendingPoolCore address
+ */
+
 interface ILendingPoolAddressesProvider {
-  event MarketIdSet(string newMarketId);
-  event LendingPoolUpdated(address indexed newAddress);
-  event ConfigurationAdminUpdated(address indexed newAddress);
-  event EmergencyAdminUpdated(address indexed newAddress);
-  event LendingPoolConfiguratorUpdated(address indexed newAddress);
-  event LendingPoolCollateralManagerUpdated(address indexed newAddress);
-  event PriceOracleUpdated(address indexed newAddress);
-  event LendingRateOracleUpdated(address indexed newAddress);
-  event ProxyCreated(bytes32 id, address indexed newAddress);
-  event AddressSet(bytes32 id, address indexed newAddress, bool hasProxy);
 
-  function getMarketId() external view returns (string memory);
+    function getLendingPool() external view returns (address);
+    function setLendingPoolImpl(address _pool) external;
 
-  function setMarketId(string calldata marketId) external;
+    function getLendingPoolCore() external view returns (address payable);
+    function setLendingPoolCoreImpl(address _lendingPoolCore) external;
 
-  function setAddress(bytes32 id, address newAddress) external;
+    function getLendingPoolConfigurator() external view returns (address);
+    function setLendingPoolConfiguratorImpl(address _configurator) external;
 
-  function setAddressAsProxy(bytes32 id, address impl) external;
+    function getLendingPoolDataProvider() external view returns (address);
+    function setLendingPoolDataProviderImpl(address _provider) external;
 
-  function getAddress(bytes32 id) external view returns (address);
+    function getTokenDistributor() external view returns (address);
+    function setTokenDistributor(address _tokenDistributor) external;
 
-  function getLendingPool() external view returns (address);
+    function getFeeProvider() external view returns (address);
+    function setFeeProviderImpl(address _feeProvider) external;
 
-  function setLendingPoolImpl(address pool) external;
+    function getLendingPoolLiquidationManager() external view returns (address);
+    function setLendingPoolLiquidationManager(address _manager) external;
 
-  function getLendingPoolConfigurator() external view returns (address);
+    function getLendingPoolManager() external view returns (address);
+    function setLendingPoolManager(address _lendingPoolManager) external;
 
-  function setLendingPoolConfiguratorImpl(address configurator) external;
+    function getPriceOracle() external view returns (address);
+    function setPriceOracle(address _priceOracle) external;
 
-  function getLendingPoolCollateralManager() external view returns (address);
+    function getLendingRateOracle() external view returns (address);
+    function setLendingRateOracle(address _lendingRateOracle) external;
 
-  function setLendingPoolCollateralManager(address manager) external;
-
-  function getPoolAdmin() external view returns (address);
-
-  function setPoolAdmin(address admin) external;
-
-  function getEmergencyAdmin() external view returns (address);
-
-  function setEmergencyAdmin(address admin) external;
-
-  function getPriceOracle() external view returns (address);
-
-  function setPriceOracle(address priceOracle) external;
-
-  function getLendingRateOracle() external view returns (address);
-
-  function setLendingRateOracle(address lendingRateOracle) external;
 }

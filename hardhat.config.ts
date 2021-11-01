@@ -14,6 +14,7 @@ import "@nomiclabs/hardhat-waffle";
 
 import "hardhat-gas-reporter";
 import "@nomiclabs/hardhat-etherscan";
+import "@openzeppelin/hardhat-upgrades";
 
 const chainIds = {
   ganache: 1337,
@@ -61,10 +62,11 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      accounts: {
+      /* accounts: {
         mnemonic: MNEMONIC,
       },
-      chainId: chainIds.hardhat,
+      chainId: chainIds.hardhat, */
+      chainId: chainIds.ganache,
     },
     mainnet: createTestnetConfig("mainnet"),
     goerli: createTestnetConfig("goerli"),
@@ -78,11 +80,8 @@ const config: HardhatUserConfig = {
         version: "0.6.12",
       },
       {
-        version: "0.7.0",
+        version: "0.5.17",
       },
-      {
-        version: "0.8.0",
-      }
     ],
   },
   etherscan: {

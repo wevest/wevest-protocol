@@ -21,43 +21,40 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface WvTokenInterface extends ethers.utils.Interface {
   functions: {
-    "DEBT_TOKEN_REVISION()": FunctionFragment;
-    "POOL()": FunctionFragment;
-    "UNDERLYING_ASSET_ADDRESS()": FunctionFragment;
+    "UINT_MAX_VALUE()": FunctionFragment;
+    "allowInterestRedirectionTo(address)": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
-    "approveDelegation(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "borrowAllowance(address,address)": FunctionFragment;
-    "burn(address,uint256)": FunctionFragment;
+    "burnOnLiquidation(address,uint256)": FunctionFragment;
+    "burnOnWithdraw(uint256)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
-    "getAverageStableRate()": FunctionFragment;
-    "getIncentivesController()": FunctionFragment;
-    "getSupplyData()": FunctionFragment;
-    "getTotalSupplyAndAvgRate()": FunctionFragment;
-    "getTotalSupplyLastUpdated()": FunctionFragment;
-    "getUserLastUpdated(address)": FunctionFragment;
-    "getUserStableRate(address)": FunctionFragment;
+    "getInterestRedirectionAddress(address)": FunctionFragment;
+    "getRedirectedBalance(address)": FunctionFragment;
+    "getUserIndex(address)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialize(address,address,address,uint8,string,string,bytes)": FunctionFragment;
-    "mint(address,address,uint256,uint256)": FunctionFragment;
+    "isTransferAllowed(address,uint256)": FunctionFragment;
+    "mintOnDeposit(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "principalBalanceOf(address)": FunctionFragment;
+    "redirectInterestStream(address)": FunctionFragment;
+    "redirectInterestStreamOf(address,address)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
+    "transferOnLiquidation(address,address,uint256)": FunctionFragment;
+    "underlyingAssetAddress()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "DEBT_TOKEN_REVISION",
+    functionFragment: "UINT_MAX_VALUE",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "POOL", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "UNDERLYING_ASSET_ADDRESS",
-    values?: undefined
+    functionFragment: "allowInterestRedirectionTo",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "allowance",
@@ -67,18 +64,14 @@ interface WvTokenInterface extends ethers.utils.Interface {
     functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "approveDelegation",
-    values: [string, BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "borrowAllowance",
-    values: [string, string]
+    functionFragment: "burnOnLiquidation",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "burn",
-    values: [string, BigNumberish]
+    functionFragment: "burnOnWithdraw",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
@@ -86,31 +79,15 @@ interface WvTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getAverageStableRate",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getIncentivesController",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getSupplyData",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getTotalSupplyAndAvgRate",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getTotalSupplyLastUpdated",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getUserLastUpdated",
+    functionFragment: "getInterestRedirectionAddress",
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getUserStableRate",
+    functionFragment: "getRedirectedBalance",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getUserIndex",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -118,17 +95,25 @@ interface WvTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
-    values: [string, string, string, BigNumberish, string, string, BytesLike]
+    functionFragment: "isTransferAllowed",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "mint",
-    values: [string, string, BigNumberish, BigNumberish]
+    functionFragment: "mintOnDeposit",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "principalBalanceOf",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "redirectInterestStream",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "redirectInterestStreamOf",
+    values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -143,70 +128,74 @@ interface WvTokenInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "transferOnLiquidation",
+    values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "underlyingAssetAddress",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
-    functionFragment: "DEBT_TOKEN_REVISION",
+    functionFragment: "UINT_MAX_VALUE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "POOL", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "UNDERLYING_ASSET_ADDRESS",
+    functionFragment: "allowInterestRedirectionTo",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "approveDelegation",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "borrowAllowance",
+    functionFragment: "burnOnLiquidation",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "burnOnWithdraw",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getAverageStableRate",
+    functionFragment: "getInterestRedirectionAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getIncentivesController",
+    functionFragment: "getRedirectedBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getSupplyData",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getTotalSupplyAndAvgRate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getTotalSupplyLastUpdated",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getUserLastUpdated",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getUserStableRate",
+    functionFragment: "getUserIndex",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "increaseAllowance",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isTransferAllowed",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "mintOnDeposit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "principalBalanceOf",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "redirectInterestStream",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "redirectInterestStreamOf",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
@@ -219,22 +208,38 @@ interface WvTokenInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferOnLiquidation",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "underlyingAssetAddress",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
-    "BorrowAllowanceDelegated(address,address,address,uint256)": EventFragment;
-    "Burn(address,uint256,uint256,uint256,uint256,uint256)": EventFragment;
-    "Initialized(address,address,address,uint8,string,string,bytes)": EventFragment;
-    "Mint(address,address,uint256,uint256,uint256,uint256,uint256,uint256)": EventFragment;
+    "BalanceTransfer(address,address,uint256,uint256,uint256,uint256,uint256)": EventFragment;
+    "BurnOnLiquidation(address,uint256,uint256,uint256)": EventFragment;
+    "InterestRedirectionAllowanceChanged(address,address)": EventFragment;
+    "InterestStreamRedirected(address,address,uint256,uint256,uint256)": EventFragment;
+    "MintOnDeposit(address,uint256,uint256,uint256)": EventFragment;
+    "RedirectedBalanceUpdated(address,uint256,uint256,uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
+    "Withdraw(address,uint256,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "BorrowAllowanceDelegated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Burn"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Mint"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "BalanceTransfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "BurnOnLiquidation"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "InterestRedirectionAllowanceChanged"
+  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InterestStreamRedirected"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MintOnDeposit"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RedirectedBalanceUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -245,62 +250,71 @@ export type ApprovalEvent = TypedEvent<
   }
 >;
 
-export type BorrowAllowanceDelegatedEvent = TypedEvent<
-  [string, string, string, BigNumber] & {
-    fromUser: string;
-    toUser: string;
-    asset: string;
-    amount: BigNumber;
+export type BalanceTransferEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+    _from: string;
+    _to: string;
+    _value: BigNumber;
+    _fromBalanceIncrease: BigNumber;
+    _toBalanceIncrease: BigNumber;
+    _fromIndex: BigNumber;
+    _toIndex: BigNumber;
   }
 >;
 
-export type BurnEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
-    user: string;
-    amount: BigNumber;
-    currentBalance: BigNumber;
-    balanceIncrease: BigNumber;
-    avgStableRate: BigNumber;
-    newTotalSupply: BigNumber;
+export type BurnOnLiquidationEvent = TypedEvent<
+  [string, BigNumber, BigNumber, BigNumber] & {
+    _from: string;
+    _value: BigNumber;
+    _fromBalanceIncrease: BigNumber;
+    _fromIndex: BigNumber;
   }
 >;
 
-export type InitializedEvent = TypedEvent<
-  [string, string, string, number, string, string, string] & {
-    underlyingAsset: string;
-    pool: string;
-    incentivesController: string;
-    debtTokenDecimals: number;
-    debtTokenName: string;
-    debtTokenSymbol: string;
-    params: string;
+export type InterestRedirectionAllowanceChangedEvent = TypedEvent<
+  [string, string] & { _from: string; _to: string }
+>;
+
+export type InterestStreamRedirectedEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber, BigNumber] & {
+    _from: string;
+    _to: string;
+    _redirectedBalance: BigNumber;
+    _fromBalanceIncrease: BigNumber;
+    _fromIndex: BigNumber;
   }
 >;
 
-export type MintEvent = TypedEvent<
-  [
-    string,
-    string,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber
-  ] & {
-    user: string;
-    onBehalfOf: string;
-    amount: BigNumber;
-    currentBalance: BigNumber;
-    balanceIncrease: BigNumber;
-    newRate: BigNumber;
-    avgStableRate: BigNumber;
-    newTotalSupply: BigNumber;
+export type MintOnDepositEvent = TypedEvent<
+  [string, BigNumber, BigNumber, BigNumber] & {
+    _from: string;
+    _value: BigNumber;
+    _fromBalanceIncrease: BigNumber;
+    _fromIndex: BigNumber;
+  }
+>;
+
+export type RedirectedBalanceUpdatedEvent = TypedEvent<
+  [string, BigNumber, BigNumber, BigNumber, BigNumber] & {
+    _targetAddress: string;
+    _targetBalanceIncrease: BigNumber;
+    _targetIndex: BigNumber;
+    _redirectedBalanceAdded: BigNumber;
+    _redirectedBalanceRemoved: BigNumber;
   }
 >;
 
 export type TransferEvent = TypedEvent<
   [string, string, BigNumber] & { from: string; to: string; value: BigNumber }
+>;
+
+export type WithdrawEvent = TypedEvent<
+  [string, BigNumber, BigNumber, BigNumber] & {
+    _from: string;
+    _value: BigNumber;
+    _fromBalanceIncrease: BigNumber;
+    _fromIndex: BigNumber;
+  }
 >;
 
 export class WvToken extends BaseContract {
@@ -347,11 +361,12 @@ export class WvToken extends BaseContract {
   interface: WvTokenInterface;
 
   functions: {
-    DEBT_TOKEN_REVISION(overrides?: CallOverrides): Promise<[BigNumber]>;
+    UINT_MAX_VALUE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    POOL(overrides?: CallOverrides): Promise<[string]>;
-
-    UNDERLYING_ASSET_ADDRESS(overrides?: CallOverrides): Promise<[string]>;
+    allowInterestRedirectionTo(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     allowance(
       owner: string,
@@ -365,23 +380,16 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    approveDelegation(
-      delegatee: string,
-      amount: BigNumberish,
+    balanceOf(_user: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    burnOnLiquidation(
+      _account: string,
+      _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    balanceOf(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    borrowAllowance(
-      fromUser: string,
-      toUser: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    burn(
-      user: string,
-      amount: BigNumberish,
+    burnOnWithdraw(
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -393,27 +401,18 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getAverageStableRate(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    getIncentivesController(overrides?: CallOverrides): Promise<[string]>;
-
-    getSupplyData(
+    getInterestRedirectionAddress(
+      _user: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber, BigNumber, number]>;
+    ): Promise<[string]>;
 
-    getTotalSupplyAndAvgRate(
+    getRedirectedBalance(
+      _user: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber]>;
+    ): Promise<[BigNumber]>;
 
-    getTotalSupplyLastUpdated(overrides?: CallOverrides): Promise<[number]>;
-
-    getUserLastUpdated(
-      user: string,
-      overrides?: CallOverrides
-    ): Promise<[number]>;
-
-    getUserStableRate(
-      user: string,
+    getUserIndex(
+      _user: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -423,31 +422,35 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    initialize(
-      pool: string,
-      underlyingAsset: string,
-      incentivesController: string,
-      debtTokenDecimals: BigNumberish,
-      debtTokenName: string,
-      debtTokenSymbol: string,
-      params: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    isTransferAllowed(
+      _user: string,
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
-    mint(
-      user: string,
-      onBehalfOf: string,
-      amount: BigNumberish,
-      rate: BigNumberish,
+    mintOnDeposit(
+      _account: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
     principalBalanceOf(
-      user: string,
+      _user: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    redirectInterestStream(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    redirectInterestStreamOf(
+      _from: string,
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
@@ -465,13 +468,23 @@ export class WvToken extends BaseContract {
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    transferOnLiquidation(
+      _from: string,
+      _to: string,
+      _value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    underlyingAssetAddress(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  DEBT_TOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+  UINT_MAX_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
-  POOL(overrides?: CallOverrides): Promise<string>;
-
-  UNDERLYING_ASSET_ADDRESS(overrides?: CallOverrides): Promise<string>;
+  allowInterestRedirectionTo(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   allowance(
     owner: string,
@@ -485,23 +498,16 @@ export class WvToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  approveDelegation(
-    delegatee: string,
-    amount: BigNumberish,
+  balanceOf(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  burnOnLiquidation(
+    _account: string,
+    _value: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  borrowAllowance(
-    fromUser: string,
-    toUser: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  burn(
-    user: string,
-    amount: BigNumberish,
+  burnOnWithdraw(
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -513,26 +519,17 @@ export class WvToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getAverageStableRate(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getIncentivesController(overrides?: CallOverrides): Promise<string>;
-
-  getSupplyData(
+  getInterestRedirectionAddress(
+    _user: string,
     overrides?: CallOverrides
-  ): Promise<[BigNumber, BigNumber, BigNumber, number]>;
+  ): Promise<string>;
 
-  getTotalSupplyAndAvgRate(
-    overrides?: CallOverrides
-  ): Promise<[BigNumber, BigNumber]>;
-
-  getTotalSupplyLastUpdated(overrides?: CallOverrides): Promise<number>;
-
-  getUserLastUpdated(user: string, overrides?: CallOverrides): Promise<number>;
-
-  getUserStableRate(
-    user: string,
+  getRedirectedBalance(
+    _user: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  getUserIndex(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   increaseAllowance(
     spender: string,
@@ -540,31 +537,35 @@ export class WvToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  initialize(
-    pool: string,
-    underlyingAsset: string,
-    incentivesController: string,
-    debtTokenDecimals: BigNumberish,
-    debtTokenName: string,
-    debtTokenSymbol: string,
-    params: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  isTransferAllowed(
+    _user: string,
+    _amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
-  mint(
-    user: string,
-    onBehalfOf: string,
-    amount: BigNumberish,
-    rate: BigNumberish,
+  mintOnDeposit(
+    _account: string,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
   principalBalanceOf(
-    user: string,
+    _user: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  redirectInterestStream(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  redirectInterestStreamOf(
+    _from: string,
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -583,12 +584,22 @@ export class WvToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  transferOnLiquidation(
+    _from: string,
+    _to: string,
+    _value: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  underlyingAssetAddress(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
-    DEBT_TOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+    UINT_MAX_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    POOL(overrides?: CallOverrides): Promise<string>;
-
-    UNDERLYING_ASSET_ADDRESS(overrides?: CallOverrides): Promise<string>;
+    allowInterestRedirectionTo(
+      _to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     allowance(
       owner: string,
@@ -602,23 +613,16 @@ export class WvToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    approveDelegation(
-      delegatee: string,
-      amount: BigNumberish,
+    balanceOf(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    burnOnLiquidation(
+      _account: string,
+      _value: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    borrowAllowance(
-      fromUser: string,
-      toUser: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    burn(
-      user: string,
-      amount: BigNumberish,
+    burnOnWithdraw(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -630,29 +634,17 @@ export class WvToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    getAverageStableRate(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getIncentivesController(overrides?: CallOverrides): Promise<string>;
-
-    getSupplyData(
+    getInterestRedirectionAddress(
+      _user: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber, BigNumber, number]>;
+    ): Promise<string>;
 
-    getTotalSupplyAndAvgRate(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber]>;
-
-    getTotalSupplyLastUpdated(overrides?: CallOverrides): Promise<number>;
-
-    getUserLastUpdated(
-      user: string,
-      overrides?: CallOverrides
-    ): Promise<number>;
-
-    getUserStableRate(
-      user: string,
+    getRedirectedBalance(
+      _user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getUserIndex(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     increaseAllowance(
       spender: string,
@@ -660,31 +652,35 @@ export class WvToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    initialize(
-      pool: string,
-      underlyingAsset: string,
-      incentivesController: string,
-      debtTokenDecimals: BigNumberish,
-      debtTokenName: string,
-      debtTokenSymbol: string,
-      params: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    mint(
-      user: string,
-      onBehalfOf: string,
-      amount: BigNumberish,
-      rate: BigNumberish,
+    isTransferAllowed(
+      _user: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    mintOnDeposit(
+      _account: string,
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
     principalBalanceOf(
-      user: string,
+      _user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    redirectInterestStream(
+      _to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    redirectInterestStreamOf(
+      _from: string,
+      _to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -702,6 +698,15 @@ export class WvToken extends BaseContract {
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    transferOnLiquidation(
+      _from: string,
+      _to: string,
+      _value: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    underlyingAssetAddress(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -723,167 +728,183 @@ export class WvToken extends BaseContract {
       { owner: string; spender: string; value: BigNumber }
     >;
 
-    "BorrowAllowanceDelegated(address,address,address,uint256)"(
-      fromUser?: string | null,
-      toUser?: string | null,
-      asset?: null,
-      amount?: null
+    "BalanceTransfer(address,address,uint256,uint256,uint256,uint256,uint256)"(
+      _from?: string | null,
+      _to?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _toBalanceIncrease?: null,
+      _fromIndex?: null,
+      _toIndex?: null
     ): TypedEventFilter<
-      [string, string, string, BigNumber],
-      { fromUser: string; toUser: string; asset: string; amount: BigNumber }
-    >;
-
-    BorrowAllowanceDelegated(
-      fromUser?: string | null,
-      toUser?: string | null,
-      asset?: null,
-      amount?: null
-    ): TypedEventFilter<
-      [string, string, string, BigNumber],
-      { fromUser: string; toUser: string; asset: string; amount: BigNumber }
-    >;
-
-    "Burn(address,uint256,uint256,uint256,uint256,uint256)"(
-      user?: string | null,
-      amount?: null,
-      currentBalance?: null,
-      balanceIncrease?: null,
-      avgStableRate?: null,
-      newTotalSupply?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
+      [string, string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
       {
-        user: string;
-        amount: BigNumber;
-        currentBalance: BigNumber;
-        balanceIncrease: BigNumber;
-        avgStableRate: BigNumber;
-        newTotalSupply: BigNumber;
+        _from: string;
+        _to: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _toBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+        _toIndex: BigNumber;
       }
     >;
 
-    Burn(
-      user?: string | null,
-      amount?: null,
-      currentBalance?: null,
-      balanceIncrease?: null,
-      avgStableRate?: null,
-      newTotalSupply?: null
+    BalanceTransfer(
+      _from?: string | null,
+      _to?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _toBalanceIncrease?: null,
+      _fromIndex?: null,
+      _toIndex?: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
+      [string, string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
       {
-        user: string;
-        amount: BigNumber;
-        currentBalance: BigNumber;
-        balanceIncrease: BigNumber;
-        avgStableRate: BigNumber;
-        newTotalSupply: BigNumber;
+        _from: string;
+        _to: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _toBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+        _toIndex: BigNumber;
       }
     >;
 
-    "Initialized(address,address,address,uint8,string,string,bytes)"(
-      underlyingAsset?: string | null,
-      pool?: string | null,
-      incentivesController?: null,
-      debtTokenDecimals?: null,
-      debtTokenName?: null,
-      debtTokenSymbol?: null,
-      params?: null
+    "BurnOnLiquidation(address,uint256,uint256,uint256)"(
+      _from?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
     ): TypedEventFilter<
-      [string, string, string, number, string, string, string],
+      [string, BigNumber, BigNumber, BigNumber],
       {
-        underlyingAsset: string;
-        pool: string;
-        incentivesController: string;
-        debtTokenDecimals: number;
-        debtTokenName: string;
-        debtTokenSymbol: string;
-        params: string;
+        _from: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
       }
     >;
 
-    Initialized(
-      underlyingAsset?: string | null,
-      pool?: string | null,
-      incentivesController?: null,
-      debtTokenDecimals?: null,
-      debtTokenName?: null,
-      debtTokenSymbol?: null,
-      params?: null
+    BurnOnLiquidation(
+      _from?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
     ): TypedEventFilter<
-      [string, string, string, number, string, string, string],
+      [string, BigNumber, BigNumber, BigNumber],
       {
-        underlyingAsset: string;
-        pool: string;
-        incentivesController: string;
-        debtTokenDecimals: number;
-        debtTokenName: string;
-        debtTokenSymbol: string;
-        params: string;
+        _from: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
       }
     >;
 
-    "Mint(address,address,uint256,uint256,uint256,uint256,uint256,uint256)"(
-      user?: string | null,
-      onBehalfOf?: string | null,
-      amount?: null,
-      currentBalance?: null,
-      balanceIncrease?: null,
-      newRate?: null,
-      avgStableRate?: null,
-      newTotalSupply?: null
+    "InterestRedirectionAllowanceChanged(address,address)"(
+      _from?: string | null,
+      _to?: string | null
+    ): TypedEventFilter<[string, string], { _from: string; _to: string }>;
+
+    InterestRedirectionAllowanceChanged(
+      _from?: string | null,
+      _to?: string | null
+    ): TypedEventFilter<[string, string], { _from: string; _to: string }>;
+
+    "InterestStreamRedirected(address,address,uint256,uint256,uint256)"(
+      _from?: string | null,
+      _to?: string | null,
+      _redirectedBalance?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
     ): TypedEventFilter<
-      [
-        string,
-        string,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber
-      ],
+      [string, string, BigNumber, BigNumber, BigNumber],
       {
-        user: string;
-        onBehalfOf: string;
-        amount: BigNumber;
-        currentBalance: BigNumber;
-        balanceIncrease: BigNumber;
-        newRate: BigNumber;
-        avgStableRate: BigNumber;
-        newTotalSupply: BigNumber;
+        _from: string;
+        _to: string;
+        _redirectedBalance: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
       }
     >;
 
-    Mint(
-      user?: string | null,
-      onBehalfOf?: string | null,
-      amount?: null,
-      currentBalance?: null,
-      balanceIncrease?: null,
-      newRate?: null,
-      avgStableRate?: null,
-      newTotalSupply?: null
+    InterestStreamRedirected(
+      _from?: string | null,
+      _to?: string | null,
+      _redirectedBalance?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
     ): TypedEventFilter<
-      [
-        string,
-        string,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber
-      ],
+      [string, string, BigNumber, BigNumber, BigNumber],
       {
-        user: string;
-        onBehalfOf: string;
-        amount: BigNumber;
-        currentBalance: BigNumber;
-        balanceIncrease: BigNumber;
-        newRate: BigNumber;
-        avgStableRate: BigNumber;
-        newTotalSupply: BigNumber;
+        _from: string;
+        _to: string;
+        _redirectedBalance: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+      }
+    >;
+
+    "MintOnDeposit(address,uint256,uint256,uint256)"(
+      _from?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber],
+      {
+        _from: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+      }
+    >;
+
+    MintOnDeposit(
+      _from?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber],
+      {
+        _from: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+      }
+    >;
+
+    "RedirectedBalanceUpdated(address,uint256,uint256,uint256,uint256)"(
+      _targetAddress?: string | null,
+      _targetBalanceIncrease?: null,
+      _targetIndex?: null,
+      _redirectedBalanceAdded?: null,
+      _redirectedBalanceRemoved?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber, BigNumber],
+      {
+        _targetAddress: string;
+        _targetBalanceIncrease: BigNumber;
+        _targetIndex: BigNumber;
+        _redirectedBalanceAdded: BigNumber;
+        _redirectedBalanceRemoved: BigNumber;
+      }
+    >;
+
+    RedirectedBalanceUpdated(
+      _targetAddress?: string | null,
+      _targetBalanceIncrease?: null,
+      _targetIndex?: null,
+      _redirectedBalanceAdded?: null,
+      _redirectedBalanceRemoved?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber, BigNumber],
+      {
+        _targetAddress: string;
+        _targetBalanceIncrease: BigNumber;
+        _targetIndex: BigNumber;
+        _redirectedBalanceAdded: BigNumber;
+        _redirectedBalanceRemoved: BigNumber;
       }
     >;
 
@@ -904,14 +925,45 @@ export class WvToken extends BaseContract {
       [string, string, BigNumber],
       { from: string; to: string; value: BigNumber }
     >;
+
+    "Withdraw(address,uint256,uint256,uint256)"(
+      _from?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber],
+      {
+        _from: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+      }
+    >;
+
+    Withdraw(
+      _from?: string | null,
+      _value?: null,
+      _fromBalanceIncrease?: null,
+      _fromIndex?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber],
+      {
+        _from: string;
+        _value: BigNumber;
+        _fromBalanceIncrease: BigNumber;
+        _fromIndex: BigNumber;
+      }
+    >;
   };
 
   estimateGas: {
-    DEBT_TOKEN_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+    UINT_MAX_VALUE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    POOL(overrides?: CallOverrides): Promise<BigNumber>;
-
-    UNDERLYING_ASSET_ADDRESS(overrides?: CallOverrides): Promise<BigNumber>;
+    allowInterestRedirectionTo(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     allowance(
       owner: string,
@@ -925,23 +977,16 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    approveDelegation(
-      delegatee: string,
-      amount: BigNumberish,
+    balanceOf(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    burnOnLiquidation(
+      _account: string,
+      _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    borrowAllowance(
-      fromUser: string,
-      toUser: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    burn(
-      user: string,
-      amount: BigNumberish,
+    burnOnWithdraw(
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -953,25 +998,17 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getAverageStableRate(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getIncentivesController(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getSupplyData(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getTotalSupplyAndAvgRate(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getTotalSupplyLastUpdated(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getUserLastUpdated(
-      user: string,
+    getInterestRedirectionAddress(
+      _user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getUserStableRate(
-      user: string,
+    getRedirectedBalance(
+      _user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getUserIndex(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     increaseAllowance(
       spender: string,
@@ -979,30 +1016,34 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    initialize(
-      pool: string,
-      underlyingAsset: string,
-      incentivesController: string,
-      debtTokenDecimals: BigNumberish,
-      debtTokenName: string,
-      debtTokenSymbol: string,
-      params: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    isTransferAllowed(
+      _user: string,
+      _amount: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    mint(
-      user: string,
-      onBehalfOf: string,
-      amount: BigNumberish,
-      rate: BigNumberish,
+    mintOnDeposit(
+      _account: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     principalBalanceOf(
-      user: string,
+      _user: string,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    redirectInterestStream(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    redirectInterestStreamOf(
+      _from: string,
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1021,17 +1062,23 @@ export class WvToken extends BaseContract {
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    transferOnLiquidation(
+      _from: string,
+      _to: string,
+      _value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    underlyingAssetAddress(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    DEBT_TOKEN_REVISION(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    UINT_MAX_VALUE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    POOL(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    UNDERLYING_ASSET_ADDRESS(
-      overrides?: CallOverrides
+    allowInterestRedirectionTo(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     allowance(
@@ -1046,26 +1093,19 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    approveDelegation(
-      delegatee: string,
-      amount: BigNumberish,
+    balanceOf(
+      _user: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    burnOnLiquidation(
+      _account: string,
+      _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    balanceOf(
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    borrowAllowance(
-      fromUser: string,
-      toUser: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    burn(
-      user: string,
-      amount: BigNumberish,
+    burnOnWithdraw(
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1077,31 +1117,18 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getAverageStableRate(
+    getInterestRedirectionAddress(
+      _user: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getIncentivesController(
+    getRedirectedBalance(
+      _user: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getSupplyData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getTotalSupplyAndAvgRate(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getTotalSupplyLastUpdated(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getUserLastUpdated(
-      user: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getUserStableRate(
-      user: string,
+    getUserIndex(
+      _user: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1111,30 +1138,34 @@ export class WvToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    initialize(
-      pool: string,
-      underlyingAsset: string,
-      incentivesController: string,
-      debtTokenDecimals: BigNumberish,
-      debtTokenName: string,
-      debtTokenSymbol: string,
-      params: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    isTransferAllowed(
+      _user: string,
+      _amount: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    mint(
-      user: string,
-      onBehalfOf: string,
-      amount: BigNumberish,
-      rate: BigNumberish,
+    mintOnDeposit(
+      _account: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     principalBalanceOf(
-      user: string,
+      _user: string,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    redirectInterestStream(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    redirectInterestStreamOf(
+      _from: string,
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1152,6 +1183,17 @@ export class WvToken extends BaseContract {
       recipient: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    transferOnLiquidation(
+      _from: string,
+      _to: string,
+      _value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    underlyingAssetAddress(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }
