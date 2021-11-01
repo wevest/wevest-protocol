@@ -24,7 +24,7 @@ describe("Lending Pool Data Provider", () => {
         console.log("Addresses provider deployed to:", poolAddressesContract.address);
         
         /* const poolDataProviderFactory = await ethers.getContractFactory("LendingPoolDataProvider");
-        poolDataProviderContract = await upgrades.deployProxy(poolDataProviderFactory, [poolAddressesContract.address], { unsafeAllowCustomTypes: true });
+        poolDataProviderContract = await upgrades.deployProxy(poolDataProviderFactory, [poolAddressesContract.address]);
         await poolDataProviderContract.deployed();
         console.log("Data provider deployed to:", poolDataProviderContract.address); */
     });

@@ -24,28 +24,32 @@ describe("Lending Pool", () => {
     let mockDaiContract: any;
     let wvDaiContract: any;
 
-    beforeEach(async () => {
+    before(async () => {
         // get signers array
         signers = await ethers.getSigners();
         // set first signer as deployer
         deployer = signers[0];
-        const lendingPoolAddressesFactory = new LendingPoolAddressesProvider__factory(deployer);
-        const lendingPoolAddressesContract = await lendingPoolAddressesFactory.deploy();
+        const poolAddressesFactory = await ethers.getContractFactory("LendingPoolAddressesProvider");
+        const poolAddressesContract = await poolAddressesFactory.deploy();
+        await poolAddressesContract.deployed();
 
         const lendingPoolFactory = await ethers.getContractFactory("LendingPool");
         lendingPoolContract = await lendingPoolFactory.deploy();
 
-        const mockDaiFactory = new MockDAI__factory(deployer);
+        const mockDaiFactory = await ethers.getContractFactory("MockDAI");
         mockDaiContract = await mockDaiFactory.deploy();
+        await mockDaiContract.deployed();
 
-        const wvTokenFactory = new WvToken__factory(deployer);
+        const wvTokenFactory = await ethers.getContractFactory("WvToken");
         wvDaiContract = await wvTokenFactory.deploy(
-            lendingPoolAddressesContract.address, 
+            poolAddressesContract.address, 
             mockDaiContract.address, 
             18, 
             "wvDai", 
             "wvDai"
         );
+        await wvDaiContract.deployed();
+        console.log("WvToken deployed to:", wvDaiContract.address);
     });
 
     describe("Deposit", async () => {
