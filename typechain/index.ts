@@ -67,6 +67,7 @@ export type { MockWBTC } from "./MockWBTC";
 export type { MockZRX } from "./MockZRX";
 export type { MockLendingPoolCore } from "./MockLendingPoolCore";
 export type { TestToken } from "./TestToken";
+export type { DebtToken } from "./DebtToken";
 export type { IncentivizedERC20 } from "./IncentivizedERC20";
 export type { WvToken } from "./WvToken";
 
@@ -136,5 +137,6 @@ export { MockWBTC__factory } from "./factories/MockWBTC__factory";
 export { MockZRX__factory } from "./factories/MockZRX__factory";
 export { MockLendingPoolCore__factory } from "./factories/MockLendingPoolCore__factory";
 export { TestToken__factory } from "./factories/TestToken__factory";
+export { DebtToken__factory } from "./factories/DebtToken__factory";
 export { IncentivizedERC20__factory } from "./factories/IncentivizedERC20__factory";
 export { WvToken__factory } from "./factories/WvToken__factory";
