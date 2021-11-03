@@ -16,6 +16,10 @@ export type { ILendingPoolAddressesProvider } from "./ILendingPoolAddressesProvi
 export type { IPriceOracle } from "./IPriceOracle";
 export type { IPriceOracleGetter } from "./IPriceOracleGetter";
 export type { IReserveInterestRateStrategy } from "./IReserveInterestRateStrategy";
+export type { IController } from "./IController";
+export type { IStrategy } from "./IStrategy";
+export type { YERC20 } from "./YERC20";
+export type { IVault } from "./IVault";
 export type { DefaultReserveInterestRateStrategy } from "./DefaultReserveInterestRateStrategy";
 export type { LendingPool } from "./LendingPool";
 export type { LendingPoolConfigurator } from "./LendingPoolConfigurator";
@@ -86,6 +90,10 @@ export { ILendingPoolAddressesProvider__factory } from "./factories/ILendingPool
 export { IPriceOracle__factory } from "./factories/IPriceOracle__factory";
 export { IPriceOracleGetter__factory } from "./factories/IPriceOracleGetter__factory";
 export { IReserveInterestRateStrategy__factory } from "./factories/IReserveInterestRateStrategy__factory";
+export { IController__factory } from "./factories/IController__factory";
+export { IStrategy__factory } from "./factories/IStrategy__factory";
+export { YERC20__factory } from "./factories/YERC20__factory";
+export { IVault__factory } from "./factories/IVault__factory";
 export { DefaultReserveInterestRateStrategy__factory } from "./factories/DefaultReserveInterestRateStrategy__factory";
 export { LendingPool__factory } from "./factories/LendingPool__factory";
 export { LendingPoolConfigurator__factory } from "./factories/LendingPoolConfigurator__factory";

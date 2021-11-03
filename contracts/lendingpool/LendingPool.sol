@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../libraries/openzeppelin-upgradeability/VersionedInitializable.sol";
 import "../configuration/LendingPoolAddressesProvider.sol";
 import "../tokenization/WvToken.sol";
+import "../tokenization/DebtToken.sol";
 import "../libraries/CoreLibrary.sol";
 import "../libraries/WadRayMath.sol";
 import "../interfaces/IFeeProvider.sol";
@@ -411,8 +412,11 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         );
         // to do, should get leverage ratio as Enum
         vars.ratio = CoreLibrary.LeverageRatioMode(_leverageRatio);
-        //if we reached this point, we can transfer
-        core.transferToUser(_reserve, msg.sender, _amount);
+        //if we reached this point, mint debt tokens
+        DebtToken debtToken = DebtToken(core.getReserveDebtTokenAddress(_reserve));
+        
+        debtToken.mint(msg.sender, _amount.mul(_leverageRatio));
+        // core.transferToUser(_reserve, msg.sender, _amount.mul(_leverageRatio));
 
         emit Borrow(
             _reserve,

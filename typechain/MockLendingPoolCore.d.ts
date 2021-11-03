@@ -34,6 +34,7 @@ interface MockLendingPoolCoreInterface extends ethers.utils.Interface {
     "getReserveAvailableLiquidity(address)": FunctionFragment;
     "getReserveConfiguration(address)": FunctionFragment;
     "getReserveCurrentLiquidityRate(address)": FunctionFragment;
+    "getReserveDebtTokenAddress(address)": FunctionFragment;
     "getReserveDecimals(address)": FunctionFragment;
     "getReserveInterestRateStrategyAddress(address)": FunctionFragment;
     "getReserveIsActive(address)": FunctionFragment;
@@ -126,6 +127,10 @@ interface MockLendingPoolCoreInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getReserveCurrentLiquidityRate",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getReserveDebtTokenAddress",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -357,6 +362,10 @@ interface MockLendingPoolCoreInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getReserveCurrentLiquidityRate",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getReserveDebtTokenAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -654,6 +663,11 @@ export class MockLendingPoolCore extends BaseContract {
       _reserve: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    getReserveDebtTokenAddress(
+      _reserve: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     getReserveDecimals(
       _reserve: string,
@@ -969,6 +983,11 @@ export class MockLendingPoolCore extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  getReserveDebtTokenAddress(
+    _reserve: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   getReserveDecimals(
     _reserve: string,
     overrides?: CallOverrides
@@ -1273,6 +1292,11 @@ export class MockLendingPoolCore extends BaseContract {
       _reserve: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getReserveDebtTokenAddress(
+      _reserve: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     getReserveDecimals(
       _reserve: string,
@@ -1612,6 +1636,11 @@ export class MockLendingPoolCore extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getReserveDebtTokenAddress(
+      _reserve: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getReserveDecimals(
       _reserve: string,
       overrides?: CallOverrides
@@ -1923,6 +1952,11 @@ export class MockLendingPoolCore extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getReserveCurrentLiquidityRate(
+      _reserve: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getReserveDebtTokenAddress(
       _reserve: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

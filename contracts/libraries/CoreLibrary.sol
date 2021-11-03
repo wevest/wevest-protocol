@@ -48,7 +48,9 @@ library CoreLibrary {
         uint256 decimals;
         //address of the wvToken representing the asset
         address wvTokenAddress;
-        // address of the interest rate strategy contract
+        //address of the debtToken
+        address debtTokenAddress;
+        //address of the interest rate strategy contract
         address interestRateStrategyAddress;
 
         uint40 lastUpdateTimestamp;

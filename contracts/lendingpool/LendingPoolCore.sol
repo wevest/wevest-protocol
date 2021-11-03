@@ -445,11 +445,27 @@ contract LendingPoolCore is VersionedInitializable {
     * @return the address of the wvToken contract
     **/
 
-    function getReserveWvTokenAddress(address _reserve) public view returns (address) {
+    function getReserveWvTokenAddress(address _reserve) 
+        public 
+        view 
+        returns (address) 
+    {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         return reserve.wvTokenAddress;
     }
 
+    /**
+    * @dev gets the debtToken contract address for the reserve
+    **/
+    function getReserveDebtTokenAddress(address _reserve)
+        public
+        view
+        returns (address) 
+    {
+        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
+        return reserve.debtTokenAddress;
+    }
+    
     /**
     * @dev gets the available liquidity in the reserve. The available liquidity is the balance of the core contract
     * @param _reserve the reserve address

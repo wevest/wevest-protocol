@@ -73,6 +73,22 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IReserveInterestRateStrategy__factory>;
     getContractFactory(
+      name: "IController",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IController__factory>;
+    getContractFactory(
+      name: "IStrategy",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IStrategy__factory>;
+    getContractFactory(
+      name: "YERC20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.YERC20__factory>;
+    getContractFactory(
+      name: "IVault",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVault__factory>;
+    getContractFactory(
       name: "DefaultReserveInterestRateStrategy",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DefaultReserveInterestRateStrategy__factory>;
@@ -364,6 +380,26 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IReserveInterestRateStrategy>;
+    getContractAt(
+      name: "IController",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IController>;
+    getContractAt(
+      name: "IStrategy",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IStrategy>;
+    getContractAt(
+      name: "YERC20",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.YERC20>;
+    getContractAt(
+      name: "IVault",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVault>;
     getContractAt(
       name: "DefaultReserveInterestRateStrategy",
       address: string,
