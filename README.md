@@ -1,46 +1,32 @@
-# Advanced Sample Hardhat Project
+# Wevest Protocol v1
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+This repository contains the smart contracts source code and markets configuration for Wevest Protocol V1. The repository uses Hardhat as development enviroment for compilation, testing and deployment tasks.
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+## What is Wevest?
 
-Try running some of the following tasks:
+The wevest protocol is an innovative lending protocol that can return profits to both borrowers and lenders by utilizing 'the Use Right Delegated Interest Rate Structure'. The wevest protocol is a 100% DAO operated by smart contracts, and all processes such as loans, repayments, and risk management are processed without human intervention.
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+The wevest protocol has the functions to implement a loan with three characteristics: 1) interest free, 2) no maturity, and 3) leverage, and its structure is different from the general lending protocol. The biggest difference in terms of technology can be summarized in three ways: interest rate model, liquidity pool management, and risk management.
+
+## Documentation
+
+The documentation of Wevest V1 is in the following [Wevest V1 documentation](https://wevest-protocol-wevest.gitbook.io/wevest-protocol-1/) link. At the documentation you can learn more about the protocol.
+
+## Setup
+
+Follow the next steps to setup the repository:
+
+- Install `node.js & npm` and Run `npm install`
+- Create an enviroment file named `.env` and fill the next enviroment variables
+
 ```
+# Mnemonic, only first address will be used
+MNEMONIC=
 
-# Etherscan verification
+# Add Infura provider keys, alchemy takes preference at the config level
+INFURA_KEY=
 
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
+# Optional Etherscan key, for automatize the verification of the contracts at Etherscan
+ETHERSCAN_KEY=
 
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/sample-script.ts
 ```
-
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
-
-# Performance optimizations
-
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
