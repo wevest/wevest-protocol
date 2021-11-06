@@ -24,8 +24,9 @@ describe("Lending Pool", () => {
         await poolAddressesContract.deployed();
 
         console.log("LendingPoolAddressesProvider deployed to:", poolAddressesContract.address);
-        await poolAddressesContract.setPoolAdmin(deployer.getAddress());
-
+        await poolAddressesContract.setPoolAdmin(await deployer.getAddress());
+        await poolAddressesContract.setEmergencyAdmin(await signers[1].getAddress());
+        
         const poolAddressesRegistryFactory = await ethers.getContractFactory("LendingPoolAddressesProviderRegistry");
         const poolAddressesRegistryContract = await poolAddressesRegistryFactory.deploy();
         await poolAddressesRegistryContract.deployed();
@@ -68,7 +69,7 @@ describe("Lending Pool", () => {
 
         // get LendingPoolProxy contract
         const lendingPoolProxy = await LendingPool__factory.connect(lendingPoolAddress, deployer);
-        
+        console.log(await lendingPoolProxy.getAddressesProvider());
         const mintableERC20Factory = await ethers.getContractFactory("MintableERC20");
         const mockUsdcContract = await mintableERC20Factory.deploy("USD Coin", "USDC", 6);
         await mockUsdcContract.deployed();
@@ -76,13 +77,7 @@ describe("Lending Pool", () => {
 
         const wvTokenFactory = await ethers.getContractFactory("WvToken");
         const treasuryExample = "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB";
-        const wvTokenContract = await wvTokenFactory.deploy(
-            lendingPoolAddress, 
-            treasuryExample,
-            6,
-            "Wevest interest bearing USDC",
-            "wvUSDC"
-        );
+        const wvTokenContract = await wvTokenFactory.deploy();
         await wvTokenContract.deployed();
         console.log(wvTokenContract.address);
         await WvToken__factory.connect(wvTokenContract.address, deployer);

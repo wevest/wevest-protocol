@@ -661,22 +661,19 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
    * - Only callable by the LendingPoolConfigurator contract
    * @param asset The address of the underlying asset of the reserve
    * @param wvTokenAddress The address of the wvToken that will be assigned to the reserve
-   * @param stableDebtAddress The address of the StableDebtToken that will be assigned to the reserve
-   * @param wvTokenAddress The address of the VariableDebtToken that will be assigned to the reserve
+   * @param debtTokenAddress The address of the DebtToken that will be assigned to the reserve
    * @param interestRateStrategyAddress The address of the interest rate strategy contract
    **/
   function initReserve(
     address asset,
     address wvTokenAddress,
-    address stableDebtAddress,
-    address variableDebtAddress,
+    address debtTokenAddress,
     address interestRateStrategyAddress
   ) external override onlyLendingPoolConfigurator {
     require(Address.isContract(asset), Errors.LP_NOT_CONTRACT);
     _reserves[asset].init(
       wvTokenAddress,
-      stableDebtAddress,
-      variableDebtAddress,
+      debtTokenAddress,
       interestRateStrategyAddress
     );
     _addReserveToList(asset);

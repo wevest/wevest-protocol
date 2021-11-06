@@ -4,65 +4,53 @@ pragma experimental ABIEncoderV2;
 
 interface ILendingPoolConfigurator {
   struct InitReserveInput {
-    address aTokenImpl;
-    address stableDebtTokenImpl;
-    address variableDebtTokenImpl;
+    address wvTokenImpl;
+    address debtTokenImpl;
     uint8 underlyingAssetDecimals;
     address interestRateStrategyAddress;
     address underlyingAsset;
     address treasury;
-    address incentivesController;
     string underlyingAssetName;
-    string aTokenName;
-    string aTokenSymbol;
-    string variableDebtTokenName;
-    string variableDebtTokenSymbol;
-    string stableDebtTokenName;
-    string stableDebtTokenSymbol;
-    bytes params;
+    string wvTokenName;
+    string wvTokenSymbol;
+    string debtTokenName;
+    string debtTokenSymbol;
   }
 
-  struct UpdateATokenInput {
+  struct UpdateWvTokenInput {
     address asset;
     address treasury;
-    address incentivesController;
     string name;
     string symbol;
     address implementation;
-    bytes params;
   }
 
   struct UpdateDebtTokenInput {
     address asset;
-    address incentivesController;
     string name;
     string symbol;
     address implementation;
-    bytes params;
   }
 
   /**
    * @dev Emitted when a reserve is initialized.
    * @param asset The address of the underlying asset of the reserve
-   * @param aToken The address of the associated aToken contract
-   * @param stableDebtToken The address of the associated stable rate debt token
-   * @param variableDebtToken The address of the associated variable rate debt token
+   * @param wvToken The address of the associated wvToken contract
+   * @param debtToken The address of the associated stable rate debt token
    * @param interestRateStrategyAddress The address of the interest rate strategy for the reserve
    **/
   event ReserveInitialized(
     address indexed asset,
-    address indexed aToken,
-    address stableDebtToken,
-    address variableDebtToken,
+    address indexed wvToken,
+    address debtToken,
     address interestRateStrategyAddress
   );
 
   /**
    * @dev Emitted when borrowing is enabled on a reserve
    * @param asset The address of the underlying asset of the reserve
-   * @param stableRateEnabled True if stable rate borrowing is enabled, false otherwise
    **/
-  event BorrowingEnabledOnReserve(address indexed asset, bool stableRateEnabled);
+  event BorrowingEnabledOnReserve(address indexed asset);
 
   /**
    * @dev Emitted when borrowing is disabled on a reserve
@@ -83,18 +71,6 @@ interface ILendingPoolConfigurator {
     uint256 liquidationThreshold,
     uint256 liquidationBonus
   );
-
-  /**
-   * @dev Emitted when stable rate borrowing is enabled on a reserve
-   * @param asset The address of the underlying asset of the reserve
-   **/
-  event StableRateEnabledOnReserve(address indexed asset);
-
-  /**
-   * @dev Emitted when stable rate borrowing is disabled on a reserve
-   * @param asset The address of the underlying asset of the reserve
-   **/
-  event StableRateDisabledOnReserve(address indexed asset);
 
   /**
    * @dev Emitted when a reserve is activated
@@ -142,12 +118,12 @@ interface ILendingPoolConfigurator {
   event ReserveInterestRateStrategyChanged(address indexed asset, address strategy);
 
   /**
-   * @dev Emitted when an aToken implementation is upgraded
+   * @dev Emitted when an wvToken implementation is upgraded
    * @param asset The address of the underlying asset of the reserve
-   * @param proxy The aToken proxy address
-   * @param implementation The new aToken implementation
+   * @param proxy The wvToken proxy address
+   * @param implementation The new wvToken implementation
    **/
-  event ATokenUpgraded(
+  event WvTokenUpgraded(
     address indexed asset,
     address indexed proxy,
     address indexed implementation
@@ -157,21 +133,9 @@ interface ILendingPoolConfigurator {
    * @dev Emitted when the implementation of a stable debt token is upgraded
    * @param asset The address of the underlying asset of the reserve
    * @param proxy The stable debt token proxy address
-   * @param implementation The new aToken implementation
+   * @param implementation The new wvToken implementation
    **/
-  event StableDebtTokenUpgraded(
-    address indexed asset,
-    address indexed proxy,
-    address indexed implementation
-  );
-
-  /**
-   * @dev Emitted when the implementation of a variable debt token is upgraded
-   * @param asset The address of the underlying asset of the reserve
-   * @param proxy The variable debt token proxy address
-   * @param implementation The new aToken implementation
-   **/
-  event VariableDebtTokenUpgraded(
+  event DebtTokenUpgraded(
     address indexed asset,
     address indexed proxy,
     address indexed implementation

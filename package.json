@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile": "npx hardhat compile",
-    "test": "TS_NODE_TRANSPILE_ONLY=1 npx hardhat test"
+    "test": "npx hardhat test"
   },
   "keywords": [],
   "author": "",
