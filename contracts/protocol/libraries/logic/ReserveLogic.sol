@@ -164,8 +164,7 @@ library ReserveLogic {
   function init(
     DataTypes.ReserveData storage reserve,
     address wvTokenAddress,
-    address stableDebtTokenAddress,
-    address variableDebtTokenAddress,
+    address debtTokenAddress,
     address interestRateStrategyAddress
   ) external {
     require(reserve.wvTokenAddress == address(0), Errors.RL_RESERVE_ALREADY_INITIALIZED);
@@ -173,8 +172,7 @@ library ReserveLogic {
     reserve.liquidityIndex = uint128(WadRayMath.ray());
     reserve.variableBorrowIndex = uint128(WadRayMath.ray());
     reserve.wvTokenAddress = wvTokenAddress;
-    reserve.stableDebtTokenAddress = stableDebtTokenAddress;
-    reserve.variableDebtTokenAddress = variableDebtTokenAddress;
+    reserve.debtTokenAddress = debtTokenAddress;
     reserve.interestRateStrategyAddress = interestRateStrategyAddress;
   }
 

@@ -284,8 +284,7 @@ interface ILendingPool {
   function initReserve(
     address reserve,
     address wvTokenAddress,
-    address stableDebtAddress,
-    address variableDebtAddress,
+    address debtTokenAddress,
     address interestRateStrategyAddress
   ) external;
 

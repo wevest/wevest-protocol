@@ -26,7 +26,7 @@ describe("Lending Pool", () => {
         console.log("LendingPoolAddressesProvider deployed to:", poolAddressesContract.address);
         await poolAddressesContract.setPoolAdmin(await deployer.getAddress());
         await poolAddressesContract.setEmergencyAdmin(await signers[1].getAddress());
-        
+
         const poolAddressesRegistryFactory = await ethers.getContractFactory("LendingPoolAddressesProviderRegistry");
         const poolAddressesRegistryContract = await poolAddressesRegistryFactory.deploy();
         await poolAddressesRegistryContract.deployed();
@@ -70,6 +70,19 @@ describe("Lending Pool", () => {
         // get LendingPoolProxy contract
         const lendingPoolProxy = await LendingPool__factory.connect(lendingPoolAddress, deployer);
         console.log(await lendingPoolProxy.getAddressesProvider());
+
+        const poolConfiguratorFactory = await ethers.getContractFactory("LendingPoolConfigurator");
+        const poolConfiguratorContract  = await poolConfiguratorFactory.deploy();
+        await poolConfiguratorContract.deployed();
+
+        // update as proxy contract
+        await poolAddressesContract.setLendingPoolConfiguratorImpl(lendingPoolContract.address);
+        const lendingPoolConfigurator = await poolAddressesContract.getLendingPoolConfigurator();
+
+        // get LendingPoolConfiguratorProxy contract
+        const lendingPoolConfiguratorProxy = await LendingPool__factory.connect(lendingPoolConfigurator, deployer);
+        console.log("LendingPoolConfigurator deployed to:", lendingPoolConfiguratorProxy.address);
+
         const mintableERC20Factory = await ethers.getContractFactory("MintableERC20");
         const mockUsdcContract = await mintableERC20Factory.deploy("USD Coin", "USDC", 6);
         await mockUsdcContract.deployed();
