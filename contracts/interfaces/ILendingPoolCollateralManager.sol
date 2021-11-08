@@ -14,7 +14,7 @@ interface ILendingPoolCollateralManager {
    * @param debtToCover The total amount liquidated
    * @param liquidatedCollateralAmount The amount of collateral being liquidated
    * @param liquidator The address of the liquidator
-   * @param receiveAToken true if the liquidator wants to receive aTokens, false otherwise
+   * @param receiveWvToken true if the liquidator wants to receive wvTokens, false otherwise
    **/
   event LiquidationCall(
     address indexed collateral,
@@ -23,7 +23,7 @@ interface ILendingPoolCollateralManager {
     uint256 debtToCover,
     uint256 liquidatedCollateralAmount,
     address liquidator,
-    bool receiveAToken
+    bool receiveWvToken
   );
 
   /**
@@ -46,7 +46,7 @@ interface ILendingPoolCollateralManager {
    * @param principal The address of the principal reserve
    * @param user The address of the borrower
    * @param debtToCover The amount of principal that the liquidator wants to repay
-   * @param receiveAToken true if the liquidators wants to receive the aTokens, false if
+   * @param receiveWvToken true if the liquidators wants to receive the wvTokens, false if
    * he wants to receive the underlying asset directly
    **/
   function liquidationCall(
@@ -54,6 +54,6 @@ interface ILendingPoolCollateralManager {
     address principal,
     address user,
     uint256 debtToCover,
-    bool receiveAToken
+    bool receiveWvToken
   ) external returns (uint256, string memory);
 }

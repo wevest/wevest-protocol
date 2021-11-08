@@ -4,8 +4,7 @@ pragma solidity 0.6.12;
 import {SafeMath} from '../../dependencies/openzeppelin/contracts//SafeMath.sol';
 import {IERC20} from '../../dependencies/openzeppelin/contracts//IERC20.sol';
 import {IWvToken} from '../../interfaces/IWvToken.sol';
-import {IStableDebtToken} from '../../interfaces/IStableDebtToken.sol';
-import {IVariableDebtToken} from '../../interfaces/IVariableDebtToken.sol';
+import {IDebtToken} from '../../interfaces/IDebtToken.sol';
 import {IPriceOracleGetter} from '../../interfaces/IPriceOracleGetter.sol';
 import {ILendingPoolCollateralManager} from '../../interfaces/ILendingPoolCollateralManager.sol';
 import {VersionedInitializable} from '../libraries/wevest-upgradeability/VersionedInitializable.sol';
@@ -40,21 +39,17 @@ contract LendingPoolCollateralManager is
 
   struct LiquidationCallLocalVars {
     uint256 userCollateralBalance;
-    uint256 userStableDebt;
-    uint256 userVariableDebt;
     uint256 userDebt;
     uint256 maxLiquidatableDebt;
     uint256 actualDebtToLiquidate;
     uint256 liquidationRatio;
     uint256 maxAmountCollateralToLiquidate;
-    uint256 userStableRate;
     uint256 maxCollateralToLiquidate;
     uint256 debtAmountNeeded;
     uint256 healthFactor;
-    uint256 liquidatorPreviousATokenBalance;
-    IWvToken collateralAtoken;
+    uint256 liquidatorPreviousWvTokenBalance;
+    IWvToken collateralWVtoken;
     bool isCollateralEnabled;
-    DataTypes.InterestRateMode borrowRateMode;
     uint256 errorCode;
     string errorMsg;
   }
@@ -76,7 +71,7 @@ contract LendingPoolCollateralManager is
    * @param debtAsset The address of the underlying borrowed asset to be repaid with the liquidation
    * @param user The address of the borrower getting liquidated
    * @param debtToCover The debt amount of borrowed `asset` the liquidator wants to cover
-   * @param receiveAToken `true` if the liquidators wants to receive the collateral aTokens, `false` if he wants
+   * @param receiveWvToken `true` if the liquidators wants to receive the collateral wvTokens, `false` if he wants
    * to receive the underlying collateral asset directly
    **/
   function liquidationCall(
@@ -84,7 +79,7 @@ contract LendingPoolCollateralManager is
     address debtAsset,
     address user,
     uint256 debtToCover,
-    bool receiveAToken
+    bool receiveWvToken
   ) external override returns (uint256, string memory) {
     DataTypes.ReserveData storage collateralReserve = _reserves[collateralAsset];
     DataTypes.ReserveData storage debtReserve = _reserves[debtAsset];
@@ -108,19 +103,18 @@ contract LendingPoolCollateralManager is
       debtReserve,
       userConfig,
       vars.healthFactor,
-      vars.userStableDebt,
-      vars.userVariableDebt
+      vars.userDebt
     );
 
     if (Errors.CollateralManagerErrors(vars.errorCode) != Errors.CollateralManagerErrors.NO_ERROR) {
       return (vars.errorCode, vars.errorMsg);
     }
 
-    vars.collateralAtoken = IWvToken(collateralReserve.wvTokenAddress);
+    vars.collateralWVtoken = IWvToken(collateralReserve.wvTokenAddress);
 
-    vars.userCollateralBalance = vars.collateralAtoken.balanceOf(user);
+    vars.userCollateralBalance = vars.collateralWVtoken.balanceOf(user);
 
-    vars.maxLiquidatableDebt = vars.userStableDebt.add(vars.userVariableDebt).percentMul(
+    vars.maxLiquidatableDebt = vars.userDebt.percentMul(
       LIQUIDATION_CLOSE_FACTOR_PERCENT
     );
 
@@ -150,9 +144,9 @@ contract LendingPoolCollateralManager is
 
     // If the liquidator reclaims the underlying asset, we make sure there is enough available liquidity in the
     // collateral reserve
-    if (!receiveAToken) {
+    if (!receiveWvToken) {
       uint256 currentAvailableCollateral =
-        IERC20(collateralAsset).balanceOf(address(vars.collateralAtoken));
+        IERC20(collateralAsset).balanceOf(address(vars.collateralWVtoken));
       if (currentAvailableCollateral < vars.maxCollateralToLiquidate) {
         return (
           uint256(Errors.CollateralManagerErrors.NOT_ENOUGH_LIQUIDITY),
@@ -163,24 +157,13 @@ contract LendingPoolCollateralManager is
 
     debtReserve.updateState();
 
-    if (vars.userVariableDebt >= vars.actualDebtToLiquidate) {
-      IVariableDebtToken(debtReserve.variableDebtTokenAddress).burn(
-        user,
-        vars.actualDebtToLiquidate,
-        debtReserve.variableBorrowIndex
+    if (vars.userDebt >= vars.actualDebtToLiquidate) {
+      IDebtToken(debtReserve.debtTokenAddress).burn(
+        user, vars.actualDebtToLiquidate
       );
     } else {
-      // If the user doesn't have variable debt, no need to try to burn variable debt tokens
-      if (vars.userVariableDebt > 0) {
-        IVariableDebtToken(debtReserve.variableDebtTokenAddress).burn(
-          user,
-          vars.userVariableDebt,
-          debtReserve.variableBorrowIndex
-        );
-      }
-      IStableDebtToken(debtReserve.stableDebtTokenAddress).burn(
-        user,
-        vars.actualDebtToLiquidate.sub(vars.userVariableDebt)
+      IDebtToken(debtReserve.debtTokenAddress).burn(
+        user, vars.userDebt
       );
     }
 
@@ -191,11 +174,11 @@ contract LendingPoolCollateralManager is
       0
     );
 
-    if (receiveAToken) {
-      vars.liquidatorPreviousATokenBalance = IERC20(vars.collateralAtoken).balanceOf(msg.sender);
-      vars.collateralAtoken.transferOnLiquidation(user, msg.sender, vars.maxCollateralToLiquidate);
+    if (receiveWvToken) {
+      vars.liquidatorPreviousWvTokenBalance = IERC20(vars.collateralWVtoken).balanceOf(msg.sender);
+      vars.collateralWVtoken.transferOnLiquidation(user, msg.sender, vars.maxCollateralToLiquidate);
 
-      if (vars.liquidatorPreviousATokenBalance == 0) {
+      if (vars.liquidatorPreviousWvTokenBalance == 0) {
         DataTypes.UserConfigurationMap storage liquidatorConfig = _usersConfig[msg.sender];
         liquidatorConfig.setUsingAsCollateral(collateralReserve.id, true);
         emit ReserveUsedAsCollateralEnabled(collateralAsset, msg.sender);
@@ -204,13 +187,13 @@ contract LendingPoolCollateralManager is
       collateralReserve.updateState();
       collateralReserve.updateInterestRates(
         collateralAsset,
-        address(vars.collateralAtoken),
+        address(vars.collateralWVtoken),
         0,
         vars.maxCollateralToLiquidate
       );
 
-      // Burn the equivalent amount of aToken, sending the underlying to the liquidator
-      vars.collateralAtoken.burn(
+      // Burn the equivalent amount of wvToken, sending the underlying to the liquidator
+      vars.collateralWVtoken.burn(
         user,
         msg.sender,
         vars.maxCollateralToLiquidate,
@@ -239,14 +222,13 @@ contract LendingPoolCollateralManager is
       vars.actualDebtToLiquidate,
       vars.maxCollateralToLiquidate,
       msg.sender,
-      receiveAToken
+      receiveWvToken
     );
 
     return (uint256(Errors.CollateralManagerErrors.NO_ERROR), Errors.LPCM_NO_ERRORS);
   }
 
   struct AvailableCollateralToLiquidateLocalVars {
-    uint256 userCompoundedBorrowBalance;
     uint256 liquidationBonus;
     uint256 collateralPrice;
     uint256 debtAssetPrice;

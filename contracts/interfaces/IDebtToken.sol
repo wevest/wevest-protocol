@@ -11,7 +11,7 @@ import {IInitializableDebtToken} from './IInitializableDebtToken.sol';
 
 interface IDebtToken is IInitializableDebtToken {
   /**
-   * @dev Emitted when new stable debt is minted
+   * @dev Emitted when new debt is minted
    * @param user The address of the user who triggered the minting, The recipient of debt tokens
    * @param amount The amount minted
    * @param currentBalance The current balance of the user
@@ -25,7 +25,7 @@ interface IDebtToken is IInitializableDebtToken {
   );
 
   /**
-   * @dev Emitted when new stable debt is burned
+   * @dev Emitted when new debt is burned
    * @param user The address of the user
    * @param amount The amount being burned
    * @param currentBalance The current balance of the user
@@ -39,7 +39,7 @@ interface IDebtToken is IInitializableDebtToken {
   );
 
   /**
-   * @dev Mints debt token to the `onBehalfOf` address.
+   * @dev Mints debt token to the user address.
    * - The resulting rate is the weighted average between the rate of the new debt
    * and the rate of the previous debt
    * @param user The address receiving the debt tokens

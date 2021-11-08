@@ -4,6 +4,7 @@ import { solidity } from "ethereum-waffle";
 import { Signer } from "ethers";
 import {
     LendingPool__factory,
+    LendingPoolConfigurator__factory,
     WvToken__factory
 } from '../types';
 
@@ -65,11 +66,9 @@ describe("Lending Pool", () => {
         // update as proxy contract
         await poolAddressesContract.setLendingPoolImpl(lendingPoolContract.address);
         const lendingPoolAddress = await poolAddressesContract.getLendingPool();
-        console.log(lendingPoolAddress);
 
         // get LendingPoolProxy contract
         const lendingPoolProxy = await LendingPool__factory.connect(lendingPoolAddress, deployer);
-        console.log(await lendingPoolProxy.getAddressesProvider());
 
         const poolConfiguratorFactory = await ethers.getContractFactory("LendingPoolConfigurator");
         const poolConfiguratorContract  = await poolConfiguratorFactory.deploy();
@@ -78,9 +77,9 @@ describe("Lending Pool", () => {
         // update as proxy contract
         await poolAddressesContract.setLendingPoolConfiguratorImpl(lendingPoolContract.address);
         const lendingPoolConfigurator = await poolAddressesContract.getLendingPoolConfigurator();
-
+        console.log(lendingPoolConfigurator);
         // get LendingPoolConfiguratorProxy contract
-        const lendingPoolConfiguratorProxy = await LendingPool__factory.connect(lendingPoolConfigurator, deployer);
+        const lendingPoolConfiguratorProxy = await LendingPoolConfigurator__factory.connect(lendingPoolConfigurator, deployer);
         console.log("LendingPoolConfigurator deployed to:", lendingPoolConfiguratorProxy.address);
 
         const mintableERC20Factory = await ethers.getContractFactory("MintableERC20");
@@ -93,7 +92,17 @@ describe("Lending Pool", () => {
         const wvTokenContract = await wvTokenFactory.deploy();
         await wvTokenContract.deployed();
         console.log(wvTokenContract.address);
-        await WvToken__factory.connect(wvTokenContract.address, deployer);
+        const wvTokenContractProxy = await WvToken__factory.connect(wvTokenContract.address, deployer);
+        wvTokenContractProxy.initialize(
+            lendingPoolProxy.address,
+            treasuryExample,
+            mockUsdcContract.address,
+            6,
+            'Wevest interest bearing USDC',
+            'wvUSDC'
+        );
+        console.log(wvTokenContractProxy.address);
+        console.log(await (wvTokenContractProxy.name()));
     });
 
     it("UserA deposit 100 USDC to lending pool", async () => {
