@@ -33,7 +33,7 @@ contract UiPoolDataProvider is IUiPoolDataProvider {
     oracle = _oracle;
   }
 
-  function getInterestRateStrategySlopes(DefaultReserveInterestRateStrategy interestRateStrategy)
+  /* function getInterestRateStrategySlopes(DefaultReserveInterestRateStrategy interestRateStrategy)
     internal
     view
     returns (
@@ -49,7 +49,7 @@ contract UiPoolDataProvider is IUiPoolDataProvider {
       interestRateStrategy.stableRateSlope1(),
       interestRateStrategy.stableRateSlope2()
     );
-  }
+  } */
 
   function getReservesList(ILendingPoolAddressesProvider provider)
     public
@@ -125,14 +125,14 @@ contract UiPoolDataProvider is IUiPoolDataProvider {
         reserveData.borrowingEnabled
       ) = baseData.configuration.getFlagsMemory();
       reserveData.usageAsCollateralEnabled = reserveData.baseLTVasCollateral != 0;
-      (
+      /* (
         reserveData.variableRateSlope1,
         reserveData.variableRateSlope2,
         reserveData.stableRateSlope1,
         reserveData.stableRateSlope2
       ) = getInterestRateStrategySlopes(
         DefaultReserveInterestRateStrategy(reserveData.interestRateStrategyAddress)
-      );
+      ); */
 
       // incentives
       if (address(0) != address(incentivesController)) {
@@ -298,14 +298,14 @@ contract UiPoolDataProvider is IUiPoolDataProvider {
         reserveData.borrowingEnabled
       ) = baseData.configuration.getFlagsMemory();
       reserveData.usageAsCollateralEnabled = reserveData.baseLTVasCollateral != 0;
-      (
+      /* (
         reserveData.variableRateSlope1,
         reserveData.variableRateSlope2,
         reserveData.stableRateSlope1,
         reserveData.stableRateSlope2
       ) = getInterestRateStrategySlopes(
         DefaultReserveInterestRateStrategy(reserveData.interestRateStrategyAddress)
-      );
+      ); */
 
       // incentives
       if (address(0) != address(incentivesController)) {

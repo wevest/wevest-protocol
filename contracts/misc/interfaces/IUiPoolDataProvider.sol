@@ -38,10 +38,12 @@ interface IUiPoolDataProvider {
     uint256 stableDebtLastUpdateTimestamp;
     uint256 totalScaledVariableDebt;
     uint256 priceInEth;
+    /* 
     uint256 variableRateSlope1;
     uint256 variableRateSlope2;
     uint256 stableRateSlope1;
-    uint256 stableRateSlope2;
+    uint256 stableRateSlope2; 
+    */
     // incentives
     uint256 aEmissionPerSecond;
     uint256 vEmissionPerSecond;
