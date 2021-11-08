@@ -87,7 +87,7 @@ describe("Lending Pool", () => {
         await mockUsdcContract.deployed();
         console.log("USDC deployed to:", mockUsdcContract.address);
 
-        const wvTokenFactory = await ethers.getContractFactory("WvToken");
+        /* const wvTokenFactory = await ethers.getContractFactory("WvToken");
         const treasuryExample = "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB";
         const wvTokenContract = await wvTokenFactory.deploy();
         await wvTokenContract.deployed();
@@ -102,7 +102,14 @@ describe("Lending Pool", () => {
             'wvUSDC'
         );
         console.log(wvTokenContractProxy.address);
-        console.log(await (wvTokenContractProxy.name()));
+        console.log(await (wvTokenContractProxy.name())); */
+
+        // deploy ProtocolDataProvider
+        const protocolDataProviderFactory = await ethers.getContractFactory("WevestProtocolDataProvider");
+        const protocolDataProviderContract  = await protocolDataProviderFactory.deploy(poolAddressesContract.address);
+        await protocolDataProviderContract.deployed();
+        console.log("ProcotolDataProvider deployed to:", protocolDataProviderContract.address);
+        console.log(await protocolDataProviderContract.getAllReservesTokens());
     });
 
     it("UserA deposit 100 USDC to lending pool", async () => {
