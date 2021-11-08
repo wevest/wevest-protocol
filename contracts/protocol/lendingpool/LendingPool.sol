@@ -556,18 +556,18 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
   }
 
   /**
-   * @dev Returns the normalized variable debt per unit of asset
-   * @param asset The address of the underlying asset of the reserve
-   * @return The reserve normalized variable debt
+   * dev Returns the normalized variable debt per unit of asset
+   * param asset The address of the underlying asset of the reserve
+   * return The reserve normalized variable debt
    */
-  function getReserveNormalizedVariableDebt(address asset)
+  /* function getReserveNormalizedVariableDebt(address asset)
     external
     view
     override
     returns (uint256)
   {
     return _reserves[asset].getNormalizedDebt();
-  }
+  } */
 
   /**
    * @dev Returns if the LendingPool is paused

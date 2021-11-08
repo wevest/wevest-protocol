@@ -321,11 +321,11 @@ interface ILendingPool {
   function getReserveNormalizedIncome(address asset) external view returns (uint256);
 
   /**
-   * @dev Returns the normalized variable debt per unit of asset
-   * @param asset The address of the underlying asset of the reserve
-   * @return The reserve normalized variable debt
+   * dev Returns the normalized variable debt per unit of asset
+   * param asset The address of the underlying asset of the reserve
+   * return The reserve normalized variable debt
    */
-  function getReserveNormalizedVariableDebt(address asset) external view returns (uint256);
+  // function getReserveNormalizedVariableDebt(address asset) external view returns (uint256);
 
   /**
    * @dev Returns the state and configuration of the reserve
