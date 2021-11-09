@@ -14,7 +14,7 @@ describe("Lending Pool", () => {
     let signers: Signer[];
     let deployer: Signer;
 
-    let lendingPoolAddressesProvider, lendingPool, wvToken, usdc, debtToken, interestRateStrategy;
+    let lendingPoolAddressesProvider, lendingPoolProxy, lendingPoolConfiguratorProxy, wvToken, usdc, debtToken, interestRateStrategy;
     before(async () => {
         // get signers array
         signers = await ethers.getSigners();
@@ -54,29 +54,28 @@ describe("Lending Pool", () => {
                 ValidationLogic: validationLogicLibContract.address
             },
         });
-        lendingPool = await LendingPool.deploy();
+        const lendingPool = await LendingPool.deploy();
         await lendingPool.deployed();
 
         // update implementation as proxy contract
         await lendingPoolAddressesProvider.setLendingPoolImpl(lendingPool.address);
         const lendingPoolAddress = await lendingPoolAddressesProvider.getLendingPool();
 
-        console.log("LendingPool deployed to:", lendingPoolAddress);
         // get LendingPoolProxy contract
-        lendingPool = await LendingPool__factory.connect(lendingPoolAddress, deployer);
-
-        /* const poolConfiguratorFactory = await ethers.getContractFactory("LendingPoolConfigurator");
-        const poolConfiguratorContract  = await poolConfiguratorFactory.deploy();
-        await poolConfiguratorContract.deployed();
+        lendingPoolProxy = await LendingPool__factory.connect(lendingPoolAddress, deployer);
+        console.log("LendingPool deployed to:", lendingPoolProxy.address);
+        console.log(await lendingPoolProxy.getAddressesProvider());
+        
+        const LendingPoolConfigurator = await ethers.getContractFactory("LendingPoolConfigurator");
+        const lendingPoolConfigurator  = await LendingPoolConfigurator.deploy();
+        await lendingPoolConfigurator.deployed();
 
         // update as proxy contract
-        await lendingPoolAddressesProvider.setLendingPoolConfiguratorImpl(lendingPool.address);
-        const lendingPoolConfigurator = await lendingPoolAddressesProvider.getLendingPoolConfigurator();
-        console.log(lendingPoolConfigurator);
+        await lendingPoolAddressesProvider.setLendingPoolConfiguratorImpl(lendingPoolConfigurator.address);
+        const lendingPoolConfiguratorAddress = await lendingPoolAddressesProvider.getLendingPoolConfigurator();
         // get LendingPoolConfiguratorProxy contract
-        const lendingPoolConfiguratorProxy = await LendingPoolConfigurator__factory.connect(lendingPoolConfigurator, deployer);
+        lendingPoolConfiguratorProxy = await LendingPoolConfigurator__factory.connect(lendingPoolConfiguratorAddress, deployer);
         console.log("LendingPoolConfigurator deployed to:", lendingPoolConfiguratorProxy.address);
-        */
 
         // deploy USDC mock contract
         const MintableERC20 = await ethers.getContractFactory("MintableERC20");
@@ -120,7 +119,7 @@ describe("Lending Pool", () => {
         await interestRateStrategy.deployed();
         
         console.log("DefaultReserveInterestRateStrategy deployed to:", interestRateStrategy.address);
-
+        
         // deploy ProtocolDataProvider
         /* const protocolDataProviderFactory = await ethers.getContractFactory("WevestProtocolDataProvider");
         const protocolDataProviderContract  = await protocolDataProviderFactory.deploy(lendingPoolAddressesProvider.address);
