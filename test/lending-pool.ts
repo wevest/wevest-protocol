@@ -1,7 +1,7 @@
 import chai from 'chai';
 import { ethers } from "hardhat";
 import { solidity } from "ethereum-waffle";
-import { Signer } from "ethers";
+import { Signer, BigNumberish } from "ethers";
 import {
     LendingPool__factory,
     LendingPoolConfigurator__factory,
@@ -14,7 +14,8 @@ describe("Lending Pool", () => {
     let signers: Signer[];
     let deployer: Signer;
 
-    let lendingPoolAddressesProvider, lendingPoolProxy, lendingPoolConfiguratorProxy, wvToken, usdc, debtToken, interestRateStrategy;
+    let lendingPoolAddressesProvider, lendingPoolProxy, lendingPoolConfiguratorProxy, wvToken, 
+    usdc, debtToken, interestRateStrategy, protocolDataProvider;
     before(async () => {
         // get signers array
         signers = await ethers.getSigners();
@@ -120,12 +121,41 @@ describe("Lending Pool", () => {
         
         console.log("DefaultReserveInterestRateStrategy deployed to:", interestRateStrategy.address);
         
+        let initReserveParams: {
+            wvTokenImpl: string;
+            debtTokenImpl: string;
+            underlyingAsset: string;
+            underlyingAssetName: string;
+            underlyingAssetDecimals: BigNumberish;
+            interestRateStrategyAddress: string;
+            treasury: string;
+            wvTokenName: string;
+            wvTokenSymbol: string;
+            debtTokenName: string;
+            debtTokenSymbol: string;
+        }[] = [];
+
+        initReserveParams.push({
+            wvTokenImpl: wvToken.address,
+            debtTokenImpl: debtToken.address,
+            underlyingAsset: usdc.address,
+            underlyingAssetName: await usdc.name(),
+            underlyingAssetDecimals: await usdc.decimals(),
+            interestRateStrategyAddress: interestRateStrategy.address,
+            treasury: treasuryExample,
+            wvTokenName: await wvToken.name(),
+            wvTokenSymbol: await wvToken.symbol(),
+            debtTokenName: await debtToken.name(),
+            debtTokenSymbol: await debtToken.symbol()
+        });
+
+        await lendingPoolConfiguratorProxy.batchInitReserve(initReserveParams);
         // deploy ProtocolDataProvider
-        /* const protocolDataProviderFactory = await ethers.getContractFactory("WevestProtocolDataProvider");
-        const protocolDataProviderContract  = await protocolDataProviderFactory.deploy(lendingPoolAddressesProvider.address);
-        await protocolDataProviderContract.deployed();
-        console.log("ProcotolDataProvider deployed to:", protocolDataProviderContract.address);
-        console.log(await protocolDataProviderContract.getAllReservesTokens()); */
+        const ProtocolDataProvider = await ethers.getContractFactory("WevestProtocolDataProvider");
+        const protocolDataProvider  = await ProtocolDataProvider.deploy(lendingPoolAddressesProvider.address);
+        await protocolDataProvider.deployed();
+        console.log("ProcotolDataProvider deployed to:", protocolDataProvider.address);
+        console.log(await protocolDataProvider.getAllReservesTokens());
     });
 
     it("UserA deposit 100 USDC to lending pool", async () => {
