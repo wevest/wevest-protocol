@@ -71,10 +71,12 @@ library ReserveLogic {
   }
 
   /**
-   * @dev Updates the liquidity cumulative index and the variable borrow index.
+   * @dev Updates the liquidity cumulative index.
    * @param reserve the reserve object
    **/
-  function updateState(DataTypes.ReserveData storage reserve) internal {
+  function updateState(DataTypes.ReserveData storage reserve) 
+    internal 
+  {
     uint256 scaledDebt = IDebtToken(reserve.debtTokenAddress).getTotalSupply();
     uint256 previousLiquidityIndex = reserve.liquidityIndex;
     uint40 lastUpdatedTimestamp = reserve.lastUpdateTimestamp;
@@ -143,10 +145,6 @@ library ReserveLogic {
     uint256 availableLiquidity;
     uint256 totalDebt;
     uint256 newLiquidityRate;
-    uint256 newStableRate;
-    uint256 newVariableRate;
-    uint256 avgStableRate;
-    uint256 totalVariableDebt;
   }
 
   /**
@@ -168,9 +166,6 @@ library ReserveLogic {
 
     vars.totalDebt = IDebtToken(vars.debtTokenAddress).getTotalSupply();
 
-    //calculates the total variable debt locally using the scaled total supply instead
-    //of totalSupply(), as it's noticeably cheaper. Also, the index has been
-    //updated by the previous updateState() call
     vars.newLiquidityRate
      = IReserveInterestRateStrategy(reserve.interestRateStrategyAddress).calculateInterestRates(
       reserveAddress,
@@ -180,6 +175,7 @@ library ReserveLogic {
       vars.totalDebt,
       reserve.configuration.getReserveFactor()
     );
+
     require(vars.newLiquidityRate <= type(uint128).max, Errors.RL_LIQUIDITY_RATE_OVERFLOW);
 
     reserve.currentLiquidityRate = uint128(vars.newLiquidityRate);

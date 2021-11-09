@@ -17,7 +17,7 @@ library DataTypes {
     //the current stable borrow rate. Expressed in ray
     uint128 currentStableBorrowRate;
     uint40 lastUpdateTimestamp;
-    //LP token address
+    // LP token address
     address wvTokenAddress;
     // debt token address
     address debtTokenAddress;

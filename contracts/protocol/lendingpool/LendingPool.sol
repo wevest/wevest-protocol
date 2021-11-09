@@ -34,10 +34,8 @@ import {LendingPoolStorage} from './LendingPoolStorage.sol';
  *   # Withdraw
  *   # Borrow
  *   # Repay
- *   # Swap their loans between variable and stable rate
  *   # Enable/disable their deposits as collateral rebalance stable rate borrow positions
  *   # Liquidate positions
- *   # Execute Flash Loans
  * - To be covered by a proxy contract, owned by the LendingPoolAddressesProvider of the specific market
  * - All admin functions are callable by the LendingPoolConfigurator contract defined also in the
  *   LendingPoolAddressesProvider
@@ -52,24 +50,16 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
   uint256 public constant LENDINGPOOL_REVISION = 0x2;
 
   modifier whenNotPaused() {
-    _whenNotPaused();
+    require(!_paused, Errors.LP_IS_PAUSED);
     _;
   }
 
   modifier onlyLendingPoolConfigurator() {
-    _onlyLendingPoolConfigurator();
-    _;
-  }
-
-  function _whenNotPaused() internal view {
-    require(!_paused, Errors.LP_IS_PAUSED);
-  }
-
-  function _onlyLendingPoolConfigurator() internal view {
     require(
       _addressesProvider.getLendingPoolConfigurator() == msg.sender,
       Errors.LP_CALLER_NOT_LENDING_POOL_CONFIGURATOR
     );
+    _;
   }
 
   function getRevision() internal pure override returns (uint256) {
@@ -85,13 +75,12 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
    **/
   function initialize(ILendingPoolAddressesProvider provider) public initializer {
     _addressesProvider = provider;
-    _maxStableRateBorrowSizePercent = 2500;
     _maxNumberOfReserves = 128;
   }
 
   /**
    * @dev Deposits an `amount` of underlying asset into the reserve, receiving in return overlying wvTokens.
-   * - E.g. User deposits 100 USDC and gets in return 100 aUSDC
+   * - E.g. User deposits 100 USDC and gets in return 100 wvUSDC
    * @param asset The address of the underlying asset to deposit
    * @param amount The amount to be deposited
    **/
@@ -105,7 +94,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     address wvToken = reserve.wvTokenAddress;
 
-    reserve.updateState();
+    // reserve.updateState();
     reserve.updateInterestRates(asset, wvToken, amount, 0);
 
     IERC20(asset).safeTransferFrom(msg.sender, wvToken, amount);
@@ -596,13 +585,6 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
   }
 
   /**
-   * @dev Returns the percentage of available liquidity that can be borrowed at once at stable rate
-   */
-  function MAX_STABLE_RATE_BORROW_SIZE_PERCENT() public view returns (uint256) {
-    return _maxStableRateBorrowSizePercent;
-  }
-
-  /**
    * @dev Returns the maximum number of reserves supported to be listed in this LendingPool
    */
   function MAX_NUMBER_RESERVES() public view returns (uint256) {
@@ -756,7 +738,6 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       vars.user,
       vars.amount,
       amountInETH,
-      _maxStableRateBorrowSizePercent,
       _reserves,
       userConfig,
       _reservesList,

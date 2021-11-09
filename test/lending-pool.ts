@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { ethers, upgrades } from "hardhat";
+import { ethers } from "hardhat";
 import { solidity } from "ethereum-waffle";
 import { Signer } from "ethers";
 import {
@@ -14,26 +14,21 @@ describe("Lending Pool", () => {
     let signers: Signer[];
     let deployer: Signer;
 
+    let lendingPoolAddressesProvider, lendingPool, wvToken, usdc, debtToken, interestRateStrategy;
     before(async () => {
         // get signers array
         signers = await ethers.getSigners();
         // set first signer as deployer
         deployer = signers[0];
 
-        const poolAddressesFactory = await ethers.getContractFactory("LendingPoolAddressesProvider");
-        const poolAddressesContract = await poolAddressesFactory.deploy("Main Market");
-        await poolAddressesContract.deployed();
+        const LendingPoolAddressesProvider = await ethers.getContractFactory("LendingPoolAddressesProvider");
+        lendingPoolAddressesProvider = await LendingPoolAddressesProvider.deploy("Main Market");
+        await lendingPoolAddressesProvider.deployed();
 
-        console.log("LendingPoolAddressesProvider deployed to:", poolAddressesContract.address);
-        await poolAddressesContract.setPoolAdmin(await deployer.getAddress());
-        await poolAddressesContract.setEmergencyAdmin(await signers[1].getAddress());
+        console.log("LendingPoolAddressesProvider deployed to:", lendingPoolAddressesProvider.address);
 
-        const poolAddressesRegistryFactory = await ethers.getContractFactory("LendingPoolAddressesProviderRegistry");
-        const poolAddressesRegistryContract = await poolAddressesRegistryFactory.deploy();
-        await poolAddressesRegistryContract.deployed();
-
-        console.log("LendingPoolAddressesProviderRegistry deployed to:", poolAddressesRegistryContract.address);
-        await poolAddressesRegistryContract.registerAddressesProvider(poolAddressesContract.address, 1);
+        await lendingPoolAddressesProvider.setPoolAdmin(await deployer.getAddress());
+        await lendingPoolAddressesProvider.setEmergencyAdmin(await signers[1].getAddress());
 
         // deploy logic libraries used by Lending Pool
         const reserveLogicLibFactory = await ethers.getContractFactory("ReserveLogic");
@@ -53,62 +48,85 @@ describe("Lending Pool", () => {
         await validationLogicLibContract.deployed();
 
         // LendingPool contract
-        const lendingPoolFactory = await ethers.getContractFactory("LendingPool", {
+        const LendingPool = await ethers.getContractFactory("LendingPool", {
             libraries: {
                 ReserveLogic: reserveLogicLibContract.address,
                 ValidationLogic: validationLogicLibContract.address
             },
         });
-        const lendingPoolContract = await lendingPoolFactory.deploy();
-        await lendingPoolContract.deployed();
+        lendingPool = await LendingPool.deploy();
+        await lendingPool.deployed();
 
-        console.log("LendingPool deployed to:", lendingPoolContract.address);
-        // update as proxy contract
-        await poolAddressesContract.setLendingPoolImpl(lendingPoolContract.address);
-        const lendingPoolAddress = await poolAddressesContract.getLendingPool();
+        // update implementation as proxy contract
+        await lendingPoolAddressesProvider.setLendingPoolImpl(lendingPool.address);
+        const lendingPoolAddress = await lendingPoolAddressesProvider.getLendingPool();
 
+        console.log("LendingPool deployed to:", lendingPoolAddress);
         // get LendingPoolProxy contract
-        const lendingPoolProxy = await LendingPool__factory.connect(lendingPoolAddress, deployer);
+        lendingPool = await LendingPool__factory.connect(lendingPoolAddress, deployer);
 
-        const poolConfiguratorFactory = await ethers.getContractFactory("LendingPoolConfigurator");
+        /* const poolConfiguratorFactory = await ethers.getContractFactory("LendingPoolConfigurator");
         const poolConfiguratorContract  = await poolConfiguratorFactory.deploy();
         await poolConfiguratorContract.deployed();
 
         // update as proxy contract
-        await poolAddressesContract.setLendingPoolConfiguratorImpl(lendingPoolContract.address);
-        const lendingPoolConfigurator = await poolAddressesContract.getLendingPoolConfigurator();
+        await lendingPoolAddressesProvider.setLendingPoolConfiguratorImpl(lendingPool.address);
+        const lendingPoolConfigurator = await lendingPoolAddressesProvider.getLendingPoolConfigurator();
         console.log(lendingPoolConfigurator);
         // get LendingPoolConfiguratorProxy contract
         const lendingPoolConfiguratorProxy = await LendingPoolConfigurator__factory.connect(lendingPoolConfigurator, deployer);
         console.log("LendingPoolConfigurator deployed to:", lendingPoolConfiguratorProxy.address);
+        */
 
-        const mintableERC20Factory = await ethers.getContractFactory("MintableERC20");
-        const mockUsdcContract = await mintableERC20Factory.deploy("USD Coin", "USDC", 6);
-        await mockUsdcContract.deployed();
-        console.log("USDC deployed to:", mockUsdcContract.address);
+        // deploy USDC mock contract
+        const MintableERC20 = await ethers.getContractFactory("MintableERC20");
+        usdc = await MintableERC20.deploy("USD Coin", "USDC", 6);
+        await usdc.deployed();
+        console.log("USDC deployed to:", usdc.address);
 
-        const wvTokenFactory = await ethers.getContractFactory("WvToken");
+        const WvToken = await ethers.getContractFactory("WvToken");
+        wvToken = await WvToken.deploy();
+        await wvToken.deployed();
+
         const treasuryExample = "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB";
-        const wvTokenContract = await wvTokenFactory.deploy();
-        await wvTokenContract.deployed();
-        console.log(wvTokenContract.address);
 
-        await wvTokenContract.initialize(
-            lendingPoolProxy.address,
+        await wvToken.initialize(
+            lendingPool.address,
             treasuryExample,
-            mockUsdcContract.address,
+            usdc.address,
             6,
             'Wevest interest bearing USDC',
             'wvUSDC'
         );
-        console.log(await (wvTokenContract.POOL()));
+
+        console.log("wvUSDC deployed to:", wvToken.address);
+
+        const DebtToken = await ethers.getContractFactory("DebtToken");
+        debtToken = await DebtToken.deploy();
+        await debtToken.deployed();
+
+        await debtToken.initialize(
+            lendingPool.address,
+            usdc.address,
+            6,
+            'Wevest debt bearing USDC',
+            'debtUSDC'
+        );
+
+        console.log("debtUSDC deployed to:", debtToken.address);
+
+        const InterestRateStrategy = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+        interestRateStrategy = await InterestRateStrategy.deploy(lendingPoolAddressesProvider.address);
+        await interestRateStrategy.deployed();
+        
+        console.log("DefaultReserveInterestRateStrategy deployed to:", interestRateStrategy.address);
 
         // deploy ProtocolDataProvider
-        const protocolDataProviderFactory = await ethers.getContractFactory("WevestProtocolDataProvider");
-        const protocolDataProviderContract  = await protocolDataProviderFactory.deploy(poolAddressesContract.address);
+        /* const protocolDataProviderFactory = await ethers.getContractFactory("WevestProtocolDataProvider");
+        const protocolDataProviderContract  = await protocolDataProviderFactory.deploy(lendingPoolAddressesProvider.address);
         await protocolDataProviderContract.deployed();
         console.log("ProcotolDataProvider deployed to:", protocolDataProviderContract.address);
-        console.log(await protocolDataProviderContract.getAllReservesTokens());
+        console.log(await protocolDataProviderContract.getAllReservesTokens()); */
     });
 
     it("UserA deposit 100 USDC to lending pool", async () => {

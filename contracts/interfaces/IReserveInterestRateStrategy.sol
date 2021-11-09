@@ -8,7 +8,6 @@ pragma solidity 0.6.12;
 interface IReserveInterestRateStrategy {
 
   function calculateInterestRates(
-    address reserve,
     uint256 availableLiquidity,
     uint256 totalDebt,
     uint256 reserveFactor

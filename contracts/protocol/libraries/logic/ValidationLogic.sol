@@ -38,8 +38,11 @@ library ValidationLogic {
    * @param reserve The reserve object on which the user is depositing
    * @param amount The amount to be deposited
    */
-  function validateDeposit(DataTypes.ReserveData storage reserve, uint256 amount) external view {
-    (bool isActive, bool isFrozen, , ) = reserve.configuration.getFlags();
+  function validateDeposit(DataTypes.ReserveData storage reserve, uint256 amount) 
+    external 
+    view 
+  {
+    (bool isActive, bool isFrozen, ) = reserve.configuration.getFlags();
 
     require(amount != 0, Errors.VL_INVALID_AMOUNT);
     require(isActive, Errors.VL_NO_ACTIVE_RESERVE);
@@ -70,7 +73,7 @@ library ValidationLogic {
     require(amount != 0, Errors.VL_INVALID_AMOUNT);
     require(amount <= userBalance, Errors.VL_NOT_ENOUGH_AVAILABLE_USER_BALANCE);
 
-    (bool isActive, , , ) = reservesData[reserveAddress].configuration.getFlags();
+    (bool isActive, , ) = reservesData[reserveAddress].configuration.getFlags();
     require(isActive, Errors.VL_NO_ACTIVE_RESERVE);
 
     require(
@@ -109,7 +112,6 @@ library ValidationLogic {
    * @param userAddress The address of the user
    * @param amount The amount to be borrowed
    * @param amountInETH The amount to be borrowed, in ETH
-   * @param maxStableLoanPercent The max amount of the liquidity that can be borrowed at stable rate, in percentage
    * @param reservesData The state of all the reserves
    * @param userConfig The state of the user for the specific reserve
    * @param reserves The addresses of all the active reserves
@@ -122,7 +124,6 @@ library ValidationLogic {
     address userAddress,
     uint256 amount,
     uint256 amountInETH,
-    uint256 maxStableLoanPercent,
     mapping(address => DataTypes.ReserveData) storage reservesData,
     DataTypes.UserConfigurationMap storage userConfig,
     mapping(uint256 => address) storage reserves,
@@ -131,7 +132,7 @@ library ValidationLogic {
   ) external view {
     ValidateBorrowLocalVars memory vars;
 
-    (vars.isActive, vars.isFrozen, vars.borrowingEnabled, vars.stableRateBorrowingEnabled) = reserve
+    (vars.isActive, vars.isFrozen, vars.borrowingEnabled) = reserve
       .configuration
       .getFlags();
 
@@ -212,7 +213,7 @@ library ValidationLogic {
     uint256 variableDebt,
     DataTypes.InterestRateMode currentRateMode
   ) external view {
-    (bool isActive, bool isFrozen, , bool stableRateEnabled) = reserve.configuration.getFlags();
+    (bool isActive, bool isFrozen, ) = reserve.configuration.getFlags();
 
     require(isActive, Errors.VL_NO_ACTIVE_RESERVE);
     require(!isFrozen, Errors.VL_RESERVE_FROZEN);
@@ -228,7 +229,7 @@ library ValidationLogic {
        * more collateral than he is borrowing, artificially lowering
        * the interest rate, borrowing at variable, and switching to stable
        **/
-      require(stableRateEnabled, Errors.VL_STABLE_BORROWING_NOT_ENABLED);
+      // require(stableRateEnabled, Errors.VL_STABLE_BORROWING_NOT_ENABLED);
 
       require(
         !userConfig.isUsingAsCollateral(reserve.id) ||
@@ -256,7 +257,7 @@ library ValidationLogic {
     IERC20 variableDebtToken,
     address wvTokenAddress
   ) external view {
-    (bool isActive, , , ) = reserve.configuration.getFlags();
+    (bool isActive, , ) = reserve.configuration.getFlags();
 
     require(isActive, Errors.VL_NO_ACTIVE_RESERVE);
 

@@ -12,9 +12,7 @@ import {IERC20} from '../../dependencies/openzeppelin/contracts/IERC20.sol';
 /**
  * @title DefaultReserveInterestRateStrategy contract
  * @notice Implements the calculation of the interest rates depending on the reserve state
- * @dev The model of interest rate is based on 2 slopes, one before the `OPTIMAL_UTILIZATION_RATE`
- * point of utilization and another from that one to 100%
- * - An instance of this same contract, can't be used across different Wevest markets, due to the caching
+ * @dev An instance of this same contract, can't be used across different Wevest markets, due to the caching
  *   of the LendingPoolAddressesProvider
  * @author Wevest
  **/
@@ -27,7 +25,7 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
    * @dev this constant represents the utilization rate at which the pool aims to obtain most competitive borrow rates.
    * Expressed in ray
    **/
-  uint256 public immutable OPTIMAL_UTILIZATION_RATE;
+  // uint256 public immutable OPTIMAL_UTILIZATION_RATE;
 
   /**
    * @dev This constant represents the excess utilization rate above the optimal. It's always equal to
@@ -35,16 +33,15 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
    * Expressed in ray
    **/
 
-  uint256 public immutable EXCESS_UTILIZATION_RATE;
+  // uint256 public immutable EXCESS_UTILIZATION_RATE;
 
   ILendingPoolAddressesProvider public immutable addressesProvider;
 
   constructor(
-    ILendingPoolAddressesProvider provider,
-    uint256 optimalUtilizationRate
+    ILendingPoolAddressesProvider provider
   ) public {
-    OPTIMAL_UTILIZATION_RATE = optimalUtilizationRate;
-    EXCESS_UTILIZATION_RATE = WadRayMath.ray().sub(optimalUtilizationRate);
+    // OPTIMAL_UTILIZATION_RATE = optimalUtilizationRate;
+    // EXCESS_UTILIZATION_RATE = WadRayMath.ray().sub(optimalUtilizationRate);
     addressesProvider = provider;
   }
 
@@ -76,7 +73,6 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
 
     return
       calculateInterestRates(
-        reserve,
         availableLiquidity,
         totalDebt,
         reserveFactor
@@ -93,14 +89,13 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
    * @dev Calculates the interest rates depending on the reserve's state and configurations.
    * NOTE This function is kept for compatibility with the previous DefaultInterestRateStrategy interface.
    * New protocol implementation uses the new calculateInterestRates() interface
-   * @param reserve The address of the reserve
    * @param availableLiquidity The liquidity available in the corresponding aToken
    * @param totalDebt The total borrowed from the reserve a stable rate
    * @param reserveFactor The reserve portion of the interest that goes to the treasury of the market
    * @return The liquidity rate
    **/
+  
   function calculateInterestRates(
-    address reserve,
     uint256 availableLiquidity,
     uint256 totalDebt,
     uint256 reserveFactor
@@ -118,11 +113,6 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
     vars.utilizationRate = vars.totalDebt == 0
       ? 0
       : vars.totalDebt.rayDiv(availableLiquidity.add(vars.totalDebt));
-
-    if (vars.utilizationRate > OPTIMAL_UTILIZATION_RATE) {
-      uint256 excessUtilizationRateRatio =
-        vars.utilizationRate.sub(OPTIMAL_UTILIZATION_RATE).rayDiv(EXCESS_UTILIZATION_RATE);
-    }
 
     vars.currentLiquidityRate = vars.utilizationRate
       .percentMul(PercentageMath.PERCENTAGE_FACTOR.sub(reserveFactor));
