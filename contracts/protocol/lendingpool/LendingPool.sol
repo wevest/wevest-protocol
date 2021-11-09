@@ -101,7 +101,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     IERC20(asset).safeTransferFrom(msg.sender, wvToken, amount);
 
     bool isFirstDeposit = IWvToken(wvToken).mint(msg.sender, amount, reserve.liquidityIndex);
-
+    console.log("isFirstDeposit: %s", isFirstDeposit);
     if (isFirstDeposit) {
       _usersConfig[msg.sender].setUsingAsCollateral(reserve.id, true);
       emit ReserveUsedAsCollateralEnabled(asset, msg.sender);

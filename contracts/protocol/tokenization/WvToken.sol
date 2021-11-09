@@ -10,6 +10,7 @@ import {Errors} from '../libraries/helpers/Errors.sol';
 import {VersionedInitializable} from '../libraries/wevest-upgradeability/VersionedInitializable.sol';
 import {IncentivizedERC20} from './IncentivizedERC20.sol';
 // import {IWevestIncentivesController} from '../../interfaces/IWevestIncentivesController.sol';
+import "hardhat/console.sol";
 
 /**
  * @title Wevest ERC20 WvToken
@@ -145,11 +146,11 @@ contract WvToken is
     uint256 index
   ) external override onlyLendingPool returns (bool) {
     uint256 previousBalance = super.balanceOf(user);
-
     uint256 amountScaled = amount.rayDiv(index);
+
     require(amountScaled != 0, Errors.CT_INVALID_MINT_AMOUNT);
     _mint(user, amountScaled);
-
+    
     emit Transfer(address(0), user, amount);
     emit Mint(user, amount, index);
 

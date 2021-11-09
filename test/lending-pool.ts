@@ -5,17 +5,26 @@ import { Signer, BigNumberish } from "ethers";
 import {
     LendingPool__factory,
     LendingPoolConfigurator__factory,
-    WvToken__factory
+    WvToken__factory,
+    MintableERC20__factory
 } from '../types';
 
 chai.use(solidity);
+const { expect } = chai;
 
 describe("Lending Pool", () => {
     let signers: Signer[];
     let deployer: Signer;
+    let userA: Signer;
+    let amountUSDCtoDeposit: BigNumberish;
+    const APPROVAL_AMOUNT_LENDING_POOL = '1000000000000000000000000000';
+    let wvUsdc: any;
 
-    let lendingPoolAddressesProvider, lendingPoolProxy, lendingPoolConfiguratorProxy, wvToken, 
-    usdc, debtToken, interestRateStrategy, protocolDataProvider;
+    let allWvTokens: any;
+    let usdc: any, wvToken: any, lendingPoolProxy: any;
+    let lendingPoolAddressesProvider, lendingPoolConfiguratorProxy;
+    let debtToken, interestRateStrategy, protocolDataProvider;
+
     before(async () => {
         // get signers array
         signers = await ethers.getSigners();
@@ -91,7 +100,7 @@ describe("Lending Pool", () => {
         const treasuryExample = "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB";
 
         await wvToken.initialize(
-            lendingPool.address,
+            lendingPoolProxy.address,
             treasuryExample,
             usdc.address,
             6,
@@ -106,7 +115,7 @@ describe("Lending Pool", () => {
         await debtToken.deployed();
 
         await debtToken.initialize(
-            lendingPool.address,
+            lendingPoolProxy.address,
             usdc.address,
             6,
             'Wevest debt bearing USDC',
@@ -152,13 +161,47 @@ describe("Lending Pool", () => {
         await lendingPoolConfiguratorProxy.batchInitReserve(initReserveParams);
         // deploy ProtocolDataProvider
         const ProtocolDataProvider = await ethers.getContractFactory("WevestProtocolDataProvider");
-        const protocolDataProvider  = await ProtocolDataProvider.deploy(lendingPoolAddressesProvider.address);
+        protocolDataProvider  = await ProtocolDataProvider.deploy(lendingPoolAddressesProvider.address);
         await protocolDataProvider.deployed();
         console.log("ProcotolDataProvider deployed to:", protocolDataProvider.address);
-        console.log(await protocolDataProvider.getAllReservesTokens());
+        allWvTokens = await protocolDataProvider.getAllWvTokens();
+        console.log(allWvTokens);
+
+        amountUSDCtoDeposit = ethers.utils.parseUnits("100", 6);
     });
 
-    it("UserA deposit 100 USDC to lending pool", async () => {
+    it("UserA deposit 100 USDC to lending pool, check & compare current balance", async () => {
+        userA = signers[2];
+        await usdc.connect(userA).mint(ethers.utils.parseUnits("1000", 6));
+        await usdc.connect(userA).approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
 
+        await lendingPoolProxy
+            .connect(userA)
+            .deposit(usdc.address, amountUSDCtoDeposit);
+
+    });
+
+    it("USDC pool balance after deposit action", async() => {
+        /* const usdcBalance = await usdc.balanceOf(await userA.getAddress());
+        console.log(usdcBalance.toString()); */
+        const wvUSDCAddress = allWvTokens.find(
+            (wvToken: { symbol: string; }) => wvToken.symbol === 'wvUSDC'
+        )?.tokenAddress;
+        wvUsdc = await WvToken__factory.connect(wvUSDCAddress, deployer);
+        const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
+        console.log("USDC pool balance: ", reserveUsdcBalance.toString());
+        expect(reserveUsdcBalance.toString()).to.be.equal(
+            amountUSDCtoDeposit.toString(), 
+            "Invalid USDC reserve balance"
+        );
+    });
+
+    it("UserA's wvUSDC balance after deposit action", async() => {
+        const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
+        console.log("UserA wvUSDC balance: ", wvUsdcBalance.toString());
+        expect(wvUsdcBalance.toString()).to.be.equal(
+            amountUSDCtoDeposit.toString(), 
+            "Invalid wvUSDC amount"
+        );
     });
 });
