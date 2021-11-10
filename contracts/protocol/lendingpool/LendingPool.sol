@@ -217,7 +217,8 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
   function borrow(
     address asset,
-    uint256 amount
+    uint256 amount,
+    uint256 leverageRatioMode
   ) external override whenNotPaused {
     DataTypes.ReserveData storage reserve = _reserves[asset];
 
@@ -226,6 +227,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         asset,
         msg.sender,
         amount,
+        leverageRatioMode,
         reserve.wvTokenAddress,
         true
       )
@@ -729,6 +731,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     address asset;
     address user;
     uint256 amount;
+    uint256 leverageRatioMode;
     address wvTokenAddress;
     bool releaseUnderlying;
   }
@@ -740,15 +743,17 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     address oracle = _addressesProvider.getPriceOracle();
 
     uint256 amountInETH =
-      IPriceOracleGetter(oracle).getAssetPrice(vars.asset).mul(vars.amount).div(
-        10**reserve.configuration.getDecimals()
-      );
+      IPriceOracleGetter(oracle).getAssetPrice(vars.asset)
+        .mul(vars.amount*vars.leverageRatioMode).div(
+          10**reserve.configuration.getDecimals()
+        );
 
     ValidationLogic.validateBorrow(
       vars.asset,
       reserve,
       vars.user,
       vars.amount,
+      vars.leverageRatioMode,
       amountInETH,
       _reserves,
       userConfig,
@@ -757,15 +762,16 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       oracle
     );
 
-    reserve.updateState();
+    // reserve.updateState();
 
     uint256 currentStableRate = 0;
 
     bool isFirstBorrowing = false;
 
+    uint leverageAmount = vars.amount * vars.leverageRatioMode;
     isFirstBorrowing = IDebtToken(reserve.debtTokenAddress).mint(
       vars.user,
-      vars.amount
+      leverageAmount
     );
 
     if (isFirstBorrowing) {
@@ -776,17 +782,18 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       vars.asset,
       vars.wvTokenAddress,
       0,
-      vars.releaseUnderlying ? vars.amount : 0
+      vars.releaseUnderlying ? leverageAmount : 0
     );
 
     if (vars.releaseUnderlying) {
-      IWvToken(vars.wvTokenAddress).transferUnderlyingTo(vars.user, vars.amount);
+      IWvToken(vars.wvTokenAddress).transferUnderlyingTo(vars.user, leverageAmount);
     }
 
     emit Borrow(
       vars.asset,
       vars.user,
-      vars.amount
+      vars.amount,
+      vars.leverageRatioMode
     );
   }
 

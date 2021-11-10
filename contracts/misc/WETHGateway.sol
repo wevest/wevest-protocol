@@ -101,14 +101,16 @@ contract WETHGateway is IWETHGateway, Ownable {
    */
   function borrowETH(
     address lendingPool,
-    uint256 amount
+    uint256 amount,
+    uint256 leverageRatioMode
   ) external override {
     ILendingPool(lendingPool).borrow(
       address(WETH),
-      amount
+      amount,
+      leverageRatioMode
     );
-    WETH.withdraw(amount);
-    _safeTransferETH(msg.sender, amount);
+    WETH.withdraw(amount * leverageRatioMode);
+    _safeTransferETH(msg.sender, amount * leverageRatioMode);
   }
 
   /**

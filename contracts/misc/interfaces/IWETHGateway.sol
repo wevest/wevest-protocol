@@ -18,6 +18,7 @@ interface IWETHGateway {
 
   function borrowETH(
     address lendingPool,
-    uint256 amount
+    uint256 amount,
+    uint256 leverageRatioMode
   ) external;
 }

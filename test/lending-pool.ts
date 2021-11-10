@@ -22,7 +22,7 @@ describe("Lending Pool", () => {
     let wvUsdc: any;
 
     let allWvTokens: any;
-    let usdc: any, wvToken: any, lendingPoolProxy: any;
+    let usdc: any, aave: any, wvToken: any, lendingPoolProxy: any;
     let wvUSDCAddress: any;
     let lendingPoolAddressesProvider, lendingPoolConfiguratorProxy;
     let debtToken, interestRateStrategy, protocolDataProvider;
@@ -96,6 +96,11 @@ describe("Lending Pool", () => {
         usdc = await MintableERC20.deploy("USD Coin", "USDC", 6);
         await usdc.deployed();
         console.log("USDC deployed to:", usdc.address);
+
+        aave = await MintableERC20.deploy("Aave Token", "AAVE", 18);
+        await aave.deployed();
+
+        console.log("AAVE deployed to:", aave.address);
 
         const WvToken = await ethers.getContractFactory("WvToken");
         wvToken = await WvToken.deploy();
@@ -250,5 +255,11 @@ describe("Lending Pool", () => {
             const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
             console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
         });
-    })
+    });
+
+    describe("Borrow", async () => {
+        /* await lendingPoolProxy
+            .connect(userA)
+            .borrow(usdc.address, amountUSDCtoDeposit); */
+    });
 });

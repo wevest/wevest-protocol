@@ -53,7 +53,8 @@ interface ILendingPool {
   event Borrow(
     address indexed reserve,
     address user,
-    uint256 amount
+    uint256 amount,
+    uint256 leverageRatioMode
   );
   /**
    * @dev Emitted on repay()
@@ -194,7 +195,8 @@ interface ILendingPool {
    **/
   function borrow(
     address asset,
-    uint256 amount
+    uint256 amount,
+    uint256 leverageRatioMode
     // uint256 interestRateMode,
     // uint16 referralCode,
     // address onBehalfOf

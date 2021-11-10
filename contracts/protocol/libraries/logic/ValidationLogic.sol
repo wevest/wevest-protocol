@@ -123,6 +123,7 @@ library ValidationLogic {
     DataTypes.ReserveData storage reserve,
     address userAddress,
     uint256 amount,
+    uint256 leverageRatioMode,
     uint256 amountInETH,
     mapping(address => DataTypes.ReserveData) storage reservesData,
     DataTypes.UserConfigurationMap storage userConfig,
