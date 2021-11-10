@@ -175,7 +175,7 @@ describe("Lending Pool", () => {
 
         // deploy YieldFarmingPool
         const YieldFarmingPool = await ethers.getContractFactory("YieldFarmingPool");
-        const yieldFarmingPool  = await LendingPoolConfigurator.deploy();
+        const yieldFarmingPool  = await YieldFarmingPool.deploy();
         await yieldFarmingPool.deployed();
 
         // update as proxy contract
