@@ -192,7 +192,7 @@ describe("Lending Pool", () => {
     });
 
     describe("Deposit", async () => {
-        it("UserA deposit 100 USDC to lending pool, check & compare current balance", async () => {
+        it("UserA deposit 100 USDC to lending pool", async () => {
             userA = signers[2];
             await usdc.connect(userA).mint(ethers.utils.parseUnits("1000", 6));
             await usdc.connect(userA).approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
@@ -258,8 +258,9 @@ describe("Lending Pool", () => {
     });
 
     describe("Borrow", async () => {
+        const amountAaveToBorrow = ethers.utils.parseUnits("10", 18);
         /* await lendingPoolProxy
             .connect(userA)
-            .borrow(usdc.address, amountUSDCtoDeposit); */
+            .borrow(aave.address, amountAaveToBorrow, 1); */
     });
 });
