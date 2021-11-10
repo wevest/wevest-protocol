@@ -102,7 +102,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     IERC20(asset).safeTransferFrom(msg.sender, wvToken, amount);
 
     bool isFirstDeposit = IWvToken(wvToken).mint(msg.sender, amount, reserve.liquidityIndex);
-    console.log("isFirstDeposit: %s", isFirstDeposit);
+    
     if (isFirstDeposit) {
       _usersConfig[msg.sender].setUsingAsCollateral(reserve.id, true);
       emit ReserveUsedAsCollateralEnabled(asset, msg.sender);
@@ -137,6 +137,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     if (amount == type(uint256).max) {
       amountToWithdraw = userBalance;
     }
+    
     ValidationLogic.validateWithdraw(
       asset,
       amountToWithdraw,
@@ -159,6 +160,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       require(yfPoolBalance >= requiredAmount, "Currently, YF pool doesnt have enough balance");
       IERC20(asset).safeTransferFrom(yfpool, wvToken, requiredAmount);
     }
+
     /** */
     // reserve.updateState();
 
@@ -179,9 +181,8 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
   /**
    * @dev Allows users to borrow a specific `amount` of the reserve underlying asset, provided that the borrower
    * already deposited enough collateral, or he was given enough allowance by a credit delegator on the
-   * corresponding debt token (StableDebtToken or VariableDebtToken)
-   * - E.g. User borrows 100 USDC passing as `onBehalfOf` his own address, receiving the 100 USDC in his wallet
-   *   and 100 stable/variable debt tokens, depending on the `interestRateMode`
+   * corresponding debt token 
+   * - E.g. User borrows 100 USDC and 100 debt tokens
    * @param asset The address of the underlying asset to borrow
    * @param amount The amount to be borrowed
    * // param interestRateMode The interest rate mode at which the user wants to borrow: 1 for Stable, 2 for Variable
@@ -764,11 +765,10 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     // reserve.updateState();
 
-    uint256 currentStableRate = 0;
-
     bool isFirstBorrowing = false;
 
     uint leverageAmount = vars.amount * vars.leverageRatioMode;
+    console.log(reserve.debtTokenAddress);
     isFirstBorrowing = IDebtToken(reserve.debtTokenAddress).mint(
       vars.user,
       leverageAmount

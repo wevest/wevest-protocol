@@ -126,12 +126,12 @@ describe("Lending Pool", () => {
         await debtToken.initialize(
             lendingPoolProxy.address,
             usdc.address,
-            6,
-            'Wevest debt bearing USDC',
-            'debtUSDC'
+            18,
+            'Wevest debt bearing AAVE',
+            'debtAAVE'
         );
 
-        console.log("debtUSDC deployed to:", debtToken.address);
+        console.log("debtAAVE deployed to:", debtToken.address);
 
         const InterestRateStrategy = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
         interestRateStrategy = await InterestRateStrategy.deploy(lendingPoolAddressesProvider.address);
@@ -194,9 +194,10 @@ describe("Lending Pool", () => {
     describe("Deposit", async () => {
         it("UserA deposit 100 USDC to lending pool", async () => {
             userA = signers[2];
+            // before start, first create 1000 USDC in userA account
             await usdc.connect(userA).mint(ethers.utils.parseUnits("1000", 6));
             await usdc.connect(userA).approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
-    
+            
             await lendingPoolProxy
                 .connect(userA)
                 .deposit(usdc.address, amountUSDCtoDeposit);
@@ -257,10 +258,16 @@ describe("Lending Pool", () => {
         });
     });
 
-    describe("Borrow", async () => {
-        const amountAaveToBorrow = ethers.utils.parseUnits("10", 18);
-        /* await lendingPoolProxy
-            .connect(userA)
-            .borrow(aave.address, amountAaveToBorrow, 1); */
-    });
+    /* describe("Borrow", async () => {
+        it("UserA deposit 100 USDC as collateral, and want to borrow AAVE with 3x leverage", async() => {
+            await lendingPoolProxy
+                .connect(userA)
+                .deposit(usdc.address, amountUSDCtoDeposit);
+
+            const amountAaveToBorrow = ethers.utils.parseUnits("10", 18);
+            await lendingPoolProxy
+                .connect(userA)
+                .borrow(aave.address, amountAaveToBorrow, 3);
+        });
+    }); */
 });
