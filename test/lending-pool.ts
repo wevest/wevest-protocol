@@ -22,6 +22,7 @@ describe("Lending Pool", () => {
 
     let allWvTokens: any;
     let usdc: any, wvToken: any, lendingPoolProxy: any;
+    let wvUSDCAddress: any;
     let lendingPoolAddressesProvider, lendingPoolConfiguratorProxy;
     let debtToken, interestRateStrategy, protocolDataProvider;
 
@@ -170,38 +171,69 @@ describe("Lending Pool", () => {
         amountUSDCtoDeposit = ethers.utils.parseUnits("100", 6);
     });
 
-    it("UserA deposit 100 USDC to lending pool, check & compare current balance", async () => {
-        userA = signers[2];
-        await usdc.connect(userA).mint(ethers.utils.parseUnits("1000", 6));
-        await usdc.connect(userA).approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
-
-        await lendingPoolProxy
-            .connect(userA)
-            .deposit(usdc.address, amountUSDCtoDeposit);
-
+    describe("Deposit", async () => {
+        it("UserA deposit 100 USDC to lending pool, check & compare current balance", async () => {
+            userA = signers[2];
+            await usdc.connect(userA).mint(ethers.utils.parseUnits("1000", 6));
+            await usdc.connect(userA).approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
+    
+            await lendingPoolProxy
+                .connect(userA)
+                .deposit(usdc.address, amountUSDCtoDeposit);
+    
+        });
+    
+        it("USDC pool balance after deposit action", async() => {
+            /* const usdcBalance = await usdc.balanceOf(await userA.getAddress());
+            console.log(usdcBalance.toString()); */
+            wvUSDCAddress = allWvTokens.find(
+                (wvToken: { symbol: string; }) => wvToken.symbol === 'wvUSDC'
+            )?.tokenAddress;
+            wvUsdc = await WvToken__factory.connect(wvUSDCAddress, deployer);
+            const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
+            console.log("USDC pool balance: ", reserveUsdcBalance.toString());
+            expect(reserveUsdcBalance.toString()).to.be.equal(
+                amountUSDCtoDeposit.toString(), 
+                "Invalid USDC reserve balance"
+            );
+        });
+    
+        it("UserA's balance after deposit action", async() => {
+            const usdcBalance = await usdc.balanceOf(await userA.getAddress());
+            console.log("UserA USDC balance: ", usdcBalance.toString());
+            const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
+            console.log("UserA wvUSDC balance: ", wvUsdcBalance.toString());
+            expect(wvUsdcBalance.toString()).to.be.equal(
+                amountUSDCtoDeposit.toString(), 
+                "Invalid wvUSDC amount"
+            );
+        });
     });
+    
+    describe("Withdraw", async () => {
+        it("UserA withdraws the whole wvUSDC balance", async() => {
+            const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
+            console.log("USDC pool previous balance: ", reserveUsdcBalance.toString());
+            const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
+            await lendingPoolProxy
+                .connect(userA)
+                .withdraw(usdc.address, wvUsdcBalance);
+        });
 
-    it("USDC pool balance after deposit action", async() => {
-        /* const usdcBalance = await usdc.balanceOf(await userA.getAddress());
-        console.log(usdcBalance.toString()); */
-        const wvUSDCAddress = allWvTokens.find(
-            (wvToken: { symbol: string; }) => wvToken.symbol === 'wvUSDC'
-        )?.tokenAddress;
-        wvUsdc = await WvToken__factory.connect(wvUSDCAddress, deployer);
-        const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
-        console.log("USDC pool balance: ", reserveUsdcBalance.toString());
-        expect(reserveUsdcBalance.toString()).to.be.equal(
-            amountUSDCtoDeposit.toString(), 
-            "Invalid USDC reserve balance"
-        );
-    });
+        it("UserA's wvUSDC balance after withdraw action", async() => {
+            const usdcBalance = await usdc.balanceOf(await userA.getAddress());
+            console.log("UserA USDC balance: ", usdcBalance.toString());
 
-    it("UserA's wvUSDC balance after deposit action", async() => {
-        const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
-        console.log("UserA wvUSDC balance: ", wvUsdcBalance.toString());
-        expect(wvUsdcBalance.toString()).to.be.equal(
-            amountUSDCtoDeposit.toString(), 
-            "Invalid wvUSDC amount"
-        );
-    });
+            const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
+            console.log("UserA wvUSDC balance: ", wvUsdcBalance.toString());
+            expect(wvUsdcBalance.toString()).to.be.equal(
+                '0', "Invalid wvUSDC amount"
+            );
+        });
+
+        it("USDC pool balance after withdraw action", async() => {
+            const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
+            console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
+        });
+    })
 });

@@ -22,13 +22,11 @@ interface ILendingPool {
    * @dev Emitted on withdraw()
    * @param reserve The address of the underlyng asset being withdrawn
    * @param user The address initiating the withdrawal, owner of wvTokens
-   * @param to Address that will receive the underlying
    * @param amount The amount to be withdrawn
    **/
   event Withdraw(
     address indexed reserve, 
-    address indexed user, 
-    address indexed to, 
+    address indexed user,
     uint256 amount
   );
 
@@ -169,15 +167,14 @@ interface ILendingPool {
    * @param asset The address of the underlying asset to withdraw
    * @param amount The underlying amount to be withdrawn
    *   - Send the value type(uint256).max in order to withdraw the whole wvToken balance
-   * @param to Address that will receive the underlying, same as msg.sender if the user
+   * // param to Address that will receive the underlying, same as msg.sender if the user
    *   wants to receive it on his own wallet, or a different address if the beneficiary is a
    *   different wallet
    * @return The final amount withdrawn
    **/
   function withdraw(
     address asset,
-    uint256 amount,
-    address to
+    uint256 amount
   ) external returns (uint256);
 
   /**

@@ -195,7 +195,6 @@ contract LendingPoolCollateralManager is
       // Burn the equivalent amount of wvToken, sending the underlying to the liquidator
       vars.collateralWVtoken.burn(
         user,
-        msg.sender,
         vars.maxCollateralToLiquidate,
         collateralReserve.liquidityIndex
       );

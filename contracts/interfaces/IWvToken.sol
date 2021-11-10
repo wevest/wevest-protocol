@@ -31,11 +31,14 @@ interface IWvToken is IERC20, IScaledBalanceToken, IInitializableWvToken {
   /**
    * @dev Emitted after wvTokens are burned
    * @param from The owner of the wvTokens, getting them burned
-   * @param target The address that will receive the underlying
    * @param value The amount being burned
    * @param index The new liquidity index of the reserve
    **/
-  event Burn(address indexed from, address indexed target, uint256 value, uint256 index);
+  event Burn(
+    address indexed from, 
+    uint256 value, 
+    uint256 index
+  );
 
   /**
    * @dev Emitted during the transfer action
@@ -49,13 +52,12 @@ interface IWvToken is IERC20, IScaledBalanceToken, IInitializableWvToken {
   /**
    * @dev Burns wvTokens from `user` and sends the equivalent amount of underlying to `receiverOfUnderlying`
    * @param user The owner of the wvTokens, getting them burned
-   * @param receiverOfUnderlying The address that will receive the underlying
+   * // param receiverOfUnderlying The address that will receive the underlying
    * @param amount The amount being burned
    * @param index The new liquidity index of the reserve
    **/
   function burn(
     address user,
-    address receiverOfUnderlying,
     uint256 amount,
     uint256 index
   ) external;

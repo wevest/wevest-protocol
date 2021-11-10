@@ -8,8 +8,7 @@ interface IWETHGateway {
 
   function withdrawETH(
     address lendingPool,
-    uint256 amount,
-    address onBehalfOf
+    uint256 amount
   ) external;
 
   function repayETH(

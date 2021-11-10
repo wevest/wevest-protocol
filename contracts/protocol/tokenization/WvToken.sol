@@ -112,13 +112,12 @@ contract WvToken is
    * @dev Burns wvTokens from `user` and sends the equivalent amount of underlying to `receiverOfUnderlying`
    * - Only callable by the LendingPool, as extra state updates there need to be managed
    * @param user The owner of the wvTokens, getting them burned
-   * @param receiverOfUnderlying The address that will receive the underlying
+   * // param receiverOfUnderlying The address that will receive the underlying
    * @param amount The amount being burned
    * @param index The new liquidity index of the reserve
    **/
   function burn(
     address user,
-    address receiverOfUnderlying,
     uint256 amount,
     uint256 index
   ) external override onlyLendingPool {
@@ -126,10 +125,10 @@ contract WvToken is
     require(amountScaled != 0, Errors.CT_INVALID_BURN_AMOUNT);
     _burn(user, amountScaled);
 
-    IERC20(_underlyingAsset).safeTransfer(receiverOfUnderlying, amount);
+    IERC20(_underlyingAsset).safeTransfer(user, amount);
 
     emit Transfer(user, address(0), amount);
-    emit Burn(user, receiverOfUnderlying, amount, index);
+    emit Burn(user, amount, index);
   }
 
   /**

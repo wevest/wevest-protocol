@@ -112,19 +112,18 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
   /**
    * @dev Withdraws an `amount` of underlying asset from the reserve, burning the equivalent wvTokens owned
-   * E.g. User has 100 aUSDC, calls withdraw() and receives 100 USDC, burning the 100 aUSDC
+   * E.g. User has 100 wvUSDC, calls withdraw() and receives 100 USDC, burning the 100 wvUSDC
    * @param asset The address of the underlying asset to withdraw
    * @param amount The underlying amount to be withdrawn
    *   - Send the value type(uint256).max in order to withdraw the whole wvToken balance
-   * @param to Address that will receive the underlying, same as msg.sender if the user
+   * // param to Address that will receive the underlying, same as msg.sender if the user
    *   wants to receive it on his own wallet, or a different address if the beneficiary is a
    *   different wallet
    * @return The final amount withdrawn
    **/
   function withdraw(
     address asset,
-    uint256 amount,
-    address to
+    uint256 amount
   ) external override whenNotPaused returns (uint256) {
     DataTypes.ReserveData storage reserve = _reserves[asset];
 
@@ -137,7 +136,6 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     if (amount == type(uint256).max) {
       amountToWithdraw = userBalance;
     }
-
     ValidationLogic.validateWithdraw(
       asset,
       amountToWithdraw,
@@ -149,7 +147,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       _addressesProvider.getPriceOracle()
     );
 
-    reserve.updateState();
+    // reserve.updateState();
 
     reserve.updateInterestRates(asset, wvToken, 0, amountToWithdraw);
 
@@ -158,9 +156,9 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       emit ReserveUsedAsCollateralDisabled(asset, msg.sender);
     }
 
-    IWvToken(wvToken).burn(msg.sender, to, amountToWithdraw, reserve.liquidityIndex);
+    IWvToken(wvToken).burn(msg.sender, amountToWithdraw, reserve.liquidityIndex);
 
-    emit Withdraw(asset, msg.sender, to, amountToWithdraw);
+    emit Withdraw(asset, msg.sender, amountToWithdraw);
 
     return amountToWithdraw;
   }
