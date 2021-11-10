@@ -4,15 +4,17 @@ pragma experimental ABIEncoderV2;
 
 import {VersionedInitializable} from '../libraries/wevest-upgradeability/VersionedInitializable.sol';
 import {ILendingPool} from '../../interfaces/ILendingPool.sol';
+import {IYieldFarmingPool} from '../../interfaces/IYieldFarmingPool.sol';
+import {ILendingPoolAddressesProvider} from '../../interfaces/ILendingPoolAddressesProvider.sol';
 
-contract YieldFarmingPool is VersionedInitializable {
+contract YieldFarmingPool is VersionedInitializable, IYieldFarmingPool {
 
     uint256 public constant YIELDFARMING_POOL_REVISION = 0x2;
 
-    ILendingPool internal _pool;
+    ILendingPoolAddressesProvider internal _addressesProvider;
 
-    function initialize(ILendingPool pool) public initializer {
-        _pool = pool;
+    function initialize(ILendingPoolAddressesProvider provider) public initializer {
+        _addressesProvider = provider;
     }
 
     function getRevision() internal pure override returns (uint256) {

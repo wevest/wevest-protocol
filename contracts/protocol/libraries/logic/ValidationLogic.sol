@@ -76,7 +76,7 @@ library ValidationLogic {
     (bool isActive, , ) = reservesData[reserveAddress].configuration.getFlags();
     require(isActive, Errors.VL_NO_ACTIVE_RESERVE);
 
-    require(
+    /* require(
       GenericLogic.balanceDecreaseAllowed(
         reserveAddress,
         msg.sender,
@@ -88,7 +88,7 @@ library ValidationLogic {
         oracle
       ),
       Errors.VL_TRANSFER_NOT_ALLOWED
-    );
+    ); */
   }
 
   struct ValidateBorrowLocalVars {

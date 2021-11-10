@@ -6,7 +6,8 @@ import {
     LendingPool__factory,
     LendingPoolConfigurator__factory,
     WvToken__factory,
-    MintableERC20__factory
+    MintableERC20__factory,
+    YieldFarmingPool__factory
 } from '../types';
 
 chai.use(solidity);
@@ -25,6 +26,8 @@ describe("Lending Pool", () => {
     let wvUSDCAddress: any;
     let lendingPoolAddressesProvider, lendingPoolConfiguratorProxy;
     let debtToken, interestRateStrategy, protocolDataProvider;
+
+    let yfPoolProxy: any;
 
     before(async () => {
         // get signers array
@@ -169,6 +172,18 @@ describe("Lending Pool", () => {
         console.log(allWvTokens);
 
         amountUSDCtoDeposit = ethers.utils.parseUnits("100", 6);
+
+        // deploy YieldFarmingPool
+        const YieldFarmingPool = await ethers.getContractFactory("YieldFarmingPool");
+        const yieldFarmingPool  = await LendingPoolConfigurator.deploy();
+        await yieldFarmingPool.deployed();
+
+        // update as proxy contract
+        await lendingPoolAddressesProvider.setYieldFarmingPoolImpl(yieldFarmingPool.address);
+        const yieldFarmingPoolAddress = await lendingPoolAddressesProvider.getYieldFarmingPool();
+        // get yfpool proxy contract
+        yfPoolProxy = await YieldFarmingPool__factory.connect(yieldFarmingPoolAddress, deployer);
+        console.log("YieldFarmingPool deployed to:", yfPoolProxy.address);
     });
 
     describe("Deposit", async () => {

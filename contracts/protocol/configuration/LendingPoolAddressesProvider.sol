@@ -25,6 +25,9 @@ contract LendingPoolAddressesProvider is Ownable, ILendingPoolAddressesProvider 
   bytes32 private constant PRICE_ORACLE = 'PRICE_ORACLE';
   bytes32 private constant LENDING_RATE_ORACLE = 'LENDING_RATE_ORACLE';
 
+  // added by SC
+  bytes32 private constant YIELD_FARMING_POOL = 'YIELD_FARMING_POOL';
+
   constructor(string memory marketId) public {
     _setMarketId(marketId);
   }
@@ -113,9 +116,27 @@ contract LendingPoolAddressesProvider is Ownable, ILendingPoolAddressesProvider 
    * setting the new `configurator` implementation on the first time calling it
    * @param configurator The new LendingPoolConfigurator implementation
    **/
-  function setLendingPoolConfiguratorImpl(address configurator) external override onlyOwner {
+  function setLendingPoolConfiguratorImpl(address configurator) 
+    external 
+    override 
+    onlyOwner 
+  {
     _updateImpl(LENDING_POOL_CONFIGURATOR, configurator);
     emit LendingPoolConfiguratorUpdated(configurator);
+  }
+
+  /**
+    * @dev Updates the implementation of the YieldFarmingPool, or creates the proxy
+    * setting the new `yfpool` implementation on the first time calling it
+    */
+
+  function getYieldFarmingPool() external view override returns (address) {
+    return getAddress(YIELD_FARMING_POOL);
+  }
+
+  function setYieldFarmingPoolImpl(address yfpool) external override onlyOwner {
+    _updateImpl(YIELD_FARMING_POOL, yfpool);
+    emit LendingPoolConfiguratorUpdated(yfpool);
   }
 
   /**

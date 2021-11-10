@@ -25,6 +25,7 @@ import {ReserveConfiguration} from '../libraries/configuration/ReserveConfigurat
 import {UserConfiguration} from '../libraries/configuration/UserConfiguration.sol';
 import {DataTypes} from '../libraries/types/DataTypes.sol';
 import {LendingPoolStorage} from './LendingPoolStorage.sol';
+import {YieldFarmingPool} from '../yieldfarmingpool/YieldFarmingPool.sol';
 import "hardhat/console.sol";
 
 /**
@@ -146,7 +147,19 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       _reservesCount,
       _addressesProvider.getPriceOracle()
     );
-
+    /* added by SC */
+    // check current balance of pool
+    uint256 underlyingAssetBalance = IERC20(asset).balanceOf(wvToken);
+    
+    address yfpool = _addressesProvider.getYieldFarmingPool();
+    // if not enough balance, transfer required asset from yf pool
+    if (underlyingAssetBalance < amount) {
+      uint256 requiredAmount = amount - underlyingAssetBalance;
+      uint256 yfPoolBalance = IERC20(asset).balanceOf(yfpool);
+      require(yfPoolBalance >= requiredAmount, "Currently, YF pool doesnt have enough balance");
+      IERC20(asset).safeTransferFrom(yfpool, wvToken, requiredAmount);
+    }
+    /** */
     // reserve.updateState();
 
     reserve.updateInterestRates(asset, wvToken, 0, amountToWithdraw);

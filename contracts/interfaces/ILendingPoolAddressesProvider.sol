@@ -37,6 +37,10 @@ interface ILendingPoolAddressesProvider {
 
   function setLendingPoolConfiguratorImpl(address configurator) external;
 
+  function getYieldFarmingPool() external view returns (address);
+
+  function setYieldFarmingPoolImpl(address yfpool) external;
+
   function getLendingPoolCollateralManager() external view returns (address);
 
   function setLendingPoolCollateralManager(address manager) external;
