@@ -177,7 +177,7 @@ contract DebtToken is IDebtToken, DebtTokenBase {
   }
 
   /**
-   * @dev Returns the the total supply and the average stable rate
+   * @dev Returns the the total supply
    **/
   function getTotalSupply() public view override returns (uint256) {
     return super.totalSupply();
