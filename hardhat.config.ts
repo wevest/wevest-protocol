@@ -38,6 +38,11 @@ const config: HardhatUserConfig = {
     ],
   },
   networks: {
+    hardhat: {
+      forking: {
+        url: process.env.MAINNET_URL || "",
+      }
+    },
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
       accounts:
@@ -50,6 +55,9 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  mocha: {
+    timeout: 80000
   },
   typechain: {
     outDir: 'types',

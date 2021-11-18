@@ -4,14 +4,14 @@ pragma experimental ABIEncoderV2;
 
 import {VersionedInitializable} from '../libraries/wevest-upgradeability/VersionedInitializable.sol';
 import {ILendingPool} from '../../interfaces/ILendingPool.sol';
-import {IYieldFarmingPool} from '../../interfaces/IYieldFarmingPool.sol';
+// import {IYieldFarmingPool} from '../../interfaces/IYieldFarmingPool.sol';
 import {ILendingPoolAddressesProvider} from '../../interfaces/ILendingPoolAddressesProvider.sol';
 import {IVault} from "../../interfaces/IVault.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IPriceOracleGetter} from '../../interfaces/IPriceOracleGetter.sol';
 import "hardhat/console.sol";
 
-contract YieldFarmingPool is VersionedInitializable, IYieldFarmingPool {
+contract YieldFarmingPool is VersionedInitializable {
 
     uint256 public constant YIELDFARMING_POOL_REVISION = 0x2;
 
@@ -31,21 +31,18 @@ contract YieldFarmingPool is VersionedInitializable, IYieldFarmingPool {
     }
 
     function deposit(address vault, address asset, uint256 amount) 
-        external 
-        override
+        external
         amountGreaterThanZero(amount)
         returns(uint256) 
     {
         uint256 assetBalance = IERC20(asset).balanceOf(address(this));
         require(assetBalance >= amount, "Exceeds YF pool asset balance");
-
-        IERC20(asset).approve(address(IVault(vault)), amount);
+        IERC20(asset).approve(vault, amount);
         return IVault(vault).deposit(amount);
     }
 
     function withdraw(address vault, uint256 maxShares) 
         external
-        override
         amountGreaterThanZero(maxShares)
         returns(uint256) 
     {
@@ -58,7 +55,7 @@ contract YieldFarmingPool is VersionedInitializable, IYieldFarmingPool {
 
     function balance(address vault) 
         external
-        override
+        view
         returns(uint256)
     {
         uint256 price = IVault(vault).pricePerShare();
@@ -66,10 +63,9 @@ contract YieldFarmingPool is VersionedInitializable, IYieldFarmingPool {
         return balanceShares * price;
     }
 
-    // pricePerShare * yvUSDC Amount -  deposit amount * priceOfDepositToken = interest
     function assetInterest(address vault, address asset)
         external
-        override
+        view
         returns(uint256)
     {
         uint256 price = IVault(vault).pricePerShare();
@@ -80,7 +76,6 @@ contract YieldFarmingPool is VersionedInitializable, IYieldFarmingPool {
         uint256 priceOfDepositToken = 
             IPriceOracleGetter(oracle).getAssetPrice(asset);
         uint256 interest = price * balanceShares - depositTokenBalance * priceOfDepositToken;
-        console.log("Interest %", interest);
         return interest;
     }
 }

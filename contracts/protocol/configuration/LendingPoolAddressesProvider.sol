@@ -136,7 +136,7 @@ contract LendingPoolAddressesProvider is Ownable, ILendingPoolAddressesProvider 
 
   function setYieldFarmingPoolImpl(address yfpool) external override onlyOwner {
     _updateImpl(YIELD_FARMING_POOL, yfpool);
-    emit LendingPoolConfiguratorUpdated(yfpool);
+    emit YieldFarmingUpdated(yfpool);
   }
 
   /**

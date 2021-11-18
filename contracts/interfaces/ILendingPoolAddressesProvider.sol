@@ -13,6 +13,7 @@ interface ILendingPoolAddressesProvider {
   event ConfigurationAdminUpdated(address indexed newAddress);
   event EmergencyAdminUpdated(address indexed newAddress);
   event LendingPoolConfiguratorUpdated(address indexed newAddress);
+  event YieldFarmingUpdated(address indexed newAddress);
   event LendingPoolCollateralManagerUpdated(address indexed newAddress);
   event PriceOracleUpdated(address indexed newAddress);
   event LendingRateOracleUpdated(address indexed newAddress);

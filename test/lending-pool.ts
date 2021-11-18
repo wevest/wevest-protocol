@@ -30,6 +30,7 @@ describe("Lending Pool", () => {
 
     let yfPoolProxy: any;
     let priceOracle: any;
+    let usdcYVault: any;
 
     before(async () => {
         // get signers array
@@ -40,7 +41,6 @@ describe("Lending Pool", () => {
         const LendingPoolAddressesProvider = await ethers.getContractFactory("LendingPoolAddressesProvider");
         lendingPoolAddressesProvider = await LendingPoolAddressesProvider.deploy("Main Market");
         await lendingPoolAddressesProvider.deployed();
-
         console.log("LendingPoolAddressesProvider deployed to:", lendingPoolAddressesProvider.address);
 
         await lendingPoolAddressesProvider.setPoolAdmin(await deployer.getAddress());
@@ -141,9 +141,16 @@ describe("Lending Pool", () => {
         
         console.log("DefaultReserveInterestRateStrategy deployed to:", interestRateStrategy.address);
         
+        const USDC_YVAULT = "0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9";
+
+        usdcYVault = await ethers.getContractAt(
+            "IVault",
+            USDC_YVAULT
+        );
         let initReserveParams: {
             wvTokenImpl: string;
             debtTokenImpl: string;
+            vaultTokenAddress: string;
             underlyingAsset: string;
             underlyingAssetName: string;
             underlyingAssetDecimals: BigNumberish;
@@ -158,6 +165,7 @@ describe("Lending Pool", () => {
         initReserveParams.push({
             wvTokenImpl: wvToken.address,
             debtTokenImpl: debtToken.address,
+            vaultTokenAddress: usdcYVault.address,
             underlyingAsset: usdc.address,
             underlyingAssetName: await usdc.name(),
             underlyingAssetDecimals: await usdc.decimals(),
@@ -176,7 +184,6 @@ describe("Lending Pool", () => {
         await protocolDataProvider.deployed();
         console.log("ProcotolDataProvider deployed to:", protocolDataProvider.address);
         allWvTokens = await protocolDataProvider.getAllWvTokens();
-        console.log(allWvTokens);
 
         amountUSDCtoDeposit = ethers.utils.parseUnits("100", 6);
 
@@ -213,7 +220,7 @@ describe("Lending Pool", () => {
             // before start, first create 1000 USDC in userA account
             await usdc.connect(userA).mint(ethers.utils.parseUnits("1000", 6));
             await usdc.connect(userA).approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
-            
+
             await lendingPoolProxy
                 .connect(userA)
                 .deposit(usdc.address, amountUSDCtoDeposit);
@@ -249,6 +256,25 @@ describe("Lending Pool", () => {
     
     describe("Withdraw", async () => {
         it("UserA withdraws the whole wvUSDC balance", async() => {
+            // initialize yf pool
+            
+            await usdc
+                .connect(userA)
+                .transfer(yfPoolProxy.address, ethers.utils.parseUnits("500", 6));
+            
+            /* await yfPoolProxy
+                .connect(userA)
+                .deposit(usdcYVault.address, usdc.address, amountUSDCtoDeposit); */
+
+            // calculate interest
+            const interest = await yfPoolProxy
+                .connect(userA)
+                .assetInterest(usdcYVault.address, usdc.address);
+
+            console.log("Interest", interest.toString());
+            console.log("USDC balance after deposit", (await usdc.balanceOf(yfPoolProxy.address)).toString());
+            console.log("yvUSDC balance after deposit", (await usdcYVault.balanceOf(yfPoolProxy.address)).toString());
+            
             const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
             console.log("USDC pool previous balance: ", reserveUsdcBalance.toString());
             const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
