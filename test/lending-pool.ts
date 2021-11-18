@@ -1,4 +1,5 @@
 import chai from 'chai';
+import hre from "hardhat";
 import { ethers } from "hardhat";
 import { solidity } from "ethereum-waffle";
 import { Signer, BigNumberish } from "ethers";
@@ -14,10 +15,16 @@ import {
 chai.use(solidity);
 const { expect } = chai;
 
+export const unlockAccount = async (address: string) => {
+    await hre.network.provider.send("hardhat_impersonateAccount", [address]);
+    return address;
+};
+
 describe("Lending Pool", () => {
     let signers: Signer[];
     let deployer: Signer;
     let userA: Signer;
+
     let amountUSDCtoDeposit: BigNumberish;
     const APPROVAL_AMOUNT_LENDING_POOL = '1000000000000000000000000000';
     let wvUsdc: any;
@@ -31,6 +38,7 @@ describe("Lending Pool", () => {
     let yfPoolProxy: any;
     let priceOracle: any;
     let usdcYVault: any;
+    let whaleSigner: any;
 
     before(async () => {
         // get signers array
@@ -80,8 +88,7 @@ describe("Lending Pool", () => {
         // get LendingPoolProxy contract
         lendingPoolProxy = await LendingPool__factory.connect(lendingPoolAddress, deployer);
         console.log("LendingPool deployed to:", lendingPoolProxy.address);
-        console.log(await lendingPoolProxy.getAddressesProvider());
-        
+
         const LendingPoolConfigurator = await ethers.getContractFactory("LendingPoolConfigurator");
         const lendingPoolConfigurator  = await LendingPoolConfigurator.deploy();
         await lendingPoolConfigurator.deployed();
@@ -95,14 +102,14 @@ describe("Lending Pool", () => {
 
         // deploy USDC mock contract
         const MintableERC20 = await ethers.getContractFactory("MintableERC20");
-        usdc = await MintableERC20.deploy("USD Coin", "USDC", 6);
-        await usdc.deployed();
+        /* usdc = await MintableERC20.deploy("USD Coin", "USDC", 6);
+        await usdc.deployed(); */
+        const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+        usdc = await ethers.getContractAt(
+            "IUSDC",
+            USDC
+        );
         console.log("USDC deployed to:", usdc.address);
-
-        aave = await MintableERC20.deploy("Aave Token", "AAVE", 18);
-        await aave.deployed();
-
-        console.log("AAVE deployed to:", aave.address);
 
         const WvToken = await ethers.getContractFactory("WvToken");
         wvToken = await WvToken.deploy();
@@ -197,6 +204,7 @@ describe("Lending Pool", () => {
         const yieldFarmingPoolAddress = await lendingPoolAddressesProvider.getYieldFarmingPool();
         // get yfpool proxy contract
         yfPoolProxy = await YieldFarmingPool__factory.connect(yieldFarmingPoolAddress, deployer);
+
         console.log("YieldFarmingPool deployed to:", yfPoolProxy.address);
 
         // deploy PriceOracle
@@ -210,32 +218,53 @@ describe("Lending Pool", () => {
 
         // get price oracle contract
         priceOracle = await PriceOracle__factory.connect(priceOracleAddress, deployer);
+        
+        const whaleAddress = "0xb55167e8c781816508988A75cB15B66173C69509";
+
+        unlockAccount(whaleAddress);
+        whaleSigner = await ethers.provider.getSigner(whaleAddress);
+
+        await signers[1].sendTransaction({
+            to: whaleAddress,
+            value: ethers.utils.parseEther("100"),
+        });
+
+        userA = signers[2];
+            
+        // before start, first create 1000 USDC in userA account
+        await usdc
+            .connect(whaleSigner)
+            .transfer(await userA.getAddress(), ethers.utils.parseUnits("1000", 6));
+        
+        await usdc
+            .connect(userA)
+            .approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
+        
+        // initialize yf pool
+        await usdc
+            .connect(whaleSigner)
+            .transfer(yfPoolProxy.address, ethers.utils.parseUnits("1000", 6));
+        
+        await yfPoolProxy
+            .connect(userA)
+            .deposit(usdcYVault.address, usdc.address, amountUSDCtoDeposit);
     });
 
     describe("Deposit", async () => {
         it("UserA deposit 100 USDC to lending pool", async () => {
-            
-            console.log((await priceOracle.getAssetPrice(usdc.address)).toString());
-            userA = signers[2];
-            // before start, first create 1000 USDC in userA account
-            await usdc.connect(userA).mint(ethers.utils.parseUnits("1000", 6));
-            await usdc.connect(userA).approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
-
             await lendingPoolProxy
                 .connect(userA)
                 .deposit(usdc.address, amountUSDCtoDeposit);
-    
         });
     
         it("USDC pool balance after deposit action", async() => {
-            /* const usdcBalance = await usdc.balanceOf(await userA.getAddress());
-            console.log(usdcBalance.toString()); */
             wvUSDCAddress = allWvTokens.find(
                 (wvToken: { symbol: string; }) => wvToken.symbol === 'wvUSDC'
             )?.tokenAddress;
             wvUsdc = await WvToken__factory.connect(wvUSDCAddress, deployer);
             const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
             console.log("USDC pool balance: ", reserveUsdcBalance.toString());
+
             expect(reserveUsdcBalance.toString()).to.be.equal(
                 amountUSDCtoDeposit.toString(), 
                 "Invalid USDC reserve balance"
@@ -255,32 +284,33 @@ describe("Lending Pool", () => {
     });
     
     describe("Withdraw", async () => {
-        it("UserA withdraws the whole wvUSDC balance", async() => {
-            // initialize yf pool
-            
-            await usdc
-                .connect(userA)
-                .transfer(yfPoolProxy.address, ethers.utils.parseUnits("500", 6));
-            
-            /* await yfPoolProxy
-                .connect(userA)
-                .deposit(usdcYVault.address, usdc.address, amountUSDCtoDeposit); */
-
-            // calculate interest
+        it("UserA withdraws 50 wvUSDC balance", async() => {
+            // calculate interest for deposit
             const interest = await yfPoolProxy
                 .connect(userA)
-                .assetInterest(usdcYVault.address, usdc.address);
+                .userAssetInterest(
+                    usdcYVault.address, 
+                    usdc.address, 
+                    await userA.getAddress(), 
+                    wvUSDCAddress
+                );
 
-            console.log("Interest", interest.toString());
-            console.log("USDC balance after deposit", (await usdc.balanceOf(yfPoolProxy.address)).toString());
-            console.log("yvUSDC balance after deposit", (await usdcYVault.balanceOf(yfPoolProxy.address)).toString());
+            console.log("user interest", interest.toString());
+
+            /* console.log("USDC balance after deposit", (await usdc.balanceOf(yfPoolProxy.address)).toString());
+            console.log("yvUSDC balance after deposit", (await usdcYVault.balanceOf(yfPoolProxy.address)).toString()); */
             
+            // const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
+            const amountToWithdraw = ethers.utils.parseUnits("50", 6);
+            const totalWithdraw = parseInt(amountToWithdraw.toString()) + parseInt(interest.toString());
+            console.log("total Withdraw: ", totalWithdraw.toString());
+
             const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
-            console.log("USDC pool previous balance: ", reserveUsdcBalance.toString());
-            const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
+            console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
+
             await lendingPoolProxy
                 .connect(userA)
-                .withdraw(usdc.address, wvUsdcBalance);
+                .withdraw(usdc.address, amountToWithdraw);
         });
 
         it("UserA's wvUSDC balance after withdraw action", async() => {
@@ -289,9 +319,9 @@ describe("Lending Pool", () => {
 
             const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
             console.log("UserA wvUSDC balance: ", wvUsdcBalance.toString());
-            expect(wvUsdcBalance.toString()).to.be.equal(
+            /* expect(wvUsdcBalance.toString()).to.be.equal(
                 '0', "Invalid wvUSDC amount"
-            );
+            ); */
         });
 
         it("USDC pool balance after withdraw action", async() => {

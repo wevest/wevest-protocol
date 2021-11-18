@@ -10,4 +10,11 @@ interface IYieldFarmingPool {
     function balance(address vault) external view returns(uint256);
 
     function assetInterest(address vault, address asset) external view returns(uint256);
+
+    function userAssetInterest(
+        address vault, 
+        address asset, 
+        address user,
+        address wvToken
+    ) external view returns(uint256);
 }

@@ -153,18 +153,26 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     address yfpool = _addressesProvider.getYieldFarmingPool();
     // calcuate interest
     require (reserve.vaultTokenAddress != address(0), "Unsupported assets for vaults");
-    uint256 totalAssetInterest = IYieldFarmingPool(yfpool).assetInterest(reserve.vaultTokenAddress, asset);
-
-    uint256 yfPoolBalance = IERC20(asset).balanceOf(yfpool);
-    uint256 userInterest = totalAssetInterest.mul(userBalance).div(yfPoolBalance);
-    console.log("user interest %s", userInterest);
+    uint256 userInterest = 
+        IYieldFarmingPool(yfpool).userAssetInterest(
+          reserve.vaultTokenAddress, 
+          asset,
+          msg.sender,
+          wvToken
+        );
     // check current balance of pool
     uint256 underlyingAssetBalance = IERC20(asset).balanceOf(wvToken);
-    
+    uint256 yfPoolBalance = IERC20(asset).balanceOf(yfpool);
     // if not enough balance, transfer required asset from yf pool
-    if (underlyingAssetBalance < amount) {
-      require(yfPoolBalance >= (amount - underlyingAssetBalance), "Currently, YF pool doesnt have enough balance");
-      IERC20(asset).safeTransferFrom(yfpool, wvToken, amount - underlyingAssetBalance);
+    // total withdraw =  request withdraw + user interest
+    amountToWithdraw += userInterest;
+    uint256 extraAmount = 0;
+    if (underlyingAssetBalance < amountToWithdraw) {
+      extraAmount = amountToWithdraw.sub(underlyingAssetBalance);
+      require(yfPoolBalance >= extraAmount, "Currently, YF pool doesnt have enough balance");
+      console.log("extra amount %s", extraAmount);
+      IERC20(asset).approve(yfpool, yfPoolBalance);
+      // IERC20(asset).transferFrom(yfpool, wvToken, extraAmount);
     }
 
     /** */
@@ -176,7 +184,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       _usersConfig[msg.sender].setUsingAsCollateral(reserve.id, false);
       emit ReserveUsedAsCollateralDisabled(asset, msg.sender);
     }
-
+    
     IWvToken(wvToken).burn(msg.sender, amountToWithdraw, reserve.liquidityIndex);
 
     emit Withdraw(asset, msg.sender, amountToWithdraw);

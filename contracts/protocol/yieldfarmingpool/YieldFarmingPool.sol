@@ -7,6 +7,7 @@ import {ILendingPool} from '../../interfaces/ILendingPool.sol';
 // import {IYieldFarmingPool} from '../../interfaces/IYieldFarmingPool.sol';
 import {ILendingPoolAddressesProvider} from '../../interfaces/ILendingPoolAddressesProvider.sol';
 import {IVault} from "../../interfaces/IVault.sol";
+import {IWvToken} from '../../interfaces/IWvToken.sol';
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IPriceOracleGetter} from '../../interfaces/IPriceOracleGetter.sol';
 import "hardhat/console.sol";
@@ -64,7 +65,7 @@ contract YieldFarmingPool is VersionedInitializable {
     }
 
     function assetInterest(address vault, address asset)
-        external
+        public
         view
         returns(uint256)
     {
@@ -75,7 +76,24 @@ contract YieldFarmingPool is VersionedInitializable {
         address oracle = _addressesProvider.getPriceOracle();
         uint256 priceOfDepositToken = 
             IPriceOracleGetter(oracle).getAssetPrice(asset);
-        uint256 interest = price * balanceShares - depositTokenBalance * priceOfDepositToken;
+        priceOfDepositToken = 245051896209141;
+        uint256 interest = price * balanceShares / 10**6 - depositTokenBalance * priceOfDepositToken / 10**18;
         return interest;
+    }
+    
+    function userAssetInterest(
+        address vault, 
+        address asset, 
+        address user,
+        address wvToken
+    )
+        external
+        view
+        returns(uint256)
+    {
+        uint256 totalInterest = assetInterest(vault, asset);
+        uint256 userBalance = IWvToken(wvToken).balanceOf(user);
+        uint256 yfPoolBalance = IERC20(asset).balanceOf(address(this));
+        return totalInterest * userBalance / yfPoolBalance;
     }
 }
