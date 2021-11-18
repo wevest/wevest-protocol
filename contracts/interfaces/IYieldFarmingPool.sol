@@ -8,4 +8,6 @@ interface IYieldFarmingPool {
     function withdraw(address vault, uint256 maxShares) external returns(uint256);
 
     function balance(address vault) external returns(uint256);
+
+    function assetInterest(address vault, address asset) external returns(uint256);
 }

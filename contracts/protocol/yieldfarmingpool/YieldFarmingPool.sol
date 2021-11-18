@@ -8,6 +8,7 @@ import {IYieldFarmingPool} from '../../interfaces/IYieldFarmingPool.sol';
 import {ILendingPoolAddressesProvider} from '../../interfaces/ILendingPoolAddressesProvider.sol';
 import {IVault} from "../../interfaces/IVault.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IPriceOracleGetter} from '../../interfaces/IPriceOracleGetter.sol';
 import "hardhat/console.sol";
 
 contract YieldFarmingPool is VersionedInitializable, IYieldFarmingPool {
@@ -63,5 +64,23 @@ contract YieldFarmingPool is VersionedInitializable, IYieldFarmingPool {
         uint256 price = IVault(vault).pricePerShare();
         uint256 balanceShares = IVault(vault).balanceOf(address(this));
         return balanceShares * price;
+    }
+
+    // pricePerShare * yvUSDC Amount -  deposit amount * priceOfDepositToken = interest
+    function assetInterest(address vault, address asset)
+        external
+        override
+        returns(uint256)
+    {
+        uint256 price = IVault(vault).pricePerShare();
+        uint256 balanceShares = IVault(vault).balanceOf(address(this));
+        uint256 depositTokenBalance = IERC20(asset).balanceOf(address(this));
+
+        address oracle = _addressesProvider.getPriceOracle();
+        uint256 priceOfDepositToken = 
+            IPriceOracleGetter(oracle).getAssetPrice(asset);
+        uint256 interest = price * balanceShares - depositTokenBalance * priceOfDepositToken;
+        console.log("Interest %", interest);
+        return interest;
     }
 }

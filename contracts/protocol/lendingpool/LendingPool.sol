@@ -13,6 +13,7 @@ import {IVariableDebtToken} from '../../interfaces/IVariableDebtToken.sol';
 import {IPriceOracleGetter} from '../../interfaces/IPriceOracleGetter.sol';
 import {IStableDebtToken} from '../../interfaces/IStableDebtToken.sol';
 import {ILendingPool} from '../../interfaces/ILendingPool.sol';
+import {IYieldFarmingPool} from '../../interfaces/IYieldFarmingPool.sol';
 import {VersionedInitializable} from '../libraries/wevest-upgradeability/VersionedInitializable.sol';
 import {Helpers} from '../libraries/helpers/Helpers.sol';
 import {Errors} from '../libraries/helpers/Errors.sol';
@@ -149,16 +150,21 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       _addressesProvider.getPriceOracle()
     );
     /* added by SC */
+    address yfpool = _addressesProvider.getYieldFarmingPool();
+    // calcuate interest
+    require (reserve.vaultTokenAddress != address(0), "Unsupported assets for vaults");
+    uint256 totalAssetInterest = IYieldFarmingPool(yfpool).assetInterest(reserve.vaultTokenAddress, asset);
+
+    uint256 yfPoolBalance = IERC20(asset).balanceOf(yfpool);
+    uint256 userInterest = totalAssetInterest.mul(userBalance).div(yfPoolBalance);
+    console.log("user interest %s", userInterest);
     // check current balance of pool
     uint256 underlyingAssetBalance = IERC20(asset).balanceOf(wvToken);
     
-    address yfpool = _addressesProvider.getYieldFarmingPool();
     // if not enough balance, transfer required asset from yf pool
     if (underlyingAssetBalance < amount) {
-      uint256 requiredAmount = amount - underlyingAssetBalance;
-      uint256 yfPoolBalance = IERC20(asset).balanceOf(yfpool);
-      require(yfPoolBalance >= requiredAmount, "Currently, YF pool doesnt have enough balance");
-      IERC20(asset).safeTransferFrom(yfpool, wvToken, requiredAmount);
+      require(yfPoolBalance >= (amount - underlyingAssetBalance), "Currently, YF pool doesnt have enough balance");
+      IERC20(asset).safeTransferFrom(yfpool, wvToken, amount - underlyingAssetBalance);
     }
 
     /** */
@@ -659,18 +665,21 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
    * @param asset The address of the underlying asset of the reserve
    * @param wvTokenAddress The address of the wvToken that will be assigned to the reserve
    * @param debtTokenAddress The address of the DebtToken that will be assigned to the reserve
+   * @param vaultTokenAddress The address of the vaultToken that will be assigned to the reserve
    * @param interestRateStrategyAddress The address of the interest rate strategy contract
    **/
   function initReserve(
     address asset,
     address wvTokenAddress,
     address debtTokenAddress,
+    address vaultTokenAddress,
     address interestRateStrategyAddress
   ) external override onlyLendingPoolConfigurator {
     require(Address.isContract(asset), Errors.LP_NOT_CONTRACT);
     _reserves[asset].init(
       wvTokenAddress,
       debtTokenAddress,
+      vaultTokenAddress,
       interestRateStrategyAddress
     );
     _addReserveToList(asset);

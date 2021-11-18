@@ -7,7 +7,8 @@ import {
     LendingPoolConfigurator__factory,
     WvToken__factory,
     MintableERC20__factory,
-    YieldFarmingPool__factory
+    YieldFarmingPool__factory,
+    PriceOracle__factory
 } from '../types';
 
 chai.use(solidity);
@@ -28,6 +29,7 @@ describe("Lending Pool", () => {
     let debtToken, interestRateStrategy, protocolDataProvider;
 
     let yfPoolProxy: any;
+    let priceOracle: any;
 
     before(async () => {
         // get signers array
@@ -189,10 +191,24 @@ describe("Lending Pool", () => {
         // get yfpool proxy contract
         yfPoolProxy = await YieldFarmingPool__factory.connect(yieldFarmingPoolAddress, deployer);
         console.log("YieldFarmingPool deployed to:", yfPoolProxy.address);
+
+        // deploy PriceOracle
+        const PriceOracleFactory = await ethers.getContractFactory("PriceOracle");
+        const priceOracleContract  = await PriceOracleFactory.deploy();
+        await priceOracleContract.deployed();
+
+        // update as proxy contract
+        await lendingPoolAddressesProvider.setPriceOracle(priceOracleContract.address);
+        const priceOracleAddress = await lendingPoolAddressesProvider.getPriceOracle();
+
+        // get price oracle contract
+        priceOracle = await PriceOracle__factory.connect(priceOracleAddress, deployer);
     });
 
     describe("Deposit", async () => {
         it("UserA deposit 100 USDC to lending pool", async () => {
+            
+            console.log((await priceOracle.getAssetPrice(usdc.address)).toString());
             userA = signers[2];
             // before start, first create 1000 USDC in userA account
             await usdc.connect(userA).mint(ethers.utils.parseUnits("1000", 6));

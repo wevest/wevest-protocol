@@ -284,6 +284,7 @@ interface ILendingPool {
     address reserve,
     address wvTokenAddress,
     address debtTokenAddress,
+    address vaultTokenAddress,
     address interestRateStrategyAddress
   ) external;
 
