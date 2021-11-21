@@ -71,13 +71,8 @@ contract YieldFarmingPool is VersionedInitializable {
     {
         uint256 price = IVault(vault).pricePerShare();
         uint256 balanceShares = IVault(vault).balanceOf(address(this));
-        uint256 depositTokenBalance = IERC20(asset).balanceOf(address(this));
-
-        address oracle = _addressesProvider.getPriceOracle();
-        uint256 priceOfDepositToken = 
-            IPriceOracleGetter(oracle).getAssetPrice(asset);
-        priceOfDepositToken = 245051896209141;
-        uint256 interest = price * balanceShares / 10**6 - depositTokenBalance * priceOfDepositToken / 10**18;
+        // uint256 depositTokenBalance = IERC20(asset).balanceOf(address(this));
+        uint256 interest = price * balanceShares / 10**IVault(vault).decimals();
         return interest;
     }
     

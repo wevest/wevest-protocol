@@ -38,7 +38,7 @@ describe("Lending Pool", () => {
     let yfPoolProxy: any;
     let priceOracle: any;
     let usdcYVault: any;
-    let whaleSigner: any;
+    let whaleSigner: any, aaveWhaleSigner: any;
 
     before(async () => {
         // get signers array
@@ -111,6 +111,12 @@ describe("Lending Pool", () => {
         );
         console.log("USDC deployed to:", usdc.address);
 
+        const AAVE = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9";
+        aave = await ethers.getContractAt(
+            "IAAVE",
+            AAVE
+        );
+        console.log("AAVE deployed to:", aave.address);
         const WvToken = await ethers.getContractFactory("WvToken");
         wvToken = await WvToken.deploy();
         await wvToken.deployed();
@@ -134,7 +140,7 @@ describe("Lending Pool", () => {
 
         await debtToken.initialize(
             lendingPoolProxy.address,
-            usdc.address,
+            aave.address,
             18,
             'Wevest debt bearing AAVE',
             'debtAAVE'
@@ -250,8 +256,8 @@ describe("Lending Pool", () => {
             .deposit(usdcYVault.address, usdc.address, amountUSDCtoDeposit);
     });
 
-    describe("Deposit", async () => {
-        it("UserA deposit 100 USDC to lending pool", async () => {
+    /* describe("Deposit", async () => {
+        it("UserA deposit 200 USDC to lending pool", async () => {
             await lendingPoolProxy
                 .connect(userA)
                 .deposit(usdc.address, amountUSDCtoDeposit);
@@ -281,9 +287,9 @@ describe("Lending Pool", () => {
                 "Invalid wvUSDC amount"
             );
         });
-    });
+    }); */
     
-    describe("Withdraw", async () => {
+    /* describe("Withdraw", async () => {
         it("UserA withdraws 50 wvUSDC balance", async() => {
             // calculate interest for deposit
             const interest = await yfPoolProxy
@@ -297,8 +303,8 @@ describe("Lending Pool", () => {
 
             console.log("user interest", interest.toString());
 
-            /* console.log("USDC balance after deposit", (await usdc.balanceOf(yfPoolProxy.address)).toString());
-            console.log("yvUSDC balance after deposit", (await usdcYVault.balanceOf(yfPoolProxy.address)).toString()); */
+            // console.log("USDC balance after deposit", (await usdc.balanceOf(yfPoolProxy.address)).toString());
+            // console.log("yvUSDC balance after deposit", (await usdcYVault.balanceOf(yfPoolProxy.address)).toString());
             
             // const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
             const amountToWithdraw = ethers.utils.parseUnits("50", 6);
@@ -319,27 +325,46 @@ describe("Lending Pool", () => {
 
             const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
             console.log("UserA wvUSDC balance: ", wvUsdcBalance.toString());
-            /* expect(wvUsdcBalance.toString()).to.be.equal(
-                '0', "Invalid wvUSDC amount"
-            ); */
+            // expect(wvUsdcBalance.toString()).to.be.equal(
+            //    '0', "Invalid wvUSDC amount"
+            // );
         });
 
         it("USDC pool balance after withdraw action", async() => {
             const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
             console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
         });
-    });
+    }); */
 
-    /* describe("Borrow", async () => {
+    describe("Borrow", async () => {
         it("UserA deposit 100 USDC as collateral, and want to borrow AAVE with 3x leverage", async() => {
             await lendingPoolProxy
                 .connect(userA)
                 .deposit(usdc.address, amountUSDCtoDeposit);
 
-            const amountAaveToBorrow = ethers.utils.parseUnits("10", 18);
+            const aaveWhaleAddress = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9";
+
+            unlockAccount(aaveWhaleAddress);
+            aaveWhaleSigner = await ethers.provider.getSigner(aaveWhaleAddress);
+
+            await signers[1].sendTransaction({
+                to: aaveWhaleSigner,
+                value: ethers.utils.parseEther("100"),
+            });
+            console.log((await aave.balanceOf(aaveWhaleAddress)).toString());
+
+            /* await aave
+                .connect(aaveWhaleSigner)
+                .transfer(lendingPoolProxy.address, ethers.utils.parseUnits("1000", 18)); */
+
+            /* await usdc
+                .connect(userA)
+                .approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
+
+            const amountAaveToBorrow = ethers.utils.parseUnits("100", 18);
             await lendingPoolProxy
                 .connect(userA)
-                .borrow(aave.address, amountAaveToBorrow, 3);
+                .borrow(aave.address, amountAaveToBorrow, 3); */
         });
-    }); */
+    });
 });

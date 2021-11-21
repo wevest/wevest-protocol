@@ -136,22 +136,19 @@ contract WvToken is
    * - Only callable by the LendingPool, as extra state updates there need to be managed
    * @param user The address receiving the minted tokens
    * @param amount The amount of tokens getting minted
-   * @param index The new liquidity index of the reserve
    * @return `true` if the the previous balance of the user was 0
    */
   function mint(
     address user,
-    uint256 amount,
-    uint256 index
+    uint256 amount
   ) external override onlyLendingPool returns (bool) {
     uint256 previousBalance = super.balanceOf(user);
-    uint256 amountScaled = amount.rayDiv(index);
-
-    require(amountScaled != 0, Errors.CT_INVALID_MINT_AMOUNT);
-    _mint(user, amountScaled);
+    // uint256 amountScaled = amount.rayDiv(index);
+    require(amount != 0, Errors.CT_INVALID_MINT_AMOUNT);
+    _mint(user, amount);
     
     emit Transfer(address(0), user, amount);
-    emit Mint(user, amount, index);
+    emit Mint(user, amount);
 
     return previousBalance == 0;
   }
@@ -176,7 +173,7 @@ contract WvToken is
     _mint(treasury, amount.rayDiv(index));
 
     emit Transfer(address(0), treasury, amount);
-    emit Mint(treasury, amount, index);
+    emit Mint(treasury, amount);
   }
 
   /**
