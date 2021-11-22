@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.6.12;
 
-interface IUniswapV2Router02 {
+interface IUniswapV2Router {
   function swapExactTokensForTokens(
     uint256 amountIn,
     uint256 amountOutMin,
