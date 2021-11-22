@@ -256,7 +256,7 @@ describe("Lending Pool", () => {
             .deposit(usdcYVault.address, usdc.address, amountUSDCtoDeposit);
     });
 
-    /* describe("Deposit", async () => {
+    describe("Deposit", async () => {
         it("UserA deposit 200 USDC to lending pool", async () => {
             await lendingPoolProxy
                 .connect(userA)
@@ -287,30 +287,26 @@ describe("Lending Pool", () => {
                 "Invalid wvUSDC amount"
             );
         });
-    }); */
+    });
     
-    /* describe("Withdraw", async () => {
+    describe("Withdraw", async () => {
         it("UserA withdraws 50 wvUSDC balance", async() => {
             // calculate interest for deposit
             const interest = await yfPoolProxy
                 .connect(userA)
-                .userAssetInterest(
+                .lenderInterest(
                     usdcYVault.address, 
                     usdc.address, 
                     await userA.getAddress(), 
                     wvUSDCAddress
                 );
 
-            console.log("user interest", interest.toString());
+            console.log("userA interest", interest.toString());
 
-            // console.log("USDC balance after deposit", (await usdc.balanceOf(yfPoolProxy.address)).toString());
-            // console.log("yvUSDC balance after deposit", (await usdcYVault.balanceOf(yfPoolProxy.address)).toString());
-            
-            // const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
             const amountToWithdraw = ethers.utils.parseUnits("50", 6);
             const totalWithdraw = parseInt(amountToWithdraw.toString()) + parseInt(interest.toString());
             console.log("total Withdraw: ", totalWithdraw.toString());
-
+            
             const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
             console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
 
@@ -334,11 +330,11 @@ describe("Lending Pool", () => {
             const reserveUsdcBalance = await usdc.balanceOf(wvUSDCAddress);
             console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
         });
-    }); */
+    });
 
     describe("Borrow", async () => {
         it("UserA deposit 100 USDC as collateral, and want to borrow AAVE with 3x leverage", async() => {
-            await lendingPoolProxy
+            /* await lendingPoolProxy
                 .connect(userA)
                 .deposit(usdc.address, amountUSDCtoDeposit);
 
@@ -351,7 +347,7 @@ describe("Lending Pool", () => {
                 to: aaveWhaleSigner,
                 value: ethers.utils.parseEther("100"),
             });
-            console.log((await aave.balanceOf(aaveWhaleAddress)).toString());
+            console.log((await aave.balanceOf(aaveWhaleAddress)).toString()); */
 
             /* await aave
                 .connect(aaveWhaleSigner)

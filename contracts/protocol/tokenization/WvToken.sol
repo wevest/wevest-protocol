@@ -114,21 +114,18 @@ contract WvToken is
    * @param user The owner of the wvTokens, getting them burned
    * // param receiverOfUnderlying The address that will receive the underlying
    * @param amount The amount being burned
-   * @param index The new liquidity index of the reserve
    **/
   function burn(
     address user,
-    uint256 amount,
-    uint256 index
+    uint256 amount
   ) external override onlyLendingPool {
-    uint256 amountScaled = amount.rayDiv(index);
-    require(amountScaled != 0, Errors.CT_INVALID_BURN_AMOUNT);
-    _burn(user, amountScaled);
+    require(amount != 0, Errors.CT_INVALID_BURN_AMOUNT);
+    _burn(user, amount);
 
     IERC20(_underlyingAsset).safeTransfer(user, amount);
 
     emit Transfer(user, address(0), amount);
-    emit Burn(user, amount, index);
+    emit Burn(user, amount);
   }
 
   /**

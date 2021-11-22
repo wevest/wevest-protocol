@@ -15,7 +15,8 @@ import "hardhat/console.sol";
 contract YieldFarmingPool is VersionedInitializable {
 
     uint256 public constant YIELDFARMING_POOL_REVISION = 0x2;
-
+    // Use mapping variable to save deposit amount from our YF pool to YF protocol.
+    mapping(address => uint256) internal depositAmount;
     ILendingPoolAddressesProvider internal _addressesProvider;
 
     function initialize(ILendingPoolAddressesProvider provider) public initializer {
@@ -39,44 +40,51 @@ contract YieldFarmingPool is VersionedInitializable {
         uint256 assetBalance = IERC20(asset).balanceOf(address(this));
         require(assetBalance >= amount, "Exceeds YF pool asset balance");
         IERC20(asset).approve(vault, amount);
-        return IVault(vault).deposit(amount);
+        uint256 wrappedAmount = IVault(vault).deposit(amount);
+        if (wrappedAmount > 0) {
+            depositAmount[asset] = amount;
+        }
+        return wrappedAmount;
     }
 
-    function withdraw(address vault, uint256 maxShares) 
+    function withdraw(address vault, uint256 maxShares, address asset) 
         external
         amountGreaterThanZero(maxShares)
         returns(uint256) 
     {
         uint256 balanceShares = IVault(vault).balanceOf(address(this));
         require(balanceShares >= maxShares, "Exceeds YF pool shares balance");
-        uint256 redeemedAmount = IVault(vault).withdraw(maxShares);
-        console.log("redeemed amount %s", redeemedAmount);
-        return redeemedAmount;
+        uint256 withdrawAmount = IVault(vault).withdraw(maxShares);
+        if (withdrawAmount > 0) {
+            depositAmount[asset] -= withdrawAmount;
+        }
+        return withdrawAmount;
     }
 
-    function balance(address vault) 
-        external
+    function currentBalance(address vault) 
+        internal
         view
         returns(uint256)
     {
         uint256 price = IVault(vault).pricePerShare();
         uint256 balanceShares = IVault(vault).balanceOf(address(this));
-        return balanceShares * price;
+        return balanceShares * price / (10**IVault(vault).decimals());
     }
 
-    function assetInterest(address vault, address asset)
+    function totalEarning(address vault, address asset)
         public
         view
         returns(uint256)
     {
-        uint256 price = IVault(vault).pricePerShare();
-        uint256 balanceShares = IVault(vault).balanceOf(address(this));
-        // uint256 depositTokenBalance = IERC20(asset).balanceOf(address(this));
-        uint256 interest = price * balanceShares / 10**IVault(vault).decimals();
-        return interest;
+        uint256 currentBal = currentBalance(vault);
+        uint256 earning = 0;
+        if (currentBal >= depositAmount[asset]) {
+            earning = currentBal - depositAmount[asset];
+        }
+        return earning;
     }
     
-    function userAssetInterest(
+    function lenderInterest(
         address vault, 
         address asset, 
         address user,
@@ -86,9 +94,8 @@ contract YieldFarmingPool is VersionedInitializable {
         view
         returns(uint256)
     {
-        uint256 totalInterest = assetInterest(vault, asset);
-        uint256 userBalance = IWvToken(wvToken).balanceOf(user);
-        uint256 yfPoolBalance = IERC20(asset).balanceOf(address(this));
-        return totalInterest * userBalance / yfPoolBalance;
+        uint256 lenderBalance = IWvToken(wvToken).balanceOf(user);
+        uint256 poolBalance = IERC20(asset).balanceOf(wvToken);
+        return totalEarning(vault, asset) * lenderBalance / poolBalance;
     }
 }

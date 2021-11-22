@@ -157,7 +157,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     // calcuate interest
     require (reserve.vaultTokenAddress != address(0), "Unsupported assets for vaults");
     uint256 userInterest = 
-        IYieldFarmingPool(yfpool).userAssetInterest(
+        IYieldFarmingPool(yfpool).lenderInterest(
           reserve.vaultTokenAddress, 
           asset,
           msg.sender,
@@ -188,7 +188,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       emit ReserveUsedAsCollateralDisabled(asset, msg.sender);
     }
     
-    IWvToken(wvToken).burn(msg.sender, amountToWithdraw, reserve.liquidityIndex);
+    IWvToken(wvToken).burn(msg.sender, amountToWithdraw);
 
     emit Withdraw(asset, msg.sender, amountToWithdraw);
 
