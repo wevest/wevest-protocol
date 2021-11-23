@@ -2,25 +2,39 @@
 pragma solidity 0.6.12;
 
 import {IERC20} from '../../dependencies/openzeppelin/contracts/IERC20.sol';
+import {Context} from '../../dependencies/openzeppelin/contracts/Context.sol';
 import {IUniswapV2Router} from "../../interfaces/IUniswapV2Router.sol";
 import {IUniswapV2Pair} from  "../../interfaces/IUniswapV2Pair.sol";
 import {IUniswapV2Factory} from  "../../interfaces/IUniswapV2Factory.sol";
+import {ILendingPool} from '../../interfaces/ILendingPool.sol';
+import {Errors} from '../libraries/helpers/Errors.sol';
 
-contract TokenSwap {
+contract TokenSwap is Context {
     address private constant UNISWAP_V2_ROUTER =
         0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     address private constant UNISWAP_V2_FACTORY = 
         0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f;
     address private constant WETH = 
         0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    
+
+    ILendingPool internal _pool;
+
+    constructor(ILendingPool pool) public {
+        _pool = pool;
+    }
+
+    modifier onlyLendingPool {
+        require(_msgSender() == address(_pool), Errors.CT_CALLER_MUST_BE_LENDING_POOL);
+        _;
+    }
+
     function swap(
         address _tokenIn,
         address _tokenOut,
         uint _amountIn,
         uint _amountOutMin,
         address _to
-    ) external {
+    ) external onlyLendingPool {
         IERC20(_tokenIn).transferFrom(msg.sender, address(this), _amountIn);
         IERC20(_tokenIn).approve(UNISWAP_V2_ROUTER, _amountIn);
 
@@ -48,6 +62,7 @@ contract TokenSwap {
     function getUniswapV2PairAddress(address token0, address token1)
         public
         view
+        onlyLendingPool
         returns(address)
     {
         address pair = IUniswapV2Factory(UNISWAP_V2_FACTORY).getPair(token0, token1);
