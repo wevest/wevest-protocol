@@ -1,17 +1,7 @@
 import chai from 'chai';
 import { TestEnv, makeSuite, unlockAccount } from './helpers/make-suite';
-import hre from "hardhat";
 import { ethers } from "hardhat";
 import { solidity } from "ethereum-waffle";
-import { Signer, BigNumberish } from "ethers";
-import {
-    LendingPool__factory,
-    LendingPoolConfigurator__factory,
-    WvToken__factory,
-    MintableERC20__factory,
-    YieldFarmingPool__factory,
-    PriceOracle__factory
-} from '../types';
 
 chai.use(solidity);
 const { expect } = chai;

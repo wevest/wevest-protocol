@@ -9,6 +9,7 @@ import {
     YieldFarmingPool__factory,
     PriceOracle__factory
 } from '../../types';
+import { any } from "hardhat/internal/core/params/argumentTypes";
 
 export interface TestEnv {
     deployer: Signer;
@@ -23,6 +24,7 @@ export interface TestEnv {
     lendingPoolConfigurator: any;
     protocolDataProvider: any;
     yieldFarmingPool: any;
+    tokenSwap: any;
     usdcYVault: any;
     interestRateStrategy: any;
 }
@@ -40,6 +42,7 @@ const testEnv: TestEnv = {
     lendingPoolConfigurator: {} as any,
     protocolDataProvider: {} as any,
     yieldFarmingPool: {} as any,
+    tokenSwap: {} as any,
     usdcYVault: {} as any,
     interestRateStrategy: {} as any
 }
@@ -217,6 +220,14 @@ export async function initialize() {
     testEnv.yieldFarmingPool = await YieldFarmingPool__factory.connect(yieldFarmingPoolAddress, testEnv.deployer);
 
     console.log("YieldFarmingPool deployed to:", testEnv.yieldFarmingPool.address);
+
+    const tokenSwapFactory = await ethers.getContractFactory(
+        "TokenSwap",
+        testEnv.deployer
+    );
+
+    testEnv.tokenSwap = await tokenSwapFactory.deploy(testEnv.lendingPool.address);
+    await testEnv.tokenSwap.deployed();
 }
 
 export function makeSuite(name: string, tests: (testEnv: TestEnv) => void) {
