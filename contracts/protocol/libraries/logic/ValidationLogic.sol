@@ -110,8 +110,8 @@ library ValidationLogic {
    * @param asset The address of the asset to borrow
    * @param reserve The reserve state from which the user is borrowing
    * @param userAddress The address of the user
-   * @param amount The amount to be borrowed
-   * @param amountInETH The amount to be borrowed, in ETH
+   * param amount The amount to be borrowed
+   * param amountInETH The amount to be borrowed, in ETH
    * @param reservesData The state of all the reserves
    * @param userConfig The state of the user for the specific reserve
    * @param reserves The addresses of all the active reserves
@@ -122,15 +122,15 @@ library ValidationLogic {
     address asset,
     DataTypes.ReserveData storage reserve,
     address userAddress,
-    uint256 amount,
+    // uint256 amount,
     uint256 leverageRatioMode,
-    uint256 amountInETH,
+    // uint256 amountInETH,
     mapping(address => DataTypes.ReserveData) storage reservesData,
     DataTypes.UserConfigurationMap storage userConfig,
     mapping(uint256 => address) storage reserves,
     uint256 reservesCount,
     address oracle
-  ) external view {
+  ) external view returns(uint256) {
     ValidateBorrowLocalVars memory vars;
 
     (vars.isActive, vars.isFrozen, vars.borrowingEnabled) = reserve
@@ -139,11 +139,11 @@ library ValidationLogic {
 
     require(vars.isActive, Errors.VL_NO_ACTIVE_RESERVE);
     require(!vars.isFrozen, Errors.VL_RESERVE_FROZEN);
-    require(amount != 0, Errors.VL_INVALID_AMOUNT);
+    // require(amount != 0, Errors.VL_INVALID_AMOUNT);
 
     require(vars.borrowingEnabled, Errors.VL_BORROWING_NOT_ENABLED);
 
-    (
+    /* (
       vars.userCollateralBalanceETH,
       vars.userBorrowBalanceETH,
       vars.currentLtv,
@@ -156,24 +156,34 @@ library ValidationLogic {
       reserves,
       reservesCount,
       oracle
+    ); */
+    vars.userCollateralBalanceETH = GenericLogic.calculateUserTotalCollateral(
+      userAddress,
+      reservesData,
+      userConfig,
+      reserves,
+      reservesCount,
+      oracle
     );
-
+    
     require(vars.userCollateralBalanceETH > 0, Errors.VL_COLLATERAL_BALANCE_IS_0);
 
-    require(
+    /* require(
       vars.healthFactor > GenericLogic.HEALTH_FACTOR_LIQUIDATION_THRESHOLD,
       Errors.VL_HEALTH_FACTOR_LOWER_THAN_LIQUIDATION_THRESHOLD
-    );
+    ); */
 
     //add the current already borrowed amount to the amount requested to calculate the total collateral needed.
-    vars.amountOfCollateralNeededETH = vars.userBorrowBalanceETH.add(amountInETH).percentDiv(
+    /* vars.amountOfCollateralNeededETH = vars.userBorrowBalanceETH.add(amountInETH).percentDiv(
       vars.currentLtv
-    ); //LTV is calculated in percentage
+    );  */
+    //LTV is calculated in percentage
 
-    require(
+    /* require(
       vars.amountOfCollateralNeededETH <= vars.userCollateralBalanceETH,
       Errors.VL_COLLATERAL_CANNOT_COVER_NEW_BORROW
-    );
+    ); */
+    return vars.userCollateralBalanceETH;
   }
 
   /**
