@@ -2,6 +2,7 @@
 pragma solidity 0.6.12;
 
 import {ILendingPool} from './ILendingPool.sol';
+import {ITokenSwap} from './ITokenSwap.sol';
 // import {IWevestIncentivesController} from './IWevestIncentivesController.sol';
 
 /**
@@ -52,6 +53,7 @@ interface IInitializableWvToken {
    */
   function initialize(
     ILendingPool pool,
+    ITokenSwap tokenSwap,
     address treasury,
     address underlyingAsset,
     // IWevestIncentivesController incentivesController,

@@ -26,12 +26,12 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
         await usdc
             .connect(whaleSigner)
             .transfer(await userA.getAddress(), ethers.utils.parseUnits("1000", 6));
-        
+
         await usdc
             .connect(userA)
             .approve(lendingPool.address, APPROVAL_AMOUNT_LENDING_POOL);
         
-        // initialize yf pool
+        // initialize YieldFarmingPool
         await usdc
             .connect(whaleSigner)
             .transfer(yieldFarmingPool.address, ethers.utils.parseUnits("1000", 6));
@@ -74,7 +74,7 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
         });
     });
     
-    describe("Withdraw", async () => {
+    /* describe("Withdraw", async () => {
         it("UserA withdraws 50 wvUSDC balance", async() => {
             const { lendingPool, yieldFarmingPool, userA, usdcYVault, wvUsdc, usdc } = testEnv;
             // calculate interest for deposit
@@ -118,37 +118,24 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
             const reserveUsdcBalance = await usdc.balanceOf(wvUsdc.address);
             console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
         });
-    });
+    }); */
 
     describe("Borrow", async () => {
         it("UserA deposit 100 USDC as collateral, and want to borrow AAVE with 3x leverage", async() => {
-            /* await lendingPoolProxy
+            const { lendingPool, userA, usdc, wvUsdc, aave } = testEnv;
+            
+            await usdc
+                .connect(whaleSigner)
+                .transfer(wvUsdc.address, ethers.utils.parseUnits("1000", 6));
+
+            // userA deposit 100 USDC as collateral
+            /* await lendingPool
                 .connect(userA)
-                .deposit(usdc.address, amountUSDCtoDeposit);
-
-            const aaveWhaleAddress = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9";
-
-            unlockAccount(aaveWhaleAddress);
-            aaveWhaleSigner = await ethers.provider.getSigner(aaveWhaleAddress);
-
-            await signers[1].sendTransaction({
-                to: aaveWhaleSigner,
-                value: ethers.utils.parseEther("100"),
-            });
-            console.log((await aave.balanceOf(aaveWhaleAddress)).toString()); */
-
-            /* await aave
-                .connect(aaveWhaleSigner)
-                .transfer(lendingPoolProxy.address, ethers.utils.parseUnits("1000", 18)); */
-
-            /* await usdc
+                .deposit(usdc.address, amountToDeposit);
+            */
+            await lendingPool
                 .connect(userA)
-                .approve(lendingPoolProxy.address, APPROVAL_AMOUNT_LENDING_POOL);
-
-            const amountAaveToBorrow = ethers.utils.parseUnits("100", 18);
-            await lendingPoolProxy
-                .connect(userA)
-                .borrow(aave.address, amountAaveToBorrow, 3); */
+                .borrow(usdc.address, amountToDeposit, aave.address, 3);
         });
     });
 });

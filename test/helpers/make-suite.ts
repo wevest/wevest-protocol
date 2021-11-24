@@ -9,16 +9,20 @@ import {
     YieldFarmingPool__factory,
     PriceOracle__factory
 } from '../../types';
-import { any } from "hardhat/internal/core/params/argumentTypes";
+import { 
+    MOCK_CHAINLINK_AGGREGATORS_PRICES, 
+    PROTOCOL_GLOBAL_PARAMS,
+    oneEther 
+} from "./constants";
 
 export interface TestEnv {
     deployer: Signer;
     signers: Signer[];
     userA: Signer;
-    wvToken: any;
-    debtToken: any;
     wvUsdc: any;
+    wvAave: any;
     usdc: any;
+    aave: any;
     lendingPool: any;
     lendingPoolAddressesProvider: any;
     lendingPoolConfigurator: any;
@@ -26,6 +30,7 @@ export interface TestEnv {
     yieldFarmingPool: any;
     tokenSwap: any;
     usdcYVault: any;
+    aaveYVault: any;
     interestRateStrategy: any;
 }
 
@@ -33,10 +38,10 @@ const testEnv: TestEnv = {
     deployer: {} as Signer,
     signers: [] as Signer[],
     userA: {} as Signer,
-    wvToken: {} as any,
-    debtToken: {} as any,
     wvUsdc: {} as any,
+    wvAave: {} as any,
     usdc: {} as any,
+    aave: {} as any,
     lendingPool: {} as any,
     lendingPoolAddressesProvider: {} as any,
     lendingPoolConfigurator: {} as any,
@@ -44,6 +49,7 @@ const testEnv: TestEnv = {
     yieldFarmingPool: {} as any,
     tokenSwap: {} as any,
     usdcYVault: {} as any,
+    aaveYVault: {} as any,
     interestRateStrategy: {} as any
 }
 
@@ -121,14 +127,21 @@ export async function initialize() {
         USDC
     );
     console.log("USDC deployed to:", testEnv.usdc.address);
+    
+    const AAVE = "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9";
+    testEnv.aave = await ethers.getContractAt(
+        "IAAVE",
+        AAVE
+    );
+    console.log("AAVE deployed to:", testEnv.aave.address);
 
     const treasuryExample = "0x488177c42bD58104618cA771A674Ba7e4D5A2FBB";
 
-    const WvToken = await ethers.getContractFactory("WvToken");
-    testEnv.wvToken = await WvToken.deploy();
-    await testEnv.wvToken.deployed();
+    const WvUSDCFactory = await ethers.getContractFactory("WvToken");
+    const wvUSDCContract = await WvUSDCFactory.deploy();
+    await wvUSDCContract.deployed();
 
-    await testEnv.wvToken.initialize(
+    await wvUSDCContract.initialize(
         testEnv.lendingPool.address,
         treasuryExample,
         testEnv.usdc.address,
@@ -136,14 +149,25 @@ export async function initialize() {
         'Wevest interest bearing USDC',
         'wvUSDC'
     );
-
-    console.log("wvUSDC deployed to:", testEnv.wvToken.address);
     
-    const DebtToken = await ethers.getContractFactory("DebtToken");
-    testEnv.debtToken = await DebtToken.deploy();
-    await testEnv.debtToken.deployed();
+    const WvAAVEFactory = await ethers.getContractFactory("WvToken");
+    const wvAAVEContract = await WvAAVEFactory.deploy();
+    await wvAAVEContract.deployed();
 
-    await testEnv.debtToken.initialize(
+    await wvAAVEContract.initialize(
+        testEnv.lendingPool.address,
+        treasuryExample,
+        testEnv.aave.address,
+        18,
+        'Wevest interest bearing AAVE',
+        'wvAAVE'
+    );
+
+    const DebtUSDCFactory = await ethers.getContractFactory("DebtToken");
+    const debtUSDCContract = await DebtUSDCFactory.deploy();
+    await debtUSDCContract.deployed();
+
+    await debtUSDCContract.initialize(
         testEnv.lendingPool.address,
         testEnv.usdc.address,
         6,
@@ -151,17 +175,35 @@ export async function initialize() {
         'debtUSDC'
     );
 
+    const DebtAAVEFactory = await ethers.getContractFactory("DebtToken");
+    const debtAAVEContract = await DebtAAVEFactory.deploy();
+    await debtAAVEContract.deployed();
+
+    await debtAAVEContract.initialize(
+        testEnv.lendingPool.address,
+        testEnv.usdc.address,
+        18,
+        'Wevest debt bearing AAVE',
+        'debtAAVE'
+    );
+    
     const InterestRateStrategy = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
     testEnv.interestRateStrategy = await InterestRateStrategy.deploy(testEnv.lendingPoolAddressesProvider.address);
     await testEnv.interestRateStrategy.deployed();
     
     console.log("DefaultReserveInterestRateStrategy deployed to:", testEnv.interestRateStrategy.address);
     
-    const USDC_YVAULT = "0x5f18C75AbDAe578b483E5F43f12a39cF75b973a9";
+    const USDC_YVAULT = "0xa354F35829Ae975e850e23e9615b11Da1B3dC4DE";
 
     testEnv.usdcYVault = await ethers.getContractAt(
         "IVault",
         USDC_YVAULT
+    );
+    
+    const AAVE_YVAULT = "0xd9788f3931Ede4D5018184E198699dC6d66C1915";
+    testEnv.aaveYVault = await ethers.getContractAt(
+        "IVault",
+        AAVE_YVAULT
     );
 
     let initReserveParams: {
@@ -180,18 +222,31 @@ export async function initialize() {
     }[] = [];
 
     initReserveParams.push({
-        wvTokenImpl: testEnv.wvToken.address,
-        debtTokenImpl: testEnv.debtToken.address,
+        wvTokenImpl: wvUSDCContract.address,
+        debtTokenImpl: debtUSDCContract.address,
         vaultTokenAddress: testEnv.usdcYVault.address,
         underlyingAsset: testEnv.usdc.address,
         underlyingAssetName: await testEnv.usdc.name(),
         underlyingAssetDecimals: await testEnv.usdc.decimals(),
         interestRateStrategyAddress: testEnv.interestRateStrategy.address,
         treasury: treasuryExample,
-        wvTokenName: await testEnv.wvToken.name(),
-        wvTokenSymbol: await testEnv.wvToken.symbol(),
-        debtTokenName: await testEnv.debtToken.name(),
-        debtTokenSymbol: await testEnv.debtToken.symbol()
+        wvTokenName: await wvUSDCContract.name(),
+        wvTokenSymbol: await wvUSDCContract.symbol(),
+        debtTokenName: await debtUSDCContract.name(),
+        debtTokenSymbol: await debtUSDCContract.symbol()
+    }, {
+        wvTokenImpl: wvAAVEContract.address,
+        debtTokenImpl: debtAAVEContract.address,
+        vaultTokenAddress: testEnv.aaveYVault.address,
+        underlyingAsset: testEnv.aave.address,
+        underlyingAssetName: await testEnv.aave.name(),
+        underlyingAssetDecimals: await testEnv.aave.decimals(),
+        interestRateStrategyAddress: testEnv.interestRateStrategy.address,
+        treasury: treasuryExample,
+        wvTokenName: await wvAAVEContract.name(),
+        wvTokenSymbol: await wvAAVEContract.symbol(),
+        debtTokenName: await debtAAVEContract.name(),
+        debtTokenSymbol: await debtAAVEContract.symbol()
     });
 
     await testEnv.lendingPoolConfigurator.batchInitReserve(initReserveParams);
@@ -207,6 +262,13 @@ export async function initialize() {
         (wvToken: { symbol: string; }) => wvToken.symbol === 'wvUSDC'
     )?.tokenAddress;
     testEnv.wvUsdc = await WvToken__factory.connect(wvUSDCAddress, testEnv.deployer);
+    console.log("wvUSDC proxy deployed:", testEnv.wvUsdc.address);
+
+    const wvAAVEAddress = allWvTokens.find(
+        (wvToken: { symbol: string; }) => wvToken.symbol === 'wvAAVE'
+    )?.tokenAddress;
+    testEnv.wvAave = await WvToken__factory.connect(wvAAVEAddress, testEnv.deployer);
+    console.log("wvAAVE proxy deployed:", testEnv.wvAave.address);
 
     // deploy YieldFarmingPool
     const YieldFarmingPool = await ethers.getContractFactory("YieldFarmingPool");
@@ -228,6 +290,53 @@ export async function initialize() {
 
     testEnv.tokenSwap = await tokenSwapFactory.deploy(testEnv.lendingPool.address);
     await testEnv.tokenSwap.deployed();
+
+    // setup price oracle
+    const priceOracle =  await ethers.getContractFactory("PriceOracle");
+    const fallbackOracle = await priceOracle.deploy();
+    await fallbackOracle.deployed();
+
+    await fallbackOracle.setEthUsdPrice(PROTOCOL_GLOBAL_PARAMS.MockUsdPriceInWei);
+    // set initial asset price
+    await fallbackOracle.setAssetPrice(testEnv.usdc.address, MOCK_CHAINLINK_AGGREGATORS_PRICES.USDC);
+    await fallbackOracle.setAssetPrice(testEnv.aave.address, MOCK_CHAINLINK_AGGREGATORS_PRICES.AAVE);
+
+    const MockAggregator = await ethers.getContractFactory("MockAggregator");
+    const usdcMockAggregator = await MockAggregator.deploy(MOCK_CHAINLINK_AGGREGATORS_PRICES.USDC);
+    await usdcMockAggregator.deployed();
+
+    const aaveMockAggregator = await MockAggregator.deploy(MOCK_CHAINLINK_AGGREGATORS_PRICES.AAVE);
+    await aaveMockAggregator.deployed();
+
+    const WETHMocked = await ethers.getContractFactory("WETH9Mocked");
+    const wethMocked = await WETHMocked.deploy();
+    await wethMocked.deployed(); 
+
+    const WevestOracle = await ethers.getContractFactory("WevestOracle");
+    const wevestOracle = await WevestOracle.deploy(
+        [
+            testEnv.usdc.address,
+            testEnv.aave.address
+        ],
+        [
+            usdcMockAggregator.address,
+            aaveMockAggregator.address
+        ],
+        fallbackOracle.address,
+        wethMocked.address,
+        oneEther.toString(),
+    );
+    await wevestOracle.deployed();
+
+    await testEnv.lendingPoolAddressesProvider.setPriceOracle(fallbackOracle.address);
+    // enabled borrowing
+    await testEnv.lendingPoolConfigurator
+        .connect(testEnv.deployer)
+        .enableBorrowingOnReserve(testEnv.usdc.address);
+
+    await testEnv.lendingPoolConfigurator
+        .connect(testEnv.deployer)
+        .enableBorrowingOnReserve(testEnv.aave.address);
 }
 
 export function makeSuite(name: string, tests: (testEnv: TestEnv) => void) {

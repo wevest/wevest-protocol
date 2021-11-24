@@ -9,6 +9,7 @@ import {WadRayMath} from '../libraries/math/WadRayMath.sol';
 import {Errors} from '../libraries/helpers/Errors.sol';
 import {VersionedInitializable} from '../libraries/wevest-upgradeability/VersionedInitializable.sol';
 import {IncentivizedERC20} from './IncentivizedERC20.sol';
+import {ITokenSwap} from '../../interfaces/ITokenSwap.sol';
 // import {IWevestIncentivesController} from '../../interfaces/IWevestIncentivesController.sol';
 import "hardhat/console.sol";
 
@@ -39,6 +40,7 @@ contract WvToken is
   bytes32 public DOMAIN_SEPARATOR;
 
   ILendingPool internal _pool;
+  ITokenSwap internal _tokenSwap;
   address internal _treasury;
   address internal _underlyingAsset;
   // IWevestIncentivesController internal _incentivesController;
@@ -64,6 +66,7 @@ contract WvToken is
    */
   function initialize(
     ILendingPool pool,
+    ITokenSwap tokenSwap,
     address treasury,
     address underlyingAsset,
     // IWevestIncentivesController incentivesController,
@@ -93,6 +96,7 @@ contract WvToken is
     _setDecimals(wvTokenDecimals);
 
     _pool = pool;
+    _tokenSwap = tokenSwap;
     _treasury = treasury;
     _underlyingAsset = underlyingAsset;
     // _incentivesController = incentivesController;
@@ -222,7 +226,7 @@ contract WvToken is
    * @return The scaled balance of the user
    * @return The scaled balance and the scaled total supply
    **/
-  function getScaledUserBalanceAndSupply(address user)
+  function getUserBalanceAndSupply(address user)
     external
     view
     override
@@ -394,5 +398,18 @@ contract WvToken is
     uint256 amount
   ) internal override {
     _transfer(from, to, amount, true);
+  }
+
+  function swap(
+    address _tokenOut,
+    uint _amountIn
+  ) external override onlyLendingPool {
+      _tokenSwap.swap(
+        _underlyingAsset,
+        _tokenOut,
+        _amountIn,
+        1,
+        msg.sender
+      );
   }
 }

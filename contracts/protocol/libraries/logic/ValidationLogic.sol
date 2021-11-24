@@ -130,7 +130,7 @@ library ValidationLogic {
     mapping(uint256 => address) storage reserves,
     uint256 reservesCount,
     address oracle
-  ) external view returns(uint256) {
+  ) external view {
     ValidateBorrowLocalVars memory vars;
 
     (vars.isActive, vars.isFrozen, vars.borrowingEnabled) = reserve
@@ -183,7 +183,6 @@ library ValidationLogic {
       vars.amountOfCollateralNeededETH <= vars.userCollateralBalanceETH,
       Errors.VL_COLLATERAL_CANNOT_COVER_NEW_BORROW
     ); */
-    return vars.userCollateralBalanceETH;
   }
 
   /**
