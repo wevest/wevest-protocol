@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.6.12;
 
-import {VariableDebtToken} from '../../protocol/tokenization/VariableDebtToken.sol';
+import {DebtToken} from '../../protocol/tokenization/DebtToken.sol';
 
-contract MockVariableDebtToken is VariableDebtToken {
+contract MockDebtToken is DebtToken {
   function getRevision() internal pure override returns (uint256) {
     return 0x2;
   }

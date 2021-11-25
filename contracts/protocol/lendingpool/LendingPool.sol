@@ -9,9 +9,7 @@ import {Address} from '../../dependencies/openzeppelin/contracts/Address.sol';
 import {ILendingPoolAddressesProvider} from '../../interfaces/ILendingPoolAddressesProvider.sol';
 import {IWvToken} from '../../interfaces/IWvToken.sol';
 import {IDebtToken} from '../../interfaces/IDebtToken.sol';
-import {IVariableDebtToken} from '../../interfaces/IVariableDebtToken.sol';
 import {IPriceOracleGetter} from '../../interfaces/IPriceOracleGetter.sol';
-import {IStableDebtToken} from '../../interfaces/IStableDebtToken.sol';
 import {ILendingPool} from '../../interfaces/ILendingPool.sol';
 import {IYieldFarmingPool} from '../../interfaces/IYieldFarmingPool.sol';
 import {IVault} from '../../interfaces/IVault.sol';
@@ -360,62 +358,6 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     return paybackAmount;
   }
-
-  /* function repay(
-    address asset,
-    uint256 amount,
-    uint256 rateMode,
-    address onBehalfOf
-  ) external override whenNotPaused returns (uint256) {
-    DataTypes.ReserveData storage reserve = _reserves[asset];
-
-    (uint256 stableDebt, uint256 variableDebt) = Helpers.getUserCurrentDebt(onBehalfOf, reserve);
-
-    DataTypes.InterestRateMode interestRateMode = DataTypes.InterestRateMode(rateMode);
-
-    ValidationLogic.validateRepay(
-      reserve,
-      amount,
-      interestRateMode,
-      onBehalfOf,
-      stableDebt,
-      variableDebt
-    );
-
-    uint256 paybackAmount =
-      interestRateMode == DataTypes.InterestRateMode.STABLE ? stableDebt : variableDebt;
-
-    if (amount < paybackAmount) {
-      paybackAmount = amount;
-    }
-
-    reserve.updateState();
-
-    if (interestRateMode == DataTypes.InterestRateMode.STABLE) {
-      IStableDebtToken(reserve.stableDebtTokenAddress).burn(onBehalfOf, paybackAmount);
-    } else {
-      IVariableDebtToken(reserve.variableDebtTokenAddress).burn(
-        onBehalfOf,
-        paybackAmount,
-        reserve.variableBorrowIndex
-      );
-    }
-
-    address wvToken = reserve.wvTokenAddress;
-    reserve.updateInterestRates(asset, wvToken, paybackAmount, 0);
-
-    if (stableDebt.add(variableDebt).sub(paybackAmount) == 0) {
-      _usersConfig[onBehalfOf].setBorrowing(reserve.id, false);
-    }
-
-    IERC20(asset).safeTransferFrom(msg.sender, wvToken, paybackAmount);
-
-    IWvToken(wvToken).handleRepayment(msg.sender, paybackAmount);
-
-    emit Repay(asset, onBehalfOf, msg.sender, paybackAmount);
-
-    return paybackAmount;
-  } */
 
   /**
    * @dev Allows depositors to enable/disable a specific deposited asset as collateral

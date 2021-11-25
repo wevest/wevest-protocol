@@ -8,10 +8,9 @@ pragma solidity 0.6.12;
  * @dev Error messages prefix glossary:
  *  - VL = ValidationLogic
  *  - MATH = Math libraries
- *  - CT = Common errors between tokens (AToken, VariableDebtToken and StableDebtToken)
- *  - AT = AToken
- *  - SDT = StableDebtToken
- *  - VDT = VariableDebtToken
+ *  - CT = Common errors between tokens (WvToken and DebtToken)
+ *  - WVT = WvToken
+ *  - DT = DebtToken
  *  - LP = LendingPool
  *  - LPAPR = LendingPoolAddressesProviderRegistry
  *  - LPC = LendingPoolConfiguration
@@ -97,8 +96,8 @@ library Errors {
   string public constant LP_INCONSISTENT_PARAMS_LENGTH = '74';
   string public constant UL_INVALID_INDEX = '77';
   string public constant LP_NOT_CONTRACT = '78';
-  string public constant SDT_STABLE_DEBT_OVERFLOW = '79';
-  string public constant SDT_BURN_EXCEEDS_BALANCE = '80';
+  string public constant DT_STABLE_DEBT_OVERFLOW = '79';
+  string public constant DT_BURN_EXCEEDS_BALANCE = '80';
 
   enum CollateralManagerErrors {
     NO_ERROR,
