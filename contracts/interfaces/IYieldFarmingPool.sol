@@ -5,9 +5,11 @@ pragma experimental ABIEncoderV2;
 interface IYieldFarmingPool {
     function deposit(address vault, address asset, uint amount) external returns(uint256);
 
-    function withdraw(address vault, uint256 maxShares) external returns(uint256);
+    function withdraw(address vault, uint256 maxShares, address asset) external returns(uint256);
 
     function totalEarning(address vault, address asset) external view returns(uint256);
+
+    function currentBalance(address vault) external view returns(uint256);
 
     function lenderInterest(
         address vault, 

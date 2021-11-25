@@ -157,15 +157,6 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
         });
     });
 
-    describe("Repay", async () => {
-        /* it("UserA repay 100 AAVE", async() => {
-            const { lendingPool, userA, usdc, aave } = testEnv;
-            await lendingPool
-                .connect(userA)
-                .repay(aave.address, ethers.utils.parseUnits("100", 18));
-        }); */
-    });
-
     describe("YF Pool transfer request", async () => {
         it("Check current balance of selected asset", async () => {
             const { yieldFarmingPool, aave } =  testEnv;
@@ -186,6 +177,15 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
             console.log("AAVE balance after transfer", afterBalance.toString());
             const YvTokenBalance = await aaveYVault.balanceOf(yieldFarmingPool.address);
             console.log("yvAAVE balance after transfer", YvTokenBalance.toString());
+        });
+    });
+
+    describe("Redeem", async () => {
+        it("UserA redeem loan", async() => {
+            const { lendingPool, userA, usdc, aave } = testEnv;
+            await lendingPool
+                .connect(userA)
+                .redeem(aave.address, usdc.address);
         });
     });
 });

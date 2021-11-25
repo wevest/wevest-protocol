@@ -247,6 +247,66 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     );
   }
 
+  function redeem(
+    address assetBorrowed,
+    address collateralAsset
+  ) external override whenNotPaused {
+    DataTypes.ReserveData storage reserve = _reserves[assetBorrowed];
+    DataTypes.ReserveData storage collateralReserve = _reserves[collateralAsset];
+    uint256 userDebt = Helpers.getUserCurrentDebt(msg.sender, collateralReserve);
+    console.log("userDebt %s", userDebt);
+
+    address yfpool = _addressesProvider.getYieldFarmingPool();
+    uint withdrawAmount = IYieldFarmingPool(yfpool).withdraw(
+      reserve.vaultTokenAddress,
+      IYieldFarmingPool(yfpool).currentBalance(reserve.vaultTokenAddress),
+      assetBorrowed
+    );
+
+    console.log("withdrawAmount %s", withdrawAmount);
+    uint256 swappedAmount = IYieldFarmingPool(yfpool).swap(
+      assetBorrowed,
+      collateralAsset,
+      withdrawAmount
+    );
+    console.log("swappedAmount %s", swappedAmount);
+
+    if (swappedAmount >= userDebt) { // price up
+      IERC20(collateralAsset).transferFrom(
+        yfpool,
+        collateralReserve.wvTokenAddress, 
+        userDebt
+      );
+
+      // transfer the rest amount including interest to borrower account
+      IERC20(collateralAsset).transferFrom(
+        yfpool,
+        msg.sender,
+        swappedAmount - userDebt
+      );
+    } else { // price down
+      IERC20(collateralAsset).transferFrom(
+        yfpool,
+        collateralReserve.wvTokenAddress, 
+        swappedAmount
+      );
+
+      // get user collateral balance
+      uint userCollateralBalance = 0;
+      (userCollateralBalance, ) = 
+        IWvToken(collateralReserve.wvTokenAddress).getUserBalanceAndSupply(msg.sender);
+      // transfer borrower account
+      uint receiveAmount = userCollateralBalance - (userDebt - swappedAmount);
+      IWvToken(collateralReserve.wvTokenAddress).transferUnderlyingTo(
+        msg.sender, 
+        receiveAmount
+      );
+    }
+
+    // burns the debt token
+    IDebtToken(collateralReserve.debtTokenAddress).burn(msg.sender, userDebt);
+  }
+
   /**
    * @notice Repays a borrowed `amount` on a specific reserve, burning the equivalent debt tokens owned
    * - E.g. User repays 100 USDC, burning 100 debt tokens
@@ -775,9 +835,9 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     bool isFirstBorrowing = false;
 
     // issue debt token with leverage amount
-    isFirstBorrowing = IDebtToken(reserve.debtTokenAddress).mint(
+    isFirstBorrowing = IDebtToken(collateralReserve.debtTokenAddress).mint(
       vars.user,
-      swappedAmount
+      leverageAmount
     );
 
     if (isFirstBorrowing) {

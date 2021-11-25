@@ -63,7 +63,7 @@ contract YieldFarmingPool is VersionedInitializable {
     }
 
     function currentBalance(address vault) 
-        internal
+        public
         view
         returns(uint256)
     {

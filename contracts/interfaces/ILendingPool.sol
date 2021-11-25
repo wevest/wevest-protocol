@@ -185,6 +185,11 @@ interface ILendingPool {
     // address onBehalfOf
   ) external;
 
+  function redeem(
+    address assetBorrowed,
+    address collateralAsset
+  ) external;
+
   /**
    * @notice Repays a borrowed `amount` on a specific reserve, burning the equivalent debt tokens owned
    * - E.g. User repays 100 USDC, burning 100 variable/stable debt tokens of the `onBehalfOf` address
