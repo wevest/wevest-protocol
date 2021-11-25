@@ -10,6 +10,8 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
     const APPROVAL_AMOUNT_LENDING_POOL = '1000000000000000000000000000';
     let whaleSigner: any;
     const amountToDeposit = ethers.utils.parseUnits("100", 6);
+    let aaveBalance: any;
+
     before(async () => {
         const { userA, usdc, lendingPool, yieldFarmingPool, usdcYVault } = testEnv;
         const whaleAddress = "0xb55167e8c781816508988A75cB15B66173C69509";
@@ -155,12 +157,35 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
         });
     });
 
-    describe("Redeem", async () => {
-        it("UserA repay 100 USDC", async() => {
+    describe("Repay", async () => {
+        /* it("UserA repay 100 AAVE", async() => {
             const { lendingPool, userA, usdc, aave } = testEnv;
             await lendingPool
                 .connect(userA)
                 .repay(aave.address, ethers.utils.parseUnits("100", 18));
+        }); */
+    });
+
+    describe("YF Pool transfer request", async () => {
+        it("Check current balance of selected asset", async () => {
+            const { yieldFarmingPool, aave } =  testEnv;
+            aaveBalance = await aave.balanceOf(yieldFarmingPool.address);
+            console.log("AAVE balance", aaveBalance.toString());
+        });
+
+        it("Send selected asset to Yearn Finance protocol", async () => {
+            const { yieldFarmingPool, aave, aaveYVault, userA } =  testEnv;
+            await yieldFarmingPool
+                .connect(userA)
+                .deposit(aaveYVault.address, aave.address, aaveBalance);
+        });
+
+        it("Check current balance of underlying asset and yVault token after transfer", async () => {
+            const { yieldFarmingPool, aave, aaveYVault } =  testEnv;
+            const afterBalance = await aave.balanceOf(yieldFarmingPool.address);
+            console.log("AAVE balance after transfer", afterBalance.toString());
+            const YvTokenBalance = await aaveYVault.balanceOf(yieldFarmingPool.address);
+            console.log("yvAAVE balance after transfer", YvTokenBalance.toString());
         });
     });
 });
