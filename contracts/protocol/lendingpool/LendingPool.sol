@@ -249,7 +249,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
   /**
    * @notice Repays a borrowed `amount` on a specific reserve, burning the equivalent debt tokens owned
-   * - E.g. User repays 100 USDC, burning 100 variable/stable debt tokens of the `onBehalfOf` address
+   * - E.g. User repays 100 USDC, burning 100 debt tokens
    * @param asset The address of the borrowed underlying asset previously borrowed
    * @param amount The amount to repay
    * - Send the value type(uint256).max in order to repay the whole debt for `asset` on the specific `debtMode`
@@ -267,7 +267,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     DataTypes.ReserveData storage reserve = _reserves[asset];
 
     uint256 userDebt = Helpers.getUserCurrentDebt(msg.sender, reserve);
-
+    console.log("currentDebt %s", userDebt);
     ValidationLogic.validateRepay(
       reserve,
       amount,
@@ -280,12 +280,12 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       paybackAmount = amount;
     }
 
-    reserve.updateState();
+    // reserve.updateState();
 
     IDebtToken(reserve.debtTokenAddress).burn(msg.sender, paybackAmount);
 
     address wvToken = reserve.wvTokenAddress;
-    reserve.updateInterestRates(asset, wvToken, paybackAmount, 0);
+    // reserve.updateInterestRates(asset, wvToken, paybackAmount, 0);
 
     if (userDebt.sub(paybackAmount) == 0) {
       _usersConfig[msg.sender].setBorrowing(reserve.id, false);
@@ -293,7 +293,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     IERC20(asset).safeTransferFrom(msg.sender, wvToken, paybackAmount);
 
-    IWvToken(wvToken).handleRepayment(msg.sender, paybackAmount);
+    // IWvToken(wvToken).handleRepayment(msg.sender, paybackAmount);
 
     emit Repay(asset, msg.sender, paybackAmount);
 
@@ -355,47 +355,6 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     return paybackAmount;
   } */
-
-  /**
-   * @dev Rebalances the stable interest rate of a user to the current stable rate defined on the reserve.
-   * - Users can be rebalanced if the following conditions are satisfied:
-   *     1. Usage ratio is above 95%
-   *     2. the current deposit APY is below REBALANCE_UP_THRESHOLD * maxVariableBorrowRate, which means that too much has been
-   *        borrowed at a stable rate and depositors are not earning enough
-   * @param asset The address of the underlying asset borrowed
-   * @param user The address of the user to be rebalanced
-   **/
-  function rebalanceStableBorrowRate(address asset, address user) external override whenNotPaused {
-    DataTypes.ReserveData storage reserve = _reserves[asset];
-
-    IERC20 stableDebtToken = IERC20(reserve.stableDebtTokenAddress);
-    IERC20 variableDebtToken = IERC20(reserve.variableDebtTokenAddress);
-    address wvTokenAddress = reserve.wvTokenAddress;
-
-    uint256 stableDebt = IERC20(stableDebtToken).balanceOf(user);
-
-    ValidationLogic.validateRebalanceStableBorrowRate(
-      reserve,
-      asset,
-      stableDebtToken,
-      variableDebtToken,
-      wvTokenAddress
-    );
-
-    reserve.updateState();
-
-    IStableDebtToken(address(stableDebtToken)).burn(user, stableDebt);
-    IStableDebtToken(address(stableDebtToken)).mint(
-      user,
-      user,
-      stableDebt,
-      reserve.currentStableBorrowRate
-    );
-
-    reserve.updateInterestRates(asset, wvTokenAddress, 0, 0);
-
-    emit RebalanceStableBorrowRate(asset, user);
-  }
 
   /**
    * @dev Allows depositors to enable/disable a specific deposited asset as collateral
@@ -805,19 +764,20 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       leverageAmount
     );
 
-    IYieldFarmingPool(yfpool).swap(
+    uint256 swappedAmount = IYieldFarmingPool(yfpool).swap(
         vars.collateralAsset,
         vars.assetToBorrow,
         leverageAmount
     );
+    console.log("swappedAmount %s", swappedAmount);
     // reserve.updateState();
 
     bool isFirstBorrowing = false;
 
     // issue debt token with leverage amount
-    isFirstBorrowing = IDebtToken(collateralReserve.debtTokenAddress).mint(
+    isFirstBorrowing = IDebtToken(reserve.debtTokenAddress).mint(
       vars.user,
-      leverageAmount
+      swappedAmount
     );
 
     if (isFirstBorrowing) {

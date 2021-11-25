@@ -41,7 +41,7 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
             .deposit(usdcYVault.address, usdc.address, amountToDeposit);
     });
 
-    describe("Deposit", async () => {
+    /* describe("Deposit", async () => {
         it("UserA deposit 100 USDC to lending pool", async () => {
             const { lendingPool, usdc, userA } = testEnv;
             await lendingPool
@@ -72,9 +72,9 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
                 "Invalid wvUSDC amount"
             );
         });
-    });
+    }); */
     
-    describe("Withdraw", async () => {
+    /* describe("Withdraw", async () => {
         it("UserA withdraws 50 wvUSDC balance", async() => {
             const { lendingPool, yieldFarmingPool, userA, usdcYVault, wvUsdc, usdc } = testEnv;
             // calculate interest for deposit
@@ -118,11 +118,11 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
             const reserveUsdcBalance = await usdc.balanceOf(wvUsdc.address);
             console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
         });
-    });
+    }); */
 
     describe("Borrow", async () => {
         it("UserA deposit 100 USDC as collateral, and want to borrow AAVE with 3x leverage", async() => {
-            const { lendingPool, userA, usdc, wvUsdc, aave, deployer } = testEnv;
+            const { lendingPool, userA, usdc, aave } = testEnv;
             // First deposit enough pool balance to test borrow function
             await usdc
                 .connect(whaleSigner)
@@ -136,6 +136,31 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
             await lendingPool
                 .connect(userA)
                 .borrow(usdc.address, amountToDeposit, aave.address, 3);
+        });
+
+        it("check UserA reserve data after borrowing", async() => {
+            const { protocolDataProvider, aave, userA } = testEnv;
+            const [
+                currentWvAaveBal, 
+                currentDebt, 
+                principleDebt, 
+                liquidityRate, 
+                usageAsCollateralEnabled
+            ] = await protocolDataProvider.getUserReserveData(
+                aave.address, 
+                await userA.getAddress()
+            );
+            console.log("UserA wvAAVE balance: ", currentWvAaveBal.toString());
+            console.log("UserA debtAAVE balance: ", currentDebt.toString());
+        });
+    });
+
+    describe("Redeem", async () => {
+        it("UserA repay 100 USDC", async() => {
+            const { lendingPool, userA, usdc, aave } = testEnv;
+            await lendingPool
+                .connect(userA)
+                .repay(aave.address, ethers.utils.parseUnits("100", 18));
         });
     });
 });

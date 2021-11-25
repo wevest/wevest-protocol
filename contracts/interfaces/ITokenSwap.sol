@@ -8,7 +8,7 @@ interface ITokenSwap {
         uint _amountIn,
         uint _amountOutMin,
         address _to
-    ) external;
+    ) external returns(uint);
 
     function getUniswapV2PairAddress(address token0, address token1)
         external

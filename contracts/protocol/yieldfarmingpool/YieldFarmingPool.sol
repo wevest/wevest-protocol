@@ -104,10 +104,10 @@ contract YieldFarmingPool is VersionedInitializable {
         address _tokenIn,
         address _tokenOut,
         uint _amountIn
-    ) external {
+    ) external returns(uint) {
         address tokenSwap = _addressesProvider.getTokenSwap();
         IERC20(_tokenIn).approve(tokenSwap, _amountIn);
-        ITokenSwap(tokenSwap).swap(
+        return ITokenSwap(tokenSwap).swap(
             _tokenIn,
             _tokenOut,
             _amountIn,

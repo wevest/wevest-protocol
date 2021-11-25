@@ -20,5 +20,5 @@ interface IYieldFarmingPool {
         address _tokenIn,
         address _tokenOut,
         uint _amountIn
-    ) external;
+    ) external returns(uint);
 }

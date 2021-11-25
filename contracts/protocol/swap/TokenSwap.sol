@@ -41,7 +41,7 @@ contract TokenSwap is VersionedInitializable {
         uint _amountIn,
         uint _amountOutMin,
         address _to
-    ) external {
+    ) external returns(uint) {
         IERC20(_tokenIn).transferFrom(msg.sender, address(this), _amountIn);
         IERC20(_tokenIn).approve(UNISWAP_V2_ROUTER, _amountIn);
 
@@ -64,6 +64,13 @@ contract TokenSwap is VersionedInitializable {
             _to,
             block.timestamp
         );
+
+        uint[] memory amountOut = IUniswapV2Router(UNISWAP_V2_ROUTER).getAmountsOut(
+            _amountIn, 
+            path
+        );
+
+        return amountOut[path.length - 1];
     }
 
     function getUniswapV2PairAddress(address token0, address token1)
