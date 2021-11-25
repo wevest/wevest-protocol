@@ -14,6 +14,7 @@ import {IPriceOracleGetter} from '../../interfaces/IPriceOracleGetter.sol';
 import {IStableDebtToken} from '../../interfaces/IStableDebtToken.sol';
 import {ILendingPool} from '../../interfaces/ILendingPool.sol';
 import {IYieldFarmingPool} from '../../interfaces/IYieldFarmingPool.sol';
+import {IVault} from '../../interfaces/IVault.sol';
 import {VersionedInitializable} from '../libraries/wevest-upgradeability/VersionedInitializable.sol';
 import {Helpers} from '../libraries/helpers/Helpers.sol';
 import {Errors} from '../libraries/helpers/Errors.sol';
@@ -259,7 +260,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     address yfpool = _addressesProvider.getYieldFarmingPool();
     uint withdrawAmount = IYieldFarmingPool(yfpool).withdraw(
       reserve.vaultTokenAddress,
-      IYieldFarmingPool(yfpool).currentBalance(reserve.vaultTokenAddress),
+      IVault(reserve.vaultTokenAddress).balanceOf(yfpool),
       assetBorrowed
     );
 
@@ -271,6 +272,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     );
     console.log("swappedAmount %s", swappedAmount);
 
+    IERC20(collateralAsset).approve(yfpool, swappedAmount);
     if (swappedAmount >= userDebt) { // price up
       IERC20(collateralAsset).transferFrom(
         yfpool,

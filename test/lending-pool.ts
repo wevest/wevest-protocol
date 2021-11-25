@@ -141,19 +141,19 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
         });
 
         it("check UserA reserve data after borrowing", async() => {
-            const { protocolDataProvider, aave, userA } = testEnv;
+            const { protocolDataProvider, usdc, userA } = testEnv;
             const [
-                currentWvAaveBal, 
+                currentWvUsdcBal, 
                 currentDebt, 
                 principleDebt, 
                 liquidityRate, 
                 usageAsCollateralEnabled
             ] = await protocolDataProvider.getUserReserveData(
-                aave.address, 
+                usdc.address, 
                 await userA.getAddress()
             );
-            console.log("UserA wvAAVE balance: ", currentWvAaveBal.toString());
-            console.log("UserA debtAAVE balance: ", currentDebt.toString());
+            console.log("UserA wvUSDC balance: ", currentWvUsdcBal.toString());
+            console.log("UserA debtUSDC balance: ", currentDebt.toString());
         });
     });
 
