@@ -272,10 +272,9 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     );
     console.log("swappedAmount %s", swappedAmount);
 
-    IERC20(collateralAsset).approve(yfpool, swappedAmount);
     if (swappedAmount >= userDebt) { // price up
-      IERC20(collateralAsset).transferFrom(
-        yfpool,
+      IYieldFarmingPool(yfpool).transferUnderlying(
+        collateralAsset,
         collateralReserve.wvTokenAddress, 
         userDebt
       );
@@ -287,8 +286,8 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         swappedAmount - userDebt
       );
     } else { // price down
-      IERC20(collateralAsset).transferFrom(
-        yfpool,
+      IYieldFarmingPool(yfpool).transferUnderlying(
+        collateralAsset,
         collateralReserve.wvTokenAddress, 
         swappedAmount
       );

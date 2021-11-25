@@ -115,4 +115,15 @@ contract YieldFarmingPool is VersionedInitializable {
             address(this)
         );
     }
+
+    function transferUnderlying(
+        address _asset,
+        address _to,
+        uint256 _amount
+    ) external {
+        IERC20(_asset).approve(_to, _amount);
+        IERC20(_asset).transfer(
+            _to, _amount
+        );
+    }
 }

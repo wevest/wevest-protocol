@@ -23,4 +23,10 @@ interface IYieldFarmingPool {
         address _tokenOut,
         uint _amountIn
     ) external returns(uint);
+
+    function transferUnderlying(
+        address _asset,
+        address _to,
+        uint256 _amount
+    ) external;
 }
