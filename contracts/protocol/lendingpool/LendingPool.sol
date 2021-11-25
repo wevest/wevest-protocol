@@ -795,31 +795,29 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     require(poolBalance >= userCollateralBalance.mul(vars.leverageRatioMode), 
       "Lending Pool does not have enough balance");
-
-    IWvToken(collateralReserve.wvTokenAddress).swap(
-      vars.assetToBorrow,
-      userCollateralBalance.mul(vars.leverageRatioMode)
-    );
-
-    uint256 swappedAmount = IERC20(vars.assetToBorrow).balanceOf(collateralReserve.wvTokenAddress);
-    console.log("swappedAmount %s", swappedAmount);
-
-    // transfer swapped amount to YF pool
+    uint256 leverageAmount = userCollateralBalance.mul(vars.leverageRatioMode);
+    console.log("LeverageAmount %s", leverageAmount);
+    // transfer from reserve pool to YF pool
     address yfpool = _addressesProvider.getYieldFarmingPool();
-    IERC20(vars.assetToBorrow).transferFrom(
-      collateralReserve.wvTokenAddress,
+
+    IWvToken(collateralReserve.wvTokenAddress).transferUnderlyingTo(
       yfpool, 
-      swappedAmount
+      leverageAmount
     );
 
+    IYieldFarmingPool(yfpool).swap(
+        vars.collateralAsset,
+        vars.assetToBorrow,
+        leverageAmount
+    );
     // reserve.updateState();
 
     bool isFirstBorrowing = false;
 
     // issue debt token with leverage amount
-    isFirstBorrowing = IDebtToken(reserve.debtTokenAddress).mint(
+    isFirstBorrowing = IDebtToken(collateralReserve.debtTokenAddress).mint(
       vars.user,
-      swappedAmount
+      leverageAmount
     );
 
     if (isFirstBorrowing) {

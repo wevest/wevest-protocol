@@ -7,7 +7,6 @@ chai.use(solidity);
 const { expect } = chai;
 
 makeSuite('Token Swap', (testEnv: TestEnv) => {
-    let tokenSwap: any;
     let erc20: any;
     const whaleAddress = "0xb55167e8c781816508988A75cB15B66173C69509";
     before(async () => {
@@ -25,7 +24,7 @@ makeSuite('Token Swap', (testEnv: TestEnv) => {
     });
 
     /* it("swap USDC into AAVE", async () => {
-        const { lendingPool, tokenSwap } =  testEnv;
+        const { tokenSwap } =  testEnv;
         const USDC = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
         const AAVE = "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9";
         const AMOUNT_OUT_MIN = 1;

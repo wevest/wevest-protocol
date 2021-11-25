@@ -103,9 +103,4 @@ interface IWvToken is IERC20, IScaledBalanceToken, IInitializableWvToken {
    * @dev Returns the address of the underlying asset of this wvToken (E.g. WETH for wvWETH)
    **/
   function UNDERLYING_ASSET_ADDRESS() external view returns (address);
-
-  function swap(
-    address _tokenOut,
-    uint _amountIn
-  ) external;
 }

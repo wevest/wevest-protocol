@@ -7,7 +7,8 @@ import {
     WvToken__factory,
     MintableERC20__factory,
     YieldFarmingPool__factory,
-    PriceOracle__factory
+    PriceOracle__factory,
+    TokenSwap__factory
 } from '../../types';
 import { 
     MOCK_CHAINLINK_AGGREGATORS_PRICES, 
@@ -121,6 +122,22 @@ export async function initialize() {
     );
     console.log("LendingPoolConfigurator deployed to:", testEnv.lendingPoolConfigurator.address);
     
+    const tokenSwapFactory = await ethers.getContractFactory(
+        "TokenSwap",
+        testEnv.deployer
+    );
+
+    const tokenSwap = await tokenSwapFactory.deploy();
+    await tokenSwap.deployed();
+
+    // update implementation as proxy contract
+    await testEnv.lendingPoolAddressesProvider.setTokenSwapImpl(tokenSwap.address);
+    const tokenSwapAddress = await testEnv.lendingPoolAddressesProvider.getTokenSwap();
+
+    // get LendingPoolProxy contract
+    testEnv.tokenSwap = await TokenSwap__factory.connect(tokenSwapAddress, testEnv.deployer);
+    console.log("TokenSwap deployed to:", testEnv.tokenSwap.address);
+
     const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
     testEnv.usdc = await ethers.getContractAt(
         "IUSDC",
@@ -282,14 +299,6 @@ export async function initialize() {
     testEnv.yieldFarmingPool = await YieldFarmingPool__factory.connect(yieldFarmingPoolAddress, testEnv.deployer);
 
     console.log("YieldFarmingPool deployed to:", testEnv.yieldFarmingPool.address);
-
-    const tokenSwapFactory = await ethers.getContractFactory(
-        "TokenSwap",
-        testEnv.deployer
-    );
-
-    testEnv.tokenSwap = await tokenSwapFactory.deploy(testEnv.lendingPool.address);
-    await testEnv.tokenSwap.deployed();
 
     // setup price oracle
     const priceOracle =  await ethers.getContractFactory("PriceOracle");

@@ -38,10 +38,6 @@ interface ILendingPoolAddressesProvider {
 
   function setLendingPoolConfiguratorImpl(address configurator) external;
 
-  function getYieldFarmingPool() external view returns (address);
-
-  function setYieldFarmingPoolImpl(address yfpool) external;
-
   function getLendingPoolCollateralManager() external view returns (address);
 
   function setLendingPoolCollateralManager(address manager) external;
@@ -61,4 +57,13 @@ interface ILendingPoolAddressesProvider {
   function getLendingRateOracle() external view returns (address);
 
   function setLendingRateOracle(address lendingRateOracle) external;
+
+  /** added by SC */
+  function getYieldFarmingPool() external view returns (address);
+
+  function setYieldFarmingPoolImpl(address yfpool) external;
+
+  function getTokenSwap() external view returns (address);
+
+  function setTokenSwapImpl(address tokenSwap) external;
 }

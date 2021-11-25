@@ -74,7 +74,7 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
         });
     });
     
-    /* describe("Withdraw", async () => {
+    describe("Withdraw", async () => {
         it("UserA withdraws 50 wvUSDC balance", async() => {
             const { lendingPool, yieldFarmingPool, userA, usdcYVault, wvUsdc, usdc } = testEnv;
             // calculate interest for deposit
@@ -118,21 +118,21 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
             const reserveUsdcBalance = await usdc.balanceOf(wvUsdc.address);
             console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
         });
-    }); */
+    });
 
     describe("Borrow", async () => {
         it("UserA deposit 100 USDC as collateral, and want to borrow AAVE with 3x leverage", async() => {
-            const { lendingPool, userA, usdc, wvUsdc, aave } = testEnv;
-            
+            const { lendingPool, userA, usdc, wvUsdc, aave, deployer } = testEnv;
+            // First deposit enough pool balance to test borrow function
             await usdc
                 .connect(whaleSigner)
-                .transfer(wvUsdc.address, ethers.utils.parseUnits("1000", 6));
+                .approve(lendingPool.address, APPROVAL_AMOUNT_LENDING_POOL);
 
-            // userA deposit 100 USDC as collateral
-            /* await lendingPool
-                .connect(userA)
-                .deposit(usdc.address, amountToDeposit);
-            */
+            await lendingPool
+                .connect(whaleSigner)
+                .deposit(usdc.address, ethers.utils.parseUnits("1000", 6));
+            
+            // call borrow function
             await lendingPool
                 .connect(userA)
                 .borrow(usdc.address, amountToDeposit, aave.address, 3);

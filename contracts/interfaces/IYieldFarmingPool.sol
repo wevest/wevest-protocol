@@ -15,4 +15,10 @@ interface IYieldFarmingPool {
         address user,
         address wvToken
     ) external view returns(uint256);
+
+    function swap(
+        address _tokenIn,
+        address _tokenOut,
+        uint _amountIn
+    ) external;
 }
