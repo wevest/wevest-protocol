@@ -36,15 +36,6 @@ interface ILendingPool {
    * @param user The address of the user initiating the borrow(), receiving the funds on borrow()
    * param amount The amount borrowed out
    **/
-  /* event Borrow(
-    address indexed reserve,
-    address user,
-    address indexed onBehalfOf,
-    uint256 amount,
-    uint256 borrowRateMode,
-    uint256 borrowRate,
-    uint16 indexed referral
-  ); */
 
   event Borrow(
     address indexed reserve,
@@ -55,15 +46,8 @@ interface ILendingPool {
    * @dev Emitted on repay()
    * @param reserve The address of the underlying asset of the reserve
    * @param user The beneficiary of the repayment, getting his debt reduced
-   * // param repayer The address of the user initiating the repay(), providing the funds
    * @param amount The amount repaid
    **/
-  /* event Repay(
-    address indexed reserve,
-    address indexed user,
-    address indexed repayer,
-    uint256 amount
-  ); */
 
   event Repay(
     address indexed reserve,

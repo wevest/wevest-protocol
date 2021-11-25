@@ -61,7 +61,7 @@ interface ILendingPoolAddressesProvider {
   /** added by SC */
   function getYieldFarmingPool() external view returns (address);
 
-  function setYieldFarmingPoolImpl(address yfpool) external;
+  function setYieldFarmingPoolImpl(address yieldFarming) external;
 
   function getTokenSwap() external view returns (address);
 
