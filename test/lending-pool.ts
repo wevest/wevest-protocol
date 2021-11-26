@@ -1,7 +1,9 @@
 import chai from 'chai';
-import { TestEnv, makeSuite, unlockAccount } from './helpers/make-suite';
 import { ethers } from "hardhat";
 import { solidity } from "ethereum-waffle";
+
+import { TestEnv, makeSuite } from './helpers/make-suite';
+import { unlockAccount } from './helpers/utils';
 
 chai.use(solidity);
 const { expect } = chai;

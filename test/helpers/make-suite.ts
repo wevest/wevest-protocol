@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
 import { Signer, BigNumberish } from "ethers";
-import hre from "hardhat";
 import {
     LendingPool__factory,
     LendingPoolConfigurator__factory,
@@ -10,11 +9,21 @@ import {
     PriceOracle__factory,
     TokenSwap__factory
 } from '../../types';
+
 import { 
     MOCK_CHAINLINK_AGGREGATORS_PRICES, 
     PROTOCOL_GLOBAL_PARAMS,
     oneEther 
 } from "./constants";
+
+import {
+    deployLendingPoolAddressesProvider,
+    deployLendingPool
+} from './contracts-deployments';
+
+import {
+    getLendingPool
+} from './contracts-getters';
 
 export interface TestEnv {
     deployer: Signer;
@@ -54,58 +63,29 @@ const testEnv: TestEnv = {
     interestRateStrategy: {} as any
 }
 
-export const unlockAccount = async (address: string) => {
-    await hre.network.provider.send("hardhat_impersonateAccount", [address]);
-    return address;
-};
-
 export async function initialize() {
     const signers = await ethers.getSigners();
     testEnv.signers = signers;
-    testEnv.deployer = signers[0];
-    testEnv.userA = signers[1];
+    const poolAdmin = signers[0];
+    const emergencyAdmin = signers[1];
+    
+    testEnv.deployer = poolAdmin;
+    testEnv.userA = signers[2];
+    
+    /* deploy LendingPoolAddressesProvider */
+    testEnv.lendingPoolAddressesProvider = await deployLendingPoolAddressesProvider()
+    console.log("LendingPoolAddressesProvider: ", testEnv.lendingPoolAddressesProvider.address);
 
-    const LendingPoolAddressesProvider = await ethers.getContractFactory("LendingPoolAddressesProvider");
-    testEnv.lendingPoolAddressesProvider = await LendingPoolAddressesProvider.deploy("Main Market");
-    await testEnv.lendingPoolAddressesProvider.deployed();
-    console.log("LendingPoolAddressesProvider deployed to:", testEnv.lendingPoolAddressesProvider.address);
+    await testEnv.lendingPoolAddressesProvider.setPoolAdmin(await poolAdmin.getAddress());
+    await testEnv.lendingPoolAddressesProvider.setEmergencyAdmin(await emergencyAdmin.getAddress());
 
-    await testEnv.lendingPoolAddressesProvider.setPoolAdmin(await testEnv.deployer.getAddress());
-    await testEnv.lendingPoolAddressesProvider.setEmergencyAdmin(await signers[1].getAddress());
-
-    // deploy logic libraries used by Lending Pool
-    const reserveLogicLibFactory = await ethers.getContractFactory("ReserveLogic");
-    const reserveLogicLibContract = await reserveLogicLibFactory.deploy();
-    await reserveLogicLibContract.deployed();
-
-    const genericLogicLibFactory = await ethers.getContractFactory("GenericLogic");
-    const genericLogicLibContract = await genericLogicLibFactory.deploy();
-    await genericLogicLibContract.deployed();
-
-    const validationLogicLibFactory = await ethers.getContractFactory("ValidationLogic", {
-        libraries: {
-            GenericLogic: genericLogicLibContract.address
-        }
-    });
-    const validationLogicLibContract = await validationLogicLibFactory.deploy();
-    await validationLogicLibContract.deployed();
-
-    // LendingPool contract
-    const LendingPool = await ethers.getContractFactory("LendingPool", {
-        libraries: {
-            ReserveLogic: reserveLogicLibContract.address,
-            ValidationLogic: validationLogicLibContract.address
-        },
-    });
-    const lendingPool = await LendingPool.deploy();
-    await lendingPool.deployed();
-
+    /* deploy LendingPool */
+    const lendingPoolImpl = await deployLendingPool();
     // update implementation as proxy contract
-    await testEnv.lendingPoolAddressesProvider.setLendingPoolImpl(lendingPool.address);
+    await testEnv.lendingPoolAddressesProvider.setLendingPoolImpl(lendingPoolImpl.address);
     const lendingPoolAddress = await testEnv.lendingPoolAddressesProvider.getLendingPool();
-
     // get LendingPoolProxy contract
-    testEnv.lendingPool = await LendingPool__factory.connect(lendingPoolAddress, testEnv.deployer);
+    testEnv.lendingPool = await getLendingPool(lendingPoolAddress, testEnv.deployer);
     console.log("LendingPool deployed to:", testEnv.lendingPool.address);
 
     const LendingPoolConfigurator = await ethers.getContractFactory("LendingPoolConfigurator");
