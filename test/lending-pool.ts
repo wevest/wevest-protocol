@@ -79,48 +79,28 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
     });
     
     describe("Withdraw", async () => {
-        it("UserA withdraws 50 wvUSDC balance", async() => {
-            const { lendingPool, yieldFarmingPool, userA, usdcYVault, wvUsdc, usdc } = testEnv;
-            // calculate interest for deposit
-            const interest = await yieldFarmingPool
-                .connect(userA)
-                .lenderInterest(
-                    usdcYVault.address, 
-                    usdc.address, 
-                    await userA.getAddress(), 
-                    wvUsdc.address
-                );
+        it("UserA withdraws 100 wvUSDC", async() => {
+            const { lendingPool, userA, wvUsdc, usdc } = testEnv;
 
-            console.log("userA interest", interest.toString());
+            const requestWithdraw = await convertToCurrencyDecimals(usdc.address, "100");
+            const prevPoolBalance = await wvUsdc.totalSupply();
+            console.log("USDC Pool prev balance", prevPoolBalance.toString());
 
-            const amountToWithdraw = ethers.utils.parseUnits("50", 6);
-            const totalWithdraw = parseInt(amountToWithdraw.toString()) + parseInt(interest.toString());
-            console.log("total Withdraw: ", totalWithdraw.toString());
-            
-            const reserveUsdcBalance = await usdc.balanceOf(wvUsdc.address);
-            console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
+            const prevUsdcBalance = await usdc.balanceOf(await userA.getAddress());
+            console.log("UserA USDC prev balance: ", prevUsdcBalance.toString());
 
             await lendingPool
                 .connect(userA)
-                .withdraw(usdc.address, amountToWithdraw);
-        });
+                .withdraw(usdc.address, requestWithdraw);
 
-        it("UserA's wvUSDC balance after withdraw action", async() => {
-            const { usdc, userA, wvUsdc } = testEnv;
-            const usdcBalance = await usdc.balanceOf(await userA.getAddress());
-            console.log("UserA USDC balance: ", usdcBalance.toString());
+            const updatedPoolBalance = await wvUsdc.totalSupply();
+            console.log("USDC Pool updated balance", updatedPoolBalance.toString());
+
+            const updatedUsdcBalance = await usdc.balanceOf(await userA.getAddress());
+            console.log("UserA USDC updated balance: ", updatedUsdcBalance.toString());
 
             const wvUsdcBalance = await wvUsdc.balanceOf(await userA.getAddress());
-            console.log("UserA wvUSDC balance: ", wvUsdcBalance.toString());
-            // expect(wvUsdcBalance.toString()).to.be.equal(
-            //    '0', "Invalid wvUSDC amount"
-            // );
-        });
-
-        it("USDC pool balance after withdraw action", async() => {
-            const { usdc, userA, wvUsdc } = testEnv;
-            const reserveUsdcBalance = await usdc.balanceOf(wvUsdc.address);
-            console.log("USDC pool current balance: ", reserveUsdcBalance.toString());
+            console.log("UserA wvUSDC updated balance: ", wvUsdcBalance.toString());
         });
     });
 
@@ -134,21 +114,20 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
 
             await lendingPool
                 .connect(whaleSigner)
-                .deposit(usdc.address, ethers.utils.parseUnits("1000", 6));
+                .deposit(usdc.address, await convertToCurrencyDecimals(usdc.address, "1000"));
             
             // call borrow function
             await lendingPool
                 .connect(userA)
-                .borrow(usdc.address, ethers.utils.parseUnits("100", 6), aave.address, 3);
-        });
+                .borrow(usdc.address, await convertToCurrencyDecimals(usdc.address, "100"), aave.address, 3);
 
-        it("check UserA reserve data after borrowing", async() => {
-            const { protocolDataProvider, usdc, userA } = testEnv;
-            const [
+            const { protocolDataProvider } = testEnv;
+
+            // get userA wvUSDC, debtUSDC balance
+            const [ 
                 currentWvUsdcBal, 
-                currentDebt, 
-                principleDebt, 
-                liquidityRate, 
+                currentDebt,
+                principalDebt,
                 usageAsCollateralEnabled
             ] = await protocolDataProvider.getUserReserveData(
                 usdc.address, 
@@ -160,23 +139,21 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
     });
 
     describe("YF Pool transfer request", async () => {
-        it("Check current balance of selected asset", async () => {
-            const { yieldFarmingPool, aave } =  testEnv;
+        it("Send total balance of selected asset to Yearn Finance", async () => {
+            const { yieldFarmingPool, aave, userA, aaveYVault } =  testEnv;
+            // check balance of selected asset
             aaveBalance = await aave.balanceOf(yieldFarmingPool.address);
             console.log("AAVE balance", aaveBalance.toString());
-        });
 
-        it("Send selected asset to Yearn Finance protocol", async () => {
-            const { yieldFarmingPool, aave, aaveYVault, userA } =  testEnv;
+            // Send selected asset to Yearn Finance protocol
             await yieldFarmingPool
                 .connect(userA)
                 .deposit(aaveYVault.address, aave.address, aaveBalance);
-        });
 
-        it("Check current balance of underlying asset and yVault token after transfer", async () => {
-            const { yieldFarmingPool, aave, aaveYVault } =  testEnv;
+            // Check current balance of underlying asset and yVault token after transfer
             const afterBalance = await aave.balanceOf(yieldFarmingPool.address);
             console.log("AAVE balance after transfer", afterBalance.toString());
+
             const YvTokenBalance = await aaveYVault.balanceOf(yieldFarmingPool.address);
             console.log("yvAAVE balance after transfer", YvTokenBalance.toString());
         });

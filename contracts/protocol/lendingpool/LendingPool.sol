@@ -147,33 +147,37 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       _reservesCount,
       _addressesProvider.getPriceOracle()
     );
+
     /* added by SC */
     address yfpool = _addressesProvider.getYieldFarmingPool();
-    // calcuate interest
+    // calcuate interest for deposit
     require (reserve.vaultTokenAddress != address(0), "Unsupported assets for vaults");
-    uint256 userInterest = 
-        IYieldFarmingPool(yfpool).lenderInterest(
-          reserve.vaultTokenAddress, 
-          asset,
-          msg.sender,
-          wvToken
-        );
-    // check current balance of pool
-    uint256 underlyingAssetBalance = IERC20(asset).balanceOf(wvToken);
+    uint256 userInterest = IYieldFarmingPool(yfpool).lenderInterest(
+      reserve.vaultTokenAddress, 
+      asset,
+      msg.sender,
+      wvToken
+    );
+    console.log("userA interest %s", userInterest);
+    // total withdraw = request withdraw + user interest
+    amountToWithdraw += userInterest;
+    console.log("total withdraw %s", amountToWithdraw);
+    // check current lending pool balance
+    uint256 lendingPoolBalance = IWvToken(wvToken).totalSupply();
+
     uint256 yfPoolBalance = IERC20(asset).balanceOf(yfpool);
     // if not enough balance, transfer required asset from yf pool
-    // total withdraw =  request withdraw + user interest
-    amountToWithdraw += userInterest;
     uint256 extraAmount = 0;
-    if (underlyingAssetBalance < amountToWithdraw) {
-      extraAmount = amountToWithdraw.sub(underlyingAssetBalance);
+    if (lendingPoolBalance < amountToWithdraw) {
+      extraAmount = amountToWithdraw.sub(lendingPoolBalance);
+      if (yfPoolBalance < extraAmount) {
+        yfPoolBalance = IYieldFarmingPool(yfpool).withdraw(
+          reserve.vaultTokenAddress, type(uint256).max, asset
+        );
+      }
       require(yfPoolBalance >= extraAmount, "Currently, YF pool doesnt have enough balance");
-      IERC20(asset).approve(yfpool, yfPoolBalance);
-      // IERC20(asset).transferFrom(yfpool, wvToken, extraAmount);
+      IYieldFarmingPool(yfpool).transferUnderlying(asset, wvToken, extraAmount);
     }
-
-    /** */
-    // reserve.updateState();
 
     reserve.updateInterestRates(asset, wvToken, 0, amountToWithdraw);
 
@@ -181,7 +185,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       _usersConfig[msg.sender].setUsingAsCollateral(reserve.id, false);
       emit ReserveUsedAsCollateralDisabled(asset, msg.sender);
     }
-    
+    // burns wvToken and transfer underlying asset to user wallet
     IWvToken(wvToken).burn(msg.sender, amountToWithdraw);
 
     emit Withdraw(asset, msg.sender, amountToWithdraw);
@@ -754,20 +758,24 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     require(poolBalance >= userCollateralBalance.mul(vars.leverageRatioMode), 
       "Lending Pool does not have enough balance");
-    uint256 leverageAmount = userCollateralBalance.mul(vars.leverageRatioMode);
-    console.log("LeverageAmount %s", leverageAmount);
+
+    uint256 borrowAmount = userCollateralBalance
+      .mul(vars.leverageRatioMode)
+      .sub(userCollateralBalance);
+    console.log("Borrow amount from lending pool %s", borrowAmount);
+
     // transfer from reserve pool to YF pool
     address yfpool = _addressesProvider.getYieldFarmingPool();
 
     IWvToken(collateralReserve.wvTokenAddress).transferUnderlyingTo(
       yfpool, 
-      leverageAmount
+      borrowAmount
     );
 
     uint256 swappedAmount = IYieldFarmingPool(yfpool).swap(
         vars.collateralAsset,
         vars.assetToBorrow,
-        leverageAmount
+        borrowAmount
     );
     console.log("swappedAmount %s", swappedAmount);
     // reserve.updateState();
@@ -777,7 +785,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     // issue debt token with leverage amount
     isFirstBorrowing = IDebtToken(collateralReserve.debtTokenAddress).mint(
       vars.user,
-      leverageAmount
+      borrowAmount
     );
 
     if (isFirstBorrowing) {
