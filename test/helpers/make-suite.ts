@@ -131,14 +131,14 @@ export async function initialize() {
 
     const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
     testEnv.usdc = await ethers.getContractAt(
-        "IUSDC",
+        "IERC20Detailed",
         USDC
     );
     console.log("USDC deployed to:", testEnv.usdc.address);
     
     const AAVE = "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9";
     testEnv.aave = await ethers.getContractAt(
-        "IAAVE",
+        "IERC20Detailed",
         AAVE
     );
     console.log("AAVE deployed to:", testEnv.aave.address);
@@ -291,6 +291,7 @@ export async function initialize() {
 
     /** deploy PriceOracle */
     const fallbackOracle = await deployPriceOracle();
+    await testEnv.addressesProvider.setPriceOracle(fallbackOracle.address);
     await fallbackOracle.setEthUsdPrice(PROTOCOL_GLOBAL_PARAMS.MockUsdPriceInWei);
     // set initial asset price
     await fallbackOracle.setAssetPrice(testEnv.usdc.address, MOCK_CHAINLINK_AGGREGATORS_PRICES.USDC);
@@ -323,7 +324,6 @@ export async function initialize() {
     );
     await wevestOracle.deployed();
 
-    await testEnv.addressesProvider.setPriceOracle(fallbackOracle.address);
     // enabled borrowing
     await testEnv.lendingPoolConfigurator
         .connect(testEnv.deployer)

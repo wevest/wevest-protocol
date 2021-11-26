@@ -95,9 +95,6 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     address wvToken = reserve.wvTokenAddress;
 
-    // reserve.updateState();
-    // reserve.updateInterestRates(asset, wvToken, amount, 0);
-
     IERC20(asset).safeTransferFrom(msg.sender, wvToken, amount);
 
     bool isFirstDeposit = IWvToken(wvToken).mint(

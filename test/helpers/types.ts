@@ -28,6 +28,7 @@ export enum ContractId {
     LendingPoolImpl = 'LendingPoolImpl',
     LendingPoolConfiguratorImpl = 'LendingPoolConfiguratorImpl',
     LendingPoolCollateralManagerImpl = 'LendingPoolCollateralManagerImpl',
+    IERC20Detailed = 'IERC20Detailed'
 }
 
 export enum TokenContractId {
@@ -61,9 +62,30 @@ export enum LeverageRatioMode {
     THREE = 3 // 3x
 }
 
-export interface IBaseConfiguration {
+export interface SymbolMap<T> {
+    [symbol: string]: T;
+}
+
+export type iParamsPerNetwork<T> = 
+ | iEthereumParamsPerNetwork<T> 
+ | iPolygonParamsPerNetwork<T>
+
+export interface iEthereumParamsPerNetwork<T> {
+    [eEthereumNetwork.main]: T;
+    [eEthereumNetwork.kovan]: T;
+    [eEthereumNetwork.ropsten]: T;
+    [eEthereumNetwork.hardhat]: T;
+}
+
+export interface iPolygonParamsPerNetwork<T> {
+    [ePolygonNetwork.matic]: T;
+    [ePolygonNetwork.mumbai]: T;
+}
+
+export interface IMarketConfiguration {
     MarketId: string;
     ProviderId: number;
+    ReserveAssets: iParamsPerNetwork<SymbolMap<string>>;
 }
 
 export enum ConfigNames {
