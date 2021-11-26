@@ -142,7 +142,8 @@ contract WevestProtocolDataProvider {
     view
     returns (
       address wvTokenAddress,
-      address debtTokenAddress
+      address debtTokenAddress,
+      address vaultTokenAddress
     )
   {
     DataTypes.ReserveData memory reserve =
@@ -150,7 +151,8 @@ contract WevestProtocolDataProvider {
 
     return (
       reserve.wvTokenAddress,
-      reserve.debtTokenAddress
+      reserve.debtTokenAddress,
+      reserve.vaultTokenAddress
     );
   }
 }

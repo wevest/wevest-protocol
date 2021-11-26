@@ -5,10 +5,17 @@ import { ContractId } from "./types";
 import { EthereumConfig } from "../markets/ethereum";
 
 export const deployLendingPoolAddressesProvider = async (): Promise<Contract> => {
-    const lendingPoolAddressesProvider = await (
+    const addressesProvider = await (
         await ethers.getContractFactory(ContractId.LendingPoolAddressesProvider)
     ).deploy(EthereumConfig.MarketId);
-    return await lendingPoolAddressesProvider.deployed();
+    return await addressesProvider.deployed();
+}
+
+export const deployLendingPoolAddressesProviderRegistry = async (): Promise<Contract> => {
+    const lendingPoolAddressesProviderRegistry = await (
+        await ethers.getContractFactory(ContractId.LendingPoolAddressesProviderRegistry)
+    ).deploy();
+    return await lendingPoolAddressesProviderRegistry.deployed();
 }
 
 export const deployReserveLogic = async (): Promise<Contract> => {
@@ -51,4 +58,25 @@ export const deployLendingPool = async (): Promise<Contract> => {
     ).deploy();
 
     return await lendingPoolImpl.deployed();
+}
+
+export const deployLendingPoolConfigurator = async (): Promise<Contract> => {
+    const lendingPoolConfiguratorImpl = await (
+        await ethers.getContractFactory(ContractId.LendingPoolConfigurator)
+    ).deploy();
+    return await lendingPoolConfiguratorImpl.deployed();
+}
+
+export const deployPriceOracle = async (): Promise<Contract> => {
+    const priceOracle = await (
+        await ethers.getContractFactory(ContractId.PriceOracle)
+    ).deploy();
+    return await priceOracle.deployed();
+}
+
+export const deployProtocolDataProvider = async (addressesProvider: string): Promise<Contract> => {
+    const protocolDataProvider = await (
+        await ethers.getContractFactory(ContractId.WevestProtocolDataProvider)
+    ).deploy(addressesProvider);
+    return await protocolDataProvider.deployed();
 }
