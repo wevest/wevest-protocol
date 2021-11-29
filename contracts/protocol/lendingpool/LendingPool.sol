@@ -97,15 +97,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     IERC20(asset).safeTransferFrom(msg.sender, wvToken, amount);
 
-    bool isFirstDeposit = IWvToken(wvToken).mint(
-      msg.sender, 
-      amount
-    );
-    
-    if (isFirstDeposit) {
-      _usersConfig[msg.sender].setUsingAsCollateral(reserve.id, true);
-      emit ReserveUsedAsCollateralEnabled(asset, msg.sender);
-    }
+    IWvToken(wvToken).mint(msg.sender, amount);
 
     emit Deposit(asset, msg.sender, amount);
   }
@@ -717,13 +709,17 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
   }
 
   function _executeBorrow(ExecuteBorrowParams memory vars) internal {
+    DataTypes.ReserveData storage reserve = _reserves[vars.assetToBorrow];
+    DataTypes.UserConfigurationMap storage userConfig = _usersConfig[vars.user];
+
+    DataTypes.ReserveData storage collateralReserve = _reserves[vars.collateralAsset];
+    
     // deposit collateral asset
     if (vars.collateralAmount > 0) {
       deposit(vars.collateralAsset, vars.collateralAmount);
+      _usersConfig[vars.user].setUsingAsCollateral(collateralReserve.id, true);
+      emit ReserveUsedAsCollateralEnabled(vars.collateralAsset, vars.user);
     }
-
-    DataTypes.ReserveData storage reserve = _reserves[vars.assetToBorrow];
-    DataTypes.UserConfigurationMap storage userConfig = _usersConfig[vars.user];
 
     address oracle = _addressesProvider.getPriceOracle();
     
@@ -740,7 +736,6 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       oracle
     );
 
-    DataTypes.ReserveData storage collateralReserve = _reserves[vars.collateralAsset];
     // check user total collateral & pool balance
     uint256 userCollateralBalance;
     uint256 poolBalance;
