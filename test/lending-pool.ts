@@ -154,17 +154,26 @@ makeSuite('Lending Pool', (testEnv: TestEnv) => {
             const afterBalance = await aave.balanceOf(yieldFarmingPool.address);
             console.log("AAVE balance after transfer", afterBalance.toString());
 
-            const YvTokenBalance = await aaveYVault.balanceOf(yieldFarmingPool.address);
-            console.log("yvAAVE balance after transfer", YvTokenBalance.toString());
+            const vaultTokenBalance = await yieldFarmingPool.currentBalance(aaveYVault.address);
+            console.log("vault balance after transfer", vaultTokenBalance.toString());
+
+            /* expect(vaultTokenBalance.toString()).to.be.equal(
+                aaveBalance.toString(),
+                "Invalid yVault balance"
+            ); */
         });
     });
 
     describe("Redeem", async () => {
-        it("UserA redeem loan", async() => {
+        it("UserA redeem 100 debtUSDC loan", async() => {
             const { lendingPool, userA, usdc, aave } = testEnv;
             await lendingPool
                 .connect(userA)
-                .redeem(aave.address, usdc.address);
+                .redeem(
+                    aave.address, 
+                    usdc.address, 
+                    await convertToCurrencyDecimals(usdc.address, "100")
+                );
         });
     });
 });

@@ -171,7 +171,8 @@ interface ILendingPool {
 
   function redeem(
     address assetBorrowed,
-    address collateralAsset
+    address collateralAsset,
+    uint256 amount
   ) external;
 
   /**

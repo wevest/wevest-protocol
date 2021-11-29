@@ -241,12 +241,15 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
   function redeem(
     address assetBorrowed,
-    address collateralAsset
+    address collateralAsset,
+    uint256 amount
   ) external override whenNotPaused {
     DataTypes.ReserveData storage reserve = _reserves[assetBorrowed];
     DataTypes.ReserveData storage collateralReserve = _reserves[collateralAsset];
     uint256 userDebt = Helpers.getUserCurrentDebt(msg.sender, collateralReserve);
     console.log("userDebt %s", userDebt);
+
+    ValidationLogic.validateRedeem(collateralReserve, amount, userDebt);
 
     address yfpool = _addressesProvider.getYieldFarmingPool();
     uint withdrawAmount = IYieldFarmingPool(yfpool).withdraw(
@@ -263,18 +266,18 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     );
     console.log("swappedAmount %s", swappedAmount);
 
-    if (swappedAmount >= userDebt) { // price up
+    if (swappedAmount >= amount) { // price up
       IYieldFarmingPool(yfpool).transferUnderlying(
         collateralAsset,
         collateralReserve.wvTokenAddress, 
-        userDebt
+        amount
       );
 
       // transfer the rest amount including interest to borrower account
-      IERC20(collateralAsset).transferFrom(
-        yfpool,
+      IYieldFarmingPool(yfpool).transferUnderlying(
+        collateralAsset,
         msg.sender,
-        swappedAmount - userDebt
+        swappedAmount - amount
       );
     } else { // price down
       IYieldFarmingPool(yfpool).transferUnderlying(
@@ -288,7 +291,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       (userCollateralBalance, ) = 
         IWvToken(collateralReserve.wvTokenAddress).getUserBalanceAndSupply(msg.sender);
       // transfer borrower account
-      uint receiveAmount = userCollateralBalance - (userDebt - swappedAmount);
+      uint receiveAmount = userCollateralBalance - (amount - swappedAmount);
       IWvToken(collateralReserve.wvTokenAddress).transferUnderlyingTo(
         msg.sender, 
         receiveAmount
@@ -296,7 +299,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
     }
 
     // burns the debt token
-    IDebtToken(collateralReserve.debtTokenAddress).burn(msg.sender, userDebt);
+    IDebtToken(collateralReserve.debtTokenAddress).burn(msg.sender, amount);
   }
 
   /**
@@ -736,13 +739,11 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       oracle
     );
 
-    // check user total collateral & pool balance
-    uint256 userCollateralBalance;
+    // check user pool balance
     uint256 poolBalance;
-    (userCollateralBalance, poolBalance) = 
+    (, poolBalance) = 
       IWvToken(collateralReserve.wvTokenAddress).getUserBalanceAndSupply(vars.user);
 
-    console.log("userCollateralBalance %s", userCollateralBalance);
     console.log("poolBalance %s", poolBalance);
 
     /* uint256 poolBalanceInETH = 
@@ -751,12 +752,13 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
       .div(10**reserve.configuration.getDecimals());
     console.log("poolBalanceETH %s", poolBalanceInETH); */
 
-    require(poolBalance >= userCollateralBalance.mul(vars.leverageRatioMode), 
+    require(poolBalance >= vars.collateralAmount.mul(vars.leverageRatioMode), 
       "Lending Pool does not have enough balance");
 
-    uint256 borrowAmount = userCollateralBalance
+    uint256 borrowAmount = vars.collateralAmount
       .mul(vars.leverageRatioMode)
-      .sub(userCollateralBalance);
+      .sub(vars.collateralAmount);
+      
     console.log("Borrow amount from lending pool %s", borrowAmount);
 
     // transfer from reserve pool to YF pool
